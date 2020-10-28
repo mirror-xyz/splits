@@ -68,7 +68,7 @@ contract MirrorOnboardingToken is IERC20 {
     }
 
     /**
-     * @dev Register an ENS subname to an address
+     * @notice Register an ENS subname to an address
      * @param _account The _account address.
      * @param _label ENS label of the new wallet (e.g. denis).
      */
