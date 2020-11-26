@@ -37,8 +37,9 @@ interface IENSManager {
     * Registers both the forward and reverse ENS.
     * @param _label The subdomain label.
     * @param _owner The owner of the subdomain.
+    * @param _spender The spender funding the registration.
     */
-    function register(string calldata _label, address _owner) external;
+    function register(string calldata _label, address _owner, address _spender) external;
 
     /**
      * @notice Returns true is a given subnode is available.

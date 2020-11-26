@@ -1,6 +1,8 @@
 const { assert } = require('chai')
 const namehash = require('eth-ens-namehash')
 
+const BigNumber = ethers.BigNumber
+
 describe('MirrorInviteToken', function() {
   it('should', async function() {
     const MirrorInviteToken = await ethers.getContractFactory('MirrorInviteToken')
@@ -15,10 +17,25 @@ describe('MirrorInviteToken', function() {
   })
 })
 
+describe('Integration test', function() {
+  it('should', async function() {
+    const [owner, user1, user2] = await ethers.getSigners()
+    const [argentENSResolver, ensRegistry, mirrorENSRegistrar, mirrorInviteToken] = await setup()
+    console.log('mint')
+    await mirrorInviteToken.mint(user1.address, 1)
+    console.log('minted')
+
+    const result = await mirrorInviteToken.connect(user1).register('vitalik', user1.address, { from : user1.address })
+    userBalance = await mirrorInviteToken.balanceOf(user1.address)
+    console.log('userBalance', userBalance)
+    assert.ok(userBalance.eq(BigNumber.from(0)))
+  })
+})
+
 
 async function setup() {
-  const accounts = await ethers.getSigners()
-  console.log('account', accounts[0].address)
+  const [owner, user1, user2] = await ethers.getSigners()
+  console.log('account', owner.address)
 
   const ENSRegistry = await ethers.getContractFactory('ENSRegistry')
   const ArgentENSResolver = await ethers.getContractFactory('ArgentENSResolver')
@@ -39,9 +56,17 @@ async function setup() {
 
   await mirrorENSRegistrar.deployed()
 
+  // Post-deploy setup
+  await mirrorInviteToken.setRegistrar(mirrorENSRegistrar.address)
+
   const result = await ensRegistry.owner(ethers.utils.formatBytes32String(''))
   console.log('result', result)
-  return [ensRegistry]
+  return [
+    argentENSResolver,
+    ensRegistry,
+    mirrorENSRegistrar,
+    mirrorInviteToken,
+  ]
 }
 
 describe('ENS', function() {

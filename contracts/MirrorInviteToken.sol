@@ -37,6 +37,6 @@ contract MirrorInviteToken is ERC20Burnable, Mintable {
    */
   function register(string calldata label, address owner) external {
     _approve(msg.sender, _registrar, 1);
-    IENSManager(_registrar).register(label, owner);
+    IENSManager(_registrar).register(label, owner, msg.sender);
   }
 }

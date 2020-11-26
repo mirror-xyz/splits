@@ -2,6 +2,7 @@ pragma solidity ^0.6.8;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 
 import "./IENSResolver.sol";
 import "./ENSReverseRegistrar.sol";
@@ -21,7 +22,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
     ENS public ensRegistry;
     address public override ensResolver;
 
-    ERC20 public mirrorInviteToken;
+    address public mirrorInviteToken;
 
     // namehash('addr.reverse')
     bytes32 constant public ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
@@ -40,7 +41,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
         rootNode = _rootNode;
         ensRegistry = ENS(_ensRegistry);
         ensResolver = _ensResolver;
-        mirrorInviteToken = ERC20(_mirrorInviteToken);
+        mirrorInviteToken = _mirrorInviteToken;
     }
 
     // *************** External Functions ********************* //
@@ -65,9 +66,10 @@ contract MirrorENSRegistrar is IENSManager, Owned {
         emit ENSResolverChanged(_ensResolver);
     }
 
-    function register(string calldata _label, address _owner) external override {
-      mirrorInviteToken.burnFrom(msg.sender, address(this), 1);
-      _register(_label, _owner);
+    function register(string calldata _label, address _owner, address _spender) external override {
+      require(msg.sender == _spender || msg.sender == mirrorInviteToken, "MirrorENSRegistrar: caller must be user or token contract");
+      ERC20Burnable(mirrorInviteToken).burnFrom(_spender, 1);
+      //_register(_label, _owner);
     }
 
     /**
