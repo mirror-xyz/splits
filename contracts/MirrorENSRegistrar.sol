@@ -69,7 +69,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
     function register(string calldata _label, address _owner, address _spender) external override {
       require(msg.sender == _spender || msg.sender == mirrorInviteToken, "MirrorENSRegistrar: caller must be user or token contract");
       ERC20Burnable(mirrorInviteToken).burnFrom(_spender, 1);
-      //_register(_label, _owner);
+      _register(_label, _owner);
     }
 
     /**

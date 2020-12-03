@@ -9,10 +9,12 @@ contract Mintable is Ownable, ERC20 {
 
   bool public mintingFinished = false;
 
-
   modifier canMint() {
     require(!mintingFinished);
     _;
+  }
+
+  constructor(string memory name, string memory symbol) ERC20(name, symbol) public {
   }
 
   /**
@@ -35,8 +37,5 @@ contract Mintable is Ownable, ERC20 {
     mintingFinished = true;
     MintFinished();
     return true;
-  }
-
-  constructor(string memory name, string memory symbol) ERC20(name, symbol) public {
   }
 }
