@@ -19,7 +19,7 @@ async function setup() {
 
   const ensRegistry = await ENSRegistry.deploy()
   const ensResolver = await ENSResolver.deploy()
-  const mirrorInviteToken = await MirrorInviteToken.deploy('MirrorInviteToken', 'MIRINVT')
+  const mirrorInviteToken = await MirrorInviteToken.deploy('MirrorInviteToken', 'WRITE')
   const reverseRegistrar = await ReverseRegistrar.deploy(ensRegistry.address, ensResolver.address)
 
   await ensRegistry.deployed()
@@ -65,21 +65,10 @@ async function setup() {
     mirrorInviteToken,
   ]
 }
-describe('MirrorInviteToken', () => {
-  it('should', async () => {
-    const MirrorInviteToken = await ethers.getContractFactory('MirrorInviteToken')
-    const token = await MirrorInviteToken.deploy('MirrorInviteToken', 'MIRINVT')
 
-    await token.deployed()
-    const totalSupply = await token.totalSupply()
-
-    const name = await token.name()
-  })
-})
-
-describe('Mirror', () => {
+describe('Mirror Onboarding', () => {
   describe('Integration test', () => {
-    it('should register user with token', async () => {
+    it('should register user with token through token contract', async () => {
       const [owner, user1, user2] = await ethers.getSigners()
       const [ensResolver, ensRegistry, mirrorENSRegistrar, mirrorInviteToken] = await setup()
 
@@ -105,11 +94,19 @@ describe('Mirror', () => {
       assert(userBalance.eq(BigNumber.from(0)))
       assert.equal(subdomainOwner, '0x0000000000000000000000000000000000000000')
     })
-  })
-})
 
-describe('ENS', () => {
-  it('should setup properly', async () => {
-    const [ensRegistry] = await setup()
+    it('should register user with token through registrar directly', async () => {
+      const [owner, user1, user2] = await ethers.getSigners()
+      const [ensResolver, ensRegistry, mirrorENSRegistrar, mirrorInviteToken] = await setup()
+
+      await mirrorInviteToken.mint(user1.address, 1)
+      await mirrorInviteToken.connect(user1).approve(mirrorENSRegistrar.address, 1)
+      await mirrorENSRegistrar.connect(user1).register('vitalik', user1.address, user1.address)
+
+      const userBalance = await mirrorInviteToken.balanceOf(user1.address)
+      const subdomainOwner = await ensRegistry.owner(ethers.utils.namehash('vitalik.mirror.xyz'))
+      assert(userBalance.eq(BigNumber.from(0)))
+      assert.equal(subdomainOwner, user1.address)
+    })
   })
 })
