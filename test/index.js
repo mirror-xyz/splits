@@ -1,4 +1,4 @@
-const { assert } = require('chai')
+const { assert, expect } = require('chai')
 const namehash = require('eth-ens-namehash')
 
 const BigNumber = ethers.BigNumber
@@ -10,7 +10,6 @@ const subnameWallet = 'mirror'
 
 async function setup() {
   const [owner, user1, user2] = await ethers.getSigners()
-  console.log('account', owner.address)
 
   const ENSRegistry = await ethers.getContractFactory('ENSRegistry')
   const ENSResolver = await ethers.getContractFactory('ArgentENSResolver')
@@ -35,7 +34,6 @@ async function setup() {
 
   // Post-deploy setup
   await mirrorInviteToken.setRegistrar(mirrorENSRegistrar.address)
-  await mirrorInviteToken.mint(user1.address, 1)
 
   await ensResolver.addManager(mirrorENSRegistrar.address)
 
@@ -59,9 +57,7 @@ async function setup() {
   )
 
   const rootOwner = await ensRegistry.owner(ZERO_BYTES32)
-  console.log('rootOwner', rootOwner)
   const xyzOwner = await ensRegistry.owner(ethers.utils.namehash(root))
-  console.log('xyzOwner', xyzOwner)
   return [
     ensResolver,
     ensRegistry,
@@ -69,34 +65,51 @@ async function setup() {
     mirrorInviteToken,
   ]
 }
-describe('MirrorInviteToken', function() {
-  it('should', async function() {
+describe('MirrorInviteToken', () => {
+  it('should', async () => {
     const MirrorInviteToken = await ethers.getContractFactory('MirrorInviteToken')
     const token = await MirrorInviteToken.deploy('MirrorInviteToken', 'MIRINVT')
 
     await token.deployed()
     const totalSupply = await token.totalSupply()
-    console.log('totalSupply', totalSupply)
 
     const name = await token.name()
-    console.log('name', name)
   })
 })
 
-describe('Integration test', function() {
-  it('should', async function() {
-    const [owner, user1, user2] = await ethers.getSigners()
-    const [ensResolver, ensRegistry, mirrorENSRegistrar, mirrorInviteToken] = await setup()
+describe('Mirror', () => {
+  describe('Integration test', () => {
+    it('should register user with token', async () => {
+      const [owner, user1, user2] = await ethers.getSigners()
+      const [ensResolver, ensRegistry, mirrorENSRegistrar, mirrorInviteToken] = await setup()
 
-    const result = await mirrorInviteToken.connect(user1).register('vitalik', user1.address)
-    const userBalance = await mirrorInviteToken.balanceOf(user1.address)
-    console.log('userBalance', userBalance)
-    assert.ok(userBalance.eq(BigNumber.from(0)))
+      await mirrorInviteToken.mint(user1.address, 1)
+      await mirrorInviteToken.connect(user1).register('vitalik', user1.address)
+
+      const userBalance = await mirrorInviteToken.balanceOf(user1.address)
+      const subdomainOwner = await ensRegistry.owner(ethers.utils.namehash('vitalik.mirror.xyz'))
+      assert(userBalance.eq(BigNumber.from(0)))
+      assert.equal(subdomainOwner, user1.address)
+    })
+
+    it('should fail to register if user doesn\'t have token', async () => {
+      const [owner, user1, user2] = await ethers.getSigners()
+      const [ensResolver, ensRegistry, mirrorENSRegistrar, mirrorInviteToken] = await setup()
+
+      await expect(
+        mirrorInviteToken.connect(user1).register('vitalik', user1.address)
+      ).revertedWith('VM Exception while processing transaction: revert ERC20: burn amount exceeds balance')
+
+      const userBalance = await mirrorInviteToken.balanceOf(user1.address)
+      const subdomainOwner = await ensRegistry.owner(ethers.utils.namehash('vitalik.mirror.xyz'))
+      assert(userBalance.eq(BigNumber.from(0)))
+      assert.equal(subdomainOwner, '0x0000000000000000000000000000000000000000')
+    })
   })
 })
 
-describe('ENS', function() {
-  it('should setup properly', async function() {
+describe('ENS', () => {
+  it('should setup properly', async () => {
     const [ensRegistry] = await setup()
   })
 })
