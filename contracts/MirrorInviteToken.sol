@@ -29,10 +29,10 @@ contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
 
   /**
    * @dev Sets the registrar that the token interacts with for register
-   * @param registrar New registrar
+   * @param registrar_ New registrar
    */
-  function setRegistrar(address registrar) onlyOwner external {
-    _registrar = registrar;
+  function setRegistrar(address registrar_) onlyOwner external {
+    _registrar = registrar_;
   }
 
   function _register(string memory label, address owner) private {
