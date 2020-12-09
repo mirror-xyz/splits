@@ -1,0 +1,9 @@
+{
+  "ropsten": {
+    "ENSRegistry": "0x6d94ac407b62141160d258434a8b894af0655d9a",
+    "ENSResolver": "0x8b2c91e7d68bb7908a2f0b374f6714a2b474d88b",
+    "MirrorInviteToken": "0xb8b5b7546caebf645bdf2331677886e88028a635",
+    "ReverseRegistrar": "0xa4a0c503a5d799091d90a15358d406c0557e473d",
+    "MirrorENSRegistrar": "0xcbcfc2438558c4c508ec9a06c833b4d97bc042b2"
+  }
+}
