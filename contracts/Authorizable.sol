@@ -1,6 +1,8 @@
 contract Authorizable {
   enum AuthorizationState { Unused, Used, Canceled }
 
+  bytes32 public DOMAIN_SEPARATOR;
+
   /**
    * @dev authorizer address => nonce => authorization state
    */

@@ -1,4 +1,4 @@
-pragma solidity ^0.6.8;
+pragma solidity ^0.6.12;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -6,13 +6,17 @@ import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import "./Mintable.sol";
 import "./IENSManager.sol";
 import "./Authorizable.sol";
+import "./EIP712.sol";
 
 contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
+  // keccak256("registerWithAuthorization(address owner,string calldata label,uint256 validAfter,uint256 validBefore,bytes32 nonce,uint8 v,bytes32 r,bytes32 s)")
+  bytes32 public constant REGISTER_WITH_AUTHORIZATION_TYPEHASH = 0x16f5869e9cdee17c2a5067be9530bee3de761fa7194831e47c6bfa6405bab752;
 
   address private _registrar;
 
   constructor(string memory name, string memory symbol) Mintable(name, symbol) public {
     _setupDecimals(0);
+    DOMAIN_SEPARATOR = EIP712.makeDomainSeparator(name, "1");
   }
 
   // ***** VIEW *****
@@ -57,8 +61,22 @@ contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
    * @param s s of the signature
    */
   function registerWithAuthorization(address owner, string calldata label, uint256 validAfter, uint256 validBefore, bytes32 nonce, uint8 v, bytes32 r, bytes32 s) external {
-    //_requireValidAuthorization()
-    _register(label, owner);
+    _requireValidAuthorization(owner, nonce, validAfter, validBefore);
+    // TODO: maybe use hash of label instead
+    bytes memory data = abi.encode(
+      REGISTER_WITH_AUTHORIZATION_TYPEHASH,
+      owner,
+      label,
+      validAfter,
+      validBefore,
+      nonce
+    );
+    require(
+      EIP712.recover(DOMAIN_SEPARATOR, v, r, s, data) == owner,
+      "MirrorInviteToken: invalid signature"
+    );
     //_markAuthorizationAsUsed()
+
+    _register(label, owner);
   }
 }

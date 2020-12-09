@@ -22,7 +22,7 @@
     "chai": "^4.2.0",
     "eth-ens-namehash": "^2.0.8",
     "ethereum-waffle": "^3.2.0",
-    "ethers": "^5.0.22",
+    "ethers": "5.0.22",
     "hardhat": "^2.0.3"
   },
   "dependencies": {
