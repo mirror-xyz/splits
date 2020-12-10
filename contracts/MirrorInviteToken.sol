@@ -9,8 +9,8 @@ import "./Authorizable.sol";
 import "./EIP712.sol";
 
 contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
-  // keccak256("RegisterWithAuthorization(address owner,string calldata label,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
-  bytes32 public constant REGISTER_WITH_AUTHORIZATION_TYPEHASH = 0x9feadbde6f5b508e6bb48525782196bef9c2ec1095021f09683bfc6982c891be;
+  // keccak256("RegisterWithAuthorization(address owner,bytes32 label,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
+  bytes32 public constant REGISTER_WITH_AUTHORIZATION_TYPEHASH = 0xbda40c1b053ac097dfc99d41d7418e9c8a525c9da68e729b35ca1da10f14a6af;
 
   address private _registrar;
 
@@ -66,7 +66,7 @@ contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
     bytes memory data = abi.encode(
       REGISTER_WITH_AUTHORIZATION_TYPEHASH,
       owner,
-      label,
+      keccak256(label),
       validAfter,
       validBefore,
       nonce

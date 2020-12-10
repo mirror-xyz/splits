@@ -52,11 +52,11 @@ async function main() {
     reverseRegistrar.address,
   )
 
-  console.log('ensResolver', ensResolver)
-  console.log('ensRegistry', ensRegistry)
-  console.log('mirrorENSRegistrar', mirrorENSRegistrar)
-  console.log('mirrorInviteToken', mirrorInviteToken)
-  console.log('domainSeparator', domainSeparator)
+  console.log('ENSRegistry', ensRegistry.address)
+  console.log('ENSResolver', ensResolver.address)
+  console.log('MirrorInviteToken', mirrorInviteToken.address)
+  console.log('MirrorENSRegistrar', mirrorENSRegistrar.address)
+  console.log('ReverseRegistrar', reverseRegistrar.address)
 }
 
 main()
