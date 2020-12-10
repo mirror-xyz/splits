@@ -140,17 +140,6 @@ describe('Mirror Onboarding', () => {
   })
 
   it('should initialize with correct domain seperator', async () => {
-    const [owner, user1, user2] = await ethers.getSigners()
-
     assert.equal(await mirrorInviteToken.DOMAIN_SEPARATOR(), domainSeparator, 'domain domain separator should match')
-
-    await mirrorInviteToken.mint(user1.address, 1)
-    await mirrorInviteToken.connect(user1).approve(mirrorENSRegistrar.address, 1)
-    await mirrorENSRegistrar.connect(user1).registerWithAuthorization('vitalik', user1.address, user1.address)
-
-    const userBalance = await mirrorInviteToken.balanceOf(user1.address)
-    const subdomainOwner = await ensRegistry.owner(ethers.utils.namehash('vitalik.mirror.xyz'))
-    assert(userBalance.eq(BigNumber.from(0)))
-    assert.equal(subdomainOwner, user1.address)
   })
 })
