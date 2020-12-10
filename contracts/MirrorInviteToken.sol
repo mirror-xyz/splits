@@ -9,8 +9,8 @@ import "./Authorizable.sol";
 import "./EIP712.sol";
 
 contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
-  // keccak256("registerWithAuthorization(address owner,string calldata label,uint256 validAfter,uint256 validBefore,bytes32 nonce,uint8 v,bytes32 r,bytes32 s)")
-  bytes32 public constant REGISTER_WITH_AUTHORIZATION_TYPEHASH = 0x16f5869e9cdee17c2a5067be9530bee3de761fa7194831e47c6bfa6405bab752;
+  // keccak256("RegisterWithAuthorization(address owner,string calldata label,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
+  bytes32 public constant REGISTER_WITH_AUTHORIZATION_TYPEHASH = 0x9feadbde6f5b508e6bb48525782196bef9c2ec1095021f09683bfc6982c891be;
 
   address private _registrar;
 
@@ -75,8 +75,7 @@ contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
       EIP712.recover(DOMAIN_SEPARATOR, v, r, s, data) == owner,
       "MirrorInviteToken: invalid signature"
     );
-    //_markAuthorizationAsUsed()
-
+    _markAuthorizationAsUsed(owner, nonce);
     _register(label, owner);
   }
 }
