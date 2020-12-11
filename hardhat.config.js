@@ -40,7 +40,8 @@ module.exports = {
       accounts: [deployerPrivateKey],
     },
     hardhat: {
-      chainId: 31337,
+      chainId: 1337,
+      //accounts: [{ privateKey: deployerPrivateKey, balance: '1000000000000000000' }],
     },
   },
 };

@@ -10,7 +10,7 @@ import "./EIP712.sol";
 
 contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
   // keccak256("RegisterWithAuthorization(address owner,bytes32 label,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
-  bytes32 public constant REGISTER_WITH_AUTHORIZATION_TYPEHASH = 0xbda40c1b053ac097dfc99d41d7418e9c8a525c9da68e729b35ca1da10f14a6af;
+  bytes32 public constant REGISTER_WITH_AUTHORIZATION_TYPEHASH = 0x21bb50094243a21cbea0c4e9dbc79b9b310dced79a8451d63a37821a0d156d46;
 
   address private _registrar;
 
@@ -66,7 +66,7 @@ contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
     bytes memory data = abi.encode(
       REGISTER_WITH_AUTHORIZATION_TYPEHASH,
       owner,
-      keccak256(label),
+      keccak256(abi.encode(label)),
       validAfter,
       validBefore,
       nonce
@@ -77,5 +77,17 @@ contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
     );
     _markAuthorizationAsUsed(owner, nonce);
     _register(label, owner);
+  }
+
+  function debug(address owner, string calldata label, uint256 validAfter, uint256 validBefore, bytes32 nonce, uint8 v, bytes32 r, bytes32 s) external view returns (address) {
+    bytes memory data = abi.encode(
+      REGISTER_WITH_AUTHORIZATION_TYPEHASH,
+      owner,
+      keccak256(abi.encode(label)),
+      validAfter,
+      validBefore,
+      nonce
+    );
+    return EIP712.recover(DOMAIN_SEPARATOR, v, r, s, data);
   }
 }

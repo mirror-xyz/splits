@@ -1,5 +1,13 @@
 const { ethers } = require('hardhat')
+const fs = require('fs')
 
+
+const NETWORK_MAP = {
+  '0': 'mainnet',
+  '3': 'ropsten',
+  '1337': 'hardhat',
+  '31337': 'hardhat',
+}
 const ZERO_BYTES32 = ethers.constants.HashZero;
 const root = 'xyz'
 const subnameWallet = 'mirror'
@@ -57,6 +65,23 @@ async function main() {
   console.log('MirrorInviteToken', mirrorInviteToken.address)
   console.log('MirrorENSRegistrar', mirrorENSRegistrar.address)
   console.log('ReverseRegistrar', reverseRegistrar.address)
+
+  const chainId = (await waffle.provider.getNetwork()).chainId
+  const networkName = NETWORK_MAP[chainId]
+  let deployedAddresses = {}
+  deployedAddresses[networkName] = {
+    ENSRegistry: ensRegistry.address,
+    ENSResolver: ensResolver.address,
+    MirrorInviteToken: mirrorInviteToken.address,
+    MirrorENSRegistrar: mirrorENSRegistrar.address,
+    ReverseRegistrar: reverseRegistrar.address,
+  }
+
+  fs.writeFileSync(
+    './frontend/src/config/deployed-addresses.json',
+    JSON.stringify(deployedAddresses, null, 2)
+  )
+  console.log('wrote to deployed-addresses.json')
 }
 
 main()

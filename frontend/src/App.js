@@ -1,19 +1,25 @@
-import React, { Component } from 'react'
-import { Transaction } from '@ethereumjs/tx'
-import { BN } from 'ethereumjs-util'
 import * as Web3 from 'web3'
+import * as ethers from 'ethers'
 import * as sigUtil from 'eth-sig-util'
+import React, { Component } from 'react'
+import { BN } from 'ethereumjs-util'
+import { Transaction } from '@ethereumjs/tx'
 
 import logo from './logo.svg';
 import './App.css';
 
 import MirrorInviteTokenABI from './abi/MirrorInviteToken.json'
+import MirrorENSRegistrarABI from './abi/MirrorENSRegistrar.json'
+import ENSRegistryABI from './abi/ENSRegistry.json'
 import deployedAddresses from './config/deployed-addresses.json'
 
 const NETWORK_MAP = {
   '0': 'mainnet',
   '3': 'ropsten',
+  '1337': 'hardhat',
+  '31337': 'hardhat',
 }
+const ZERO_BYTES32 = ethers.constants.HashZero;
 
 let web3
 
@@ -45,22 +51,55 @@ class Signer extends Component {
   "value": 0,
   "data": "0x"
 }`,
-      signedTx: ''
+      signedTx: '',
+      label: 'vitalik',
     }
+
+    //this.sign = this.sign.bind(this);
+    //this.signMsg = this.signMsg.bind(this);
+    ////this.submitTx = this.submitTx.bind(this);
+  }
+
+  getDomainSeparator(chainId, contractAddress) {
+    console.log('contractAddress', contractAddress)
+    return ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(
+        ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
+        [
+          ethers.utils.keccak256(
+            ethers.utils.toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
+          ),
+          ethers.utils.keccak256(ethers.utils.toUtf8Bytes('MirrorInviteToken')),
+          ethers.utils.keccak256(ethers.utils.toUtf8Bytes('1')),
+          chainId,
+          contractAddress,
+        ]
+      )
+    )
   }
 
   async componentDidMount() {
     const chainId = await web3.eth.net.getId()
+    console.log('chainId', chainId)
     const account = (await web3.eth.getAccounts())[0]
+
+    const mirrorInviteTokenAddress = deployedAddresses[NETWORK_MAP[chainId]]['MirrorInviteToken']
+    const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), mirrorInviteTokenAddress)
+
+    const domainSeparator = this.getDomainSeparator(chainId, mirrorInviteTokenAddress)
+
     this.setState({
+      ...this.state,
       chainId,
       account,
+      domainSeparator
     })
   }
 
-  handleChange(event) {
+  handleLabelChange(event) {
     this.setState({
-      textareaValue: event.target.value
+      ...this.state,
+      label: event.target.value
     })
   }
 
@@ -82,20 +121,15 @@ class Signer extends Component {
     console.log('', r.toString(), s.toString(), v.toString())
     const signedTx = Transaction.fromTxData(signedTxData).serialize().toString('hex')
 
-    this.setState({ signedTx })
-  }
-
-  async refresh() {
-    const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), deployedAddresses['ropsten']['MirrorInviteToken'])
-    const domainSeparator = await mirrorInviteToken.methods.DOMAIN_SEPARATOR().call()
-    this.setState({ domainSeparator })
+    this.setState({
+      ...this.state,
+      signedTx,
+    })
   }
 
   // https://docs.metamask.io/guide/signing-data.html#sign-typed-data-v4
   // https://medium.com/metamask/eip712-is-coming-what-to-expect-and-how-to-use-it-bb92fd1a7a26
   async signMsg() {
-    console.log('', deployedAddresses)
-    console.log('#', deployedAddresses[NETWORK_MAP[this.state.chainId]])
     const msgParams = JSON.stringify({
       domain: {
         // Defining the chain aka Rinkeby testnet or Ethereum Main Net
@@ -111,10 +145,10 @@ class Signer extends Component {
       // Defining the message signing data content.
       message: {
         owner: this.state.account,
-        label: 'daniel',
-        validAfter: '1639082582', // one year from now
-        validBefore: '0',
-        nonce: '0',
+        label: web3.utils.keccak256(this.state.label),
+        validAfter: '0',
+        validBefore: '1639082582', // one year from now
+        nonce: ZERO_BYTES32,
       },
       // Refers to the keys of the *types* object below.
       primaryType: 'RegisterWithAuthorization',
@@ -128,7 +162,7 @@ class Signer extends Component {
         ],
         RegisterWithAuthorization: [
           { type: 'address', name: 'owner' },
-          { type: 'string', name: 'label' },
+          { type: 'bytes32', name: 'label' },
           { type: 'uint256', name: 'validAfter' },
           { type: 'uint256', name: 'validBefore' },
           { type: 'bytes32', name: 'nonce' },
@@ -143,59 +177,86 @@ class Signer extends Component {
       method: 'eth_signTypedData_v4',
       params: [from, msgParams],
       from: from,
-    }, function (err, result) {
+    }, (err, result) => {
       if (err) return console.error(err)
       if (result.error) {
         return console.error(result.error.message)
       }
-      console.log('result', result)
 
       const signature = result.result.substring(2);
-      const r = "0x" + signature.substring(0, 64);
-      const s = "0x" + signature.substring(64, 128);
+      const r = '0x' + signature.substring(0, 64);
+      const s = '0x' + signature.substring(64, 128);
       const v = parseInt(signature.substring(128, 130), 16);
 
-      console.log('', { v, r, s })
+      this.setState({
+        ...this.state,
+        signature: { v, r, s }
+      })
       const recovered = sigUtil.recoverTypedSignature_v4({
         data: JSON.parse(msgParams),
         sig: result.result,
       })
-      console.log('recovered', recovered, 'from', from)
       if (recovered === from ) {
-        alert('Recovered signer: ' + from)
+        console.log('Recovered signer: ' + from)
       } else {
-        alert('Failed to verify signer, got: ' + JSON.stringify(result))
+        console.log('Failed to verify signer, got: ' + JSON.stringify(result))
       }
     })
+  }
+
+  async submitTx() {
+    const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['MirrorInviteToken'])
+    const { v, r, s } = this.state.signature
+    console.log('signature', this.state.signature)
+    mirrorInviteToken.methods.registerWithAuthorization(this.state.account, this.state.label, '0', '1639082582', ZERO_BYTES32, /*'0x' + v.toString(16) */ v, r, s).send({ from: this.state.account })
+  }
+
+  async loadFields() {
+    const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['MirrorInviteToken'])
+    const domainSeparator = await mirrorInviteToken.methods.DOMAIN_SEPARATOR().call({ from: this.state.account, gas: '800000'})
+    console.log('domainSeparator', domainSeparator)
+
+    const { v, r, s } = this.state.signature
+    const recovered = await mirrorInviteToken.methods.debug(this.state.account, this.state.label, '0', '1639082582', '0x0', '0x' + v.toString(16), r, s).call({ from: this.state.account, gas: '800000'})
+    console.log('recovered', recovered)
+
+    const mirrorENSRegistrar = new web3.eth.Contract((MirrorENSRegistrarABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['MirrorENSRegistrar'])
+    const available = await mirrorENSRegistrar.methods.isAvailable(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(this.state.label))).call({ from: this.state.account, gas: '800000'})
+    console.log('available', available)
+
+    const ensRegistry = new web3.eth.Contract((ENSRegistryABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['ENSRegistry'])
+    const fullLabel = `${this.state.label}.mirror.xyz`
+    console.log('node', fullLabel, ethers.utils.namehash(fullLabel))
+    const owner = await ensRegistry.methods.owner(ethers.utils.namehash(fullLabel)).call({ from: this.state.account, gas: '800000'})
+    console.log('owner', owner)
+
   }
 
   render() {
     return (
       <div>
         <h1>Offline Sign</h1>
-        <div>Domain Separator: {this.state.domainSeparator}</div>
         <h2>Input</h2>
-        <div>Warning: be careful about what you sign.</div>
+        <h3>Instructions</h3>
+        <div>Click Sign, then Submit.</div>
         <div>
-          <textarea
-          value={ this.state.textareaValue }
-          onChange={(event) => { this.handleChange(event) }}
-          style={{ width: '600px', height: '250px' }}
-        />
+          <div>Domain Separator: { this.state.domainSeparator }</div>
+          <div>Chain ID: { this.state.chainId }</div>
+          <div>Account: { this.state.account }</div>
+          <input
+          value={ this.state.label }
+          onChange={(event) => { this.handleLabelChange(event) }}
+          />
           </div>
-          <div>
-            <button onClick={() => { this.signMsg() }}>Sign</button>
-          </div>
-          <div>
-            <button onClick={() => { this.refresh() }}>Refresh</button>
-          </div>
-          <h2>Output</h2>
+          <div><button onClick={() => { this.signMsg() }}>Sign</button></div>
+          <div><button onClick={() => { this.submitTx() }}>Submit</button></div>
+          <div><button onClick={() => { this.loadFields() }}>Load</button></div>
           <textarea
           disabled
-          value={ this.state.signedTx }
+          value={ JSON.stringify(this.state.signature) }
           style={{ width: '600px', height: '250px' }}
         />
-          </div>
+      </div>
     )
   }
 }
