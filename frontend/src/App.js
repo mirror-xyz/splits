@@ -98,7 +98,6 @@ class Signer extends Component {
 
   handleLabelChange(event) {
     this.setState({
-      ...this.state,
       label: event.target.value
     })
   }
@@ -174,7 +173,7 @@ class Signer extends Component {
     console.log('from', from)
 
     web3.currentProvider.sendAsync({
-      method: 'eth_signTypedData_v4',
+      method: 'eth_signTypedData_v3',
       params: [from, msgParams],
       from: from,
     }, (err, result) => {
@@ -232,6 +231,21 @@ class Signer extends Component {
 
   }
 
+  handleReadLabelChange(event) {
+    this.setState({
+      readLabel: event.target.value
+    })
+  }
+
+  async queryLabel() {
+    const ensRegistry = new web3.eth.Contract((ENSRegistryABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['ENSRegistry'])
+    const fullLabel = `${this.state.readLabel}.mirror.xyz`
+    const owner = await ensRegistry.methods.owner(ethers.utils.namehash(fullLabel)).call({ from: this.state.account, gas: '800000'})
+    this.setState({
+      readOwner: owner,
+    })
+  }
+
   render() {
     return (
       <div>
@@ -255,6 +269,16 @@ class Signer extends Component {
           disabled
           value={ JSON.stringify(this.state.signature) }
           style={{ width: '600px', height: '250px' }}
+        />
+        <h2>Read</h2>
+        <input
+        value={ this.state.readLabel }
+        onChange={(event) => { this.handleReadLabelChange(event) }}
+        />
+        <div><button onClick={() => { this.queryLabel() }}>Sign</button></div>
+        <input
+        disabled
+        value={ this.state.readOwner }
         />
       </div>
     )
