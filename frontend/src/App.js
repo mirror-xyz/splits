@@ -53,11 +53,8 @@ class Signer extends Component {
 }`,
       signedTx: '',
       label: 'vitalik',
+      mintAmount: 100,
     }
-
-    //this.sign = this.sign.bind(this);
-    //this.signMsg = this.signMsg.bind(this);
-    ////this.submitTx = this.submitTx.bind(this);
   }
 
   getDomainSeparator(chainId, contractAddress) {
@@ -85,6 +82,7 @@ class Signer extends Component {
 
     const mirrorInviteTokenAddress = deployedAddresses[NETWORK_MAP[chainId]]['MirrorInviteToken']
     const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), mirrorInviteTokenAddress)
+    const numTokens = await mirrorInviteToken.methods.balanceOf(account).call()
 
     const domainSeparator = this.getDomainSeparator(chainId, mirrorInviteTokenAddress)
 
@@ -92,7 +90,8 @@ class Signer extends Component {
       ...this.state,
       chainId,
       account,
-      domainSeparator
+      domainSeparator,
+      numTokens,
     })
   }
 
@@ -203,11 +202,16 @@ class Signer extends Component {
     })
   }
 
-  async submitTx() {
+  async submitMetaTx() {
     const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['MirrorInviteToken'])
     const { v, r, s } = this.state.signature
     console.log('signature', this.state.signature)
     mirrorInviteToken.methods.registerWithAuthorization(this.state.account, this.state.label, '0', '1639082582', ZERO_BYTES32, /*'0x' + v.toString(16) */ v, r, s).send({ from: this.state.account })
+  }
+
+  async submitTx() {
+    const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['MirrorInviteToken'])
+    mirrorInviteToken.methods.register(this.state.label, this.state.account).send({ from: this.state.account })
   }
 
   async loadFields() {
@@ -246,24 +250,57 @@ class Signer extends Component {
     })
   }
 
+  handleMintAddressLabelChange(event) {
+    this.setState({
+      mintAddress: event.target.value
+    })
+  }
+
+  handleMintAmountLabelChange(event) {
+    this.setState({
+      mintAmount: event.target.value
+    })
+  }
+
+  async mint() {
+    const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['MirrorInviteToken'])
+    mirrorInviteToken.methods.mint(this.state.mintAddress, this.state.mintAmount).send({ from: this.state.account })
+  }
+
   render() {
     return (
       <div>
         <h1>Offline Sign</h1>
-        <h2>Input</h2>
-        <h3>Instructions</h3>
+        <h2>Admin</h2>
+        <div>Address</div>
+        <input
+        value={ this.state.mintAddress }
+        onChange={(event) => { this.handleMintAddressLabelChange(event) }}
+        />
+        <div>Amount</div>
+        <input
+        value={ this.state.mintAmount }
+        onChange={(event) => { this.handleMintAmountLabelChange(event) }}
+        />
+        <div><button onClick={() => { this.mint() }}>Mint</button></div>
+        <h2>Register</h2>
+        <input
+        value={ this.state.label }
+        onChange={(event) => { this.handleLabelChange(event) }}
+        />
+        <h3>Normal</h3>
+        <div><button onClick={() => { this.submitTx() }}>Submit Normal</button></div>
+        <h3>Meta Transactions</h3>
+        <h4>Instructions</h4>
         <div>Click Sign, then Submit.</div>
         <div>
           <div>Domain Separator: { this.state.domainSeparator }</div>
           <div>Chain ID: { this.state.chainId }</div>
           <div>Account: { this.state.account }</div>
-          <input
-          value={ this.state.label }
-          onChange={(event) => { this.handleLabelChange(event) }}
-          />
+          <div>Num Tokens: { this.state.numTokens }</div>
           </div>
           <div><button onClick={() => { this.signMsg() }}>Sign</button></div>
-          <div><button onClick={() => { this.submitTx() }}>Submit</button></div>
+          <div><button onClick={() => { this.submitMetaTx() }}>Submit Meta Tx</button></div>
           <div><button onClick={() => { this.loadFields() }}>Load</button></div>
           <textarea
           disabled
@@ -275,7 +312,7 @@ class Signer extends Component {
         value={ this.state.readLabel }
         onChange={(event) => { this.handleReadLabelChange(event) }}
         />
-        <div><button onClick={() => { this.queryLabel() }}>Sign</button></div>
+        <div><button onClick={() => { this.queryLabel() }}>Query</button></div>
         <input
         disabled
         value={ this.state.readOwner }
