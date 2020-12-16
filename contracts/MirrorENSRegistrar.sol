@@ -82,7 +82,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
         bytes32 labelNode = keccak256(abi.encodePacked(_label));
         bytes32 node = keccak256(abi.encodePacked(rootNode, labelNode));
         address currentOwner = ensRegistry.owner(node);
-        require(currentOwner == address(0), "AEM: _label is alrealdy owned");
+        require(currentOwner == address(0), "MirrorENSRegistrar: _label is alrealdy owned");
 
         // Forward ENS
         ensRegistry.setSubnodeRecord(rootNode, labelNode, _owner, address(ensResolver), 0);
