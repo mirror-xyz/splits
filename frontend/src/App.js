@@ -42,15 +42,6 @@ class Signer extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            textareaValue: `{
-  "nonce": 0,
-  "gasPrice": 30000000000,
-  "gasLimit": 21000,
-  "to": "0x443D2f2755DB5942601fa062Cc248aAA153313D3",
-  "value": 0,
-  "data": "0x"
-}`,
-            signedTx: '',
             label: '',
             mintAmount: '',
         }
