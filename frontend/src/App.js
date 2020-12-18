@@ -56,42 +56,21 @@ class Signer extends Component {
         }
     }
 
-    getDomainSeparator(chainId, contractAddress) {
-        console.log('contractAddress', contractAddress)
-        return ethers.utils.keccak256(
-            ethers.utils.defaultAbiCoder.encode(
-                ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
-                [
-                    ethers.utils.keccak256(
-                        ethers.utils.toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
-                    ),
-                    ethers.utils.keccak256(ethers.utils.toUtf8Bytes('MirrorInviteToken')),
-                    ethers.utils.keccak256(ethers.utils.toUtf8Bytes('1')),
-                    chainId,
-                    contractAddress,
-                ]
-            )
-        )
-    }
-
     async componentDidMount() {
         const chainId = await web3.eth.net.getId()
-        console.log('chainId', chainId)
         const account = (await web3.eth.getAccounts())[0]
 
         const mirrorInviteTokenAddress = deployedAddresses[NETWORK_MAP[chainId]]['MirrorInviteToken']
         const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), mirrorInviteTokenAddress)
         const numTokens = await mirrorInviteToken.methods.balanceOf(account).call()
 
-        const domainSeparator = this.getDomainSeparator(chainId, mirrorInviteTokenAddress)
-
         this.setState({
             ...this.state,
             chainId,
             account,
-            domainSeparator,
             numTokens,
-        })
+            mirrorInviteTokenAddress
+        });
     }
 
     handleLabelChange(event) {
@@ -291,8 +270,31 @@ class Signer extends Component {
                     </div>
                 </div>
 
-                <div >
-                    <div className="form-section">
+                <div>
+                    <div className="section">
+                        <h3>Connection Details</h3>
+                        <table className="horizontal-table u-full-width">
+                            <tbody>
+                            <tr>
+                                <td>Chain ID</td>
+                                <td>{this.state.chainId}</td>
+                            </tr>
+                            <tr>
+                                <td>Mirror Token Address</td>
+                                <td>{this.state.mirrorInviteTokenAddress}</td>
+                            </tr>
+                            <tr>
+                                <td>Connected Account Address</td>
+                                <td>{this.state.account}</td>
+                            </tr>
+                            <tr>
+                                <td>Tokens Owned</td>
+                                <td>{this.state.numTokens}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="section">
                         <h3>Mint Tokens</h3>
                         <label htmlFor="receiverAddress">Receiver Address</label>
                         <input
@@ -322,7 +324,7 @@ class Signer extends Component {
                         </div>
                     </div>
 
-                    <div className="form-section">
+                    <div className="section">
                         <h3>Register a Label</h3>
                         <label htmlFor="labelName">Label name</label>
                         <input

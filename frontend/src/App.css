@@ -3,6 +3,10 @@
   text-align: center;
 }
 
-.form-section {
+.section {
   margin-bottom: 20px;
+}
+
+.horizontal-table tr td:first-child {
+  font-weight: bold;
 }
