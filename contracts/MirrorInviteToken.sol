@@ -60,7 +60,16 @@ contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
      * @param r r of the signature
      * @param s s of the signature
      */
-    function registerWithAuthorization(address owner, string calldata label, uint256 validAfter, uint256 validBefore, bytes32 nonce, uint8 v, bytes32 r, bytes32 s) external {
+    function registerWithAuthorization(
+        address owner,
+        string calldata label,
+        uint256 validAfter,
+        uint256 validBefore,
+        bytes32 nonce,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
         _requireValidAuthorization(owner, nonce, validAfter, validBefore);
         // TODO: maybe use hash of label instead
         bytes memory data = abi.encode(
@@ -79,7 +88,16 @@ contract MirrorInviteToken is ERC20Burnable, Mintable, Authorizable {
         _register(label, owner);
     }
 
-    function debug(address owner, string calldata label, uint256 validAfter, uint256 validBefore, bytes32 nonce, uint8 v, bytes32 r, bytes32 s) external view returns (address) {
+    function debug(
+        address owner,
+        string calldata label,
+        uint256 validAfter,
+        uint256 validBefore,
+        bytes32 nonce,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external view returns (address) {
         bytes memory data = abi.encode(
             REGISTER_WITH_AUTHORIZATION_TYPEHASH,
             owner,
