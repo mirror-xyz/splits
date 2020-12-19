@@ -15,6 +15,7 @@ import deployedAddresses from './config/deployed-addresses.json'
 const NETWORK_MAP = {
     '0': 'mainnet',
     '3': 'ropsten',
+    '4': 'rinkeby',
     '1337': 'hardhat',
     '31337': 'hardhat',
 }
@@ -206,7 +207,7 @@ class Signer extends Component {
         console.log('available', available)
 
         const ensRegistry = new web3.eth.Contract((ENSRegistryABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['ENSRegistry'])
-        const fullLabel = `${this.state.label}.mirror.xyz`
+        const fullLabel = `${this.state.label}.mirror.test`
         console.log('node', fullLabel, ethers.utils.namehash(fullLabel))
         const owner = await ensRegistry.methods.owner(ethers.utils.namehash(fullLabel)).call({
             from: this.state.account,
@@ -216,15 +217,9 @@ class Signer extends Component {
 
     }
 
-    handleReadLabelChange(event) {
-        this.setState({
-            readLabel: event.target.value
-        })
-    }
-
     async queryLabel() {
         const ensRegistry = new web3.eth.Contract((ENSRegistryABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['ENSRegistry'])
-        const fullLabel = `${this.state.readLabel}.mirror.xyz`
+        const fullLabel = `${this.state.readLabel}.mirror.test`
         const owner = await ensRegistry.methods.owner(ethers.utils.namehash(fullLabel)).call({
             from: this.state.account,
             gas: '800000'
