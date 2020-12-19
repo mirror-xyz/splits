@@ -1,7 +1,7 @@
 pragma solidity ^0.6.8;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 
 import "./IENSResolver.sol";
@@ -27,6 +27,8 @@ contract MirrorENSRegistrar is IENSManager, Owned {
     // namehash('addr.reverse')
     bytes32 constant public ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
+    event MirrorTokenBurned(address _address);
+
     // *************** Constructor ********************** //
 
     /**
@@ -41,6 +43,8 @@ contract MirrorENSRegistrar is IENSManager, Owned {
         rootNode = _rootNode;
         ensRegistry = ENS(_ensRegistry);
         ensResolver = _ensResolver;
+
+        // The mirror token is added for burning before registering.
         mirrorInviteToken = _mirrorInviteToken;
     }
 
@@ -61,14 +65,30 @@ contract MirrorENSRegistrar is IENSManager, Owned {
      * @param _ensResolver The address of the ENS resolver contract.
      */
     function changeENSResolver(address _ensResolver) external onlyOwner {
-        require(_ensResolver != address(0), "WF: address cannot be null");
+        require(_ensResolver != address(0), "MirrorENSRegistrar: address cannot be null");
         ensResolver = _ensResolver;
         emit ENSResolverChanged(_ensResolver);
     }
 
     function register(string calldata _label, address _owner, address _spender) external override {
-      require(msg.sender == _spender || msg.sender == mirrorInviteToken, "MirrorENSRegistrar: caller must be user or token contract");
+      // Verify that the sender can burn a token.
+      require(
+        msg.sender == _spender || msg.sender == mirrorInviteToken,
+        "MirrorENSRegistrar: caller must be user or token contract"
+      );
+
+      uint256 balancePriorToBurn = IERC20(mirrorInviteToken).balanceOf(_spender);
+      require(
+          balancePriorToBurn > 0, "Must have a token balance."
+      );
+
       ERC20Burnable(mirrorInviteToken).burnFrom(_spender, 1);
+
+      uint256 balanceAfterBurn = IERC20(mirrorInviteToken).balanceOf(_spender);
+
+      require(balanceAfterBurn == balancePriorToBurn - 1, "MirrorENSRegistrar: Failed to burn");
+      emit MirrorTokenBurned(_spender);
+
       _register(_label, _owner);
     }
 
@@ -82,7 +102,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
         bytes32 labelNode = keccak256(abi.encodePacked(_label));
         bytes32 node = keccak256(abi.encodePacked(rootNode, labelNode));
         address currentOwner = ensRegistry.owner(node);
-        require(currentOwner == address(0), "MirrorENSRegistrar: _label is alrealdy owned");
+        require(currentOwner == address(0), "MirrorENSRegistrar: _label is already owned");
 
         // Forward ENS
         ensRegistry.setSubnodeRecord(rootNode, labelNode, _owner, address(ensResolver), 0);

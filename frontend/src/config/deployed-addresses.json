@@ -1,9 +1,7 @@
 {
-  "ropsten": {
-    "ENSRegistry": "0x5921f865A4eB0a66b1ef6034D7BD31F2870B73E8",
-    "ENSResolver": "0x86a2108F9AD5b19a9fa40bce0eCaFf840fAe3ed5",
-    "MirrorInviteToken": "0xA7EfB26D6DFe9015ec6eb4c5763D4E4c0512b7A1",
-    "MirrorENSRegistrar": "0xD4236987b5583e46E4b30DF480f9955C5621A933",
-    "ReverseRegistrar": "0x2e4ED64061CEc81A5bb50cA23555d3EBBe4bd7eA"
+  "rinkeby": {
+    "ENSResolver": "0x6A4E77905d107bFC8BAC70afDdb14F9a9D41CfC4",
+    "MirrorInviteToken": "0xb8735D76245FBfD6E42CfaD1F98F2B2FE0c47E53",
+    "MirrorENSRegistrar": "0xc11796439c3202f4EF836EB126CC67eB378D52c8"
   }
 }

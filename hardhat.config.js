@@ -39,6 +39,10 @@ module.exports = {
       url: `http://eth-ropsten.alchemyapi.io/v2/${alchemyAPIKey}`,
       accounts: [deployerPrivateKey],
     },
+    rinkeby: {
+      url: `http://eth-rinkeby.alchemyapi.io/v2/${alchemyAPIKey}`,
+      accounts: [deployerPrivateKey],
+    },
     hardhat: {
       chainId: 1337,
       //accounts: [{ privateKey: deployerPrivateKey, balance: '1000000000000000000' }],

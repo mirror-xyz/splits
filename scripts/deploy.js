@@ -5,34 +5,48 @@ const fs = require('fs')
 const NETWORK_MAP = {
   '0': 'mainnet',
   '3': 'ropsten',
+  '4': 'rinkeby',
   '1337': 'hardhat',
   '31337': 'hardhat',
 }
+
+const ENS_REGISTRY_ADDRESS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
+
 const ZERO_BYTES32 = ethers.constants.HashZero;
-const root = 'xyz'
+const root = 'test'
 const subnameWallet = 'mirror'
 
 async function main() {
   const [owner, user1, user2] = await ethers.getSigners()
 
-  const ENSRegistry = await ethers.getContractFactory('ENSRegistry')
+  // const ENSRegistry = await ethers.getContractFactory('ENSRegistry')
   const ENSResolver = await ethers.getContractFactory('ArgentENSResolver')
   const MirrorENSRegistrar = await ethers.getContractFactory('MirrorENSRegistrar')
   const MirrorInviteToken = await ethers.getContractFactory('MirrorInviteToken')
   const ReverseRegistrar = await ethers.getContractFactory('MirrorENSReverseRegistrar')
 
-  const ensRegistry = await ENSRegistry.deploy()
+  // const ensRegistry = await ENSRegistry.deploy()
   const ensResolver = await ENSResolver.deploy()
   const mirrorInviteToken = await MirrorInviteToken.deploy('MirrorInviteToken', 'WRITE')
-  const reverseRegistrar = await ReverseRegistrar.deploy(ensRegistry.address, ensResolver.address)
-
-  await ensRegistry.deployed()
-  await ensResolver.deployed()
   await mirrorInviteToken.deployed()
 
-  const rootName = 'mirror.xyz'
+  // const reverseRegistrar = await ReverseRegistrar.deploy(
+  //     ENS_REGISTRY_ADDRESS,
+  //     ensResolver.address
+  // )
+
+  // await ensRegistry.deployed()
+  await ensResolver.deployed()
+
+  const rootName = 'mirror.test'
   const rootNode = ethers.utils.namehash(rootName)
-  const mirrorENSRegistrar = await MirrorENSRegistrar.deploy(rootName, rootNode, ensRegistry.address, ensResolver.address, mirrorInviteToken.address)
+  const mirrorENSRegistrar = await MirrorENSRegistrar.deploy(
+      rootName,
+      rootNode,
+      ENS_REGISTRY_ADDRESS,
+      ensResolver.address,
+      mirrorInviteToken.address
+  )
 
   await mirrorENSRegistrar.deployed()
 
@@ -42,39 +56,39 @@ async function main() {
   await ensResolver.addManager(mirrorENSRegistrar.address)
 
   // Set up ENS infrastructure
-  await ensRegistry.setSubnodeOwner(
-    ZERO_BYTES32,
-    ethers.utils.keccak256(ethers.utils.toUtf8Bytes(root)),
-    owner.address)
-  await ensRegistry.setSubnodeOwner(
-    ethers.utils.namehash(root),
-    ethers.utils.keccak256(ethers.utils.toUtf8Bytes('mirror')),
-    mirrorENSRegistrar.address);
-  await ensRegistry.setSubnodeOwner(
-    ZERO_BYTES32,
-    ethers.utils.keccak256(ethers.utils.toUtf8Bytes('reverse')),
-    owner.address)
-  await ensRegistry.setSubnodeOwner(
-    ethers.utils.namehash('reverse'),
-    ethers.utils.keccak256(ethers.utils.toUtf8Bytes('addr')),
-    reverseRegistrar.address,
-  )
+  // await ensRegistry.setSubnodeOwner(
+  //   ZERO_BYTES32,
+  //   ethers.utils.keccak256(ethers.utils.toUtf8Bytes(root)),
+  //   owner.address)
+  // await ensRegistry.setSubnodeOwner(
+  //   ethers.utils.namehash(root),
+  //   ethers.utils.keccak256(ethers.utils.toUtf8Bytes('mirror')),
+  //   mirrorENSRegistrar.address);
+  // await ensRegistry.setSubnodeOwner(
+  //   ZERO_BYTES32,
+  //   ethers.utils.keccak256(ethers.utils.toUtf8Bytes('reverse')),
+  //   owner.address)
+  // await ensRegistry.setSubnodeOwner(
+  //   ethers.utils.namehash('reverse'),
+  //   ethers.utils.keccak256(ethers.utils.toUtf8Bytes('addr')),
+  //   reverseRegistrar.address,
+  // )
 
-  console.log('ENSRegistry', ensRegistry.address)
+  // console.log('ENSRegistry', ensRegistry.address)
   console.log('ENSResolver', ensResolver.address)
   console.log('MirrorInviteToken', mirrorInviteToken.address)
   console.log('MirrorENSRegistrar', mirrorENSRegistrar.address)
-  console.log('ReverseRegistrar', reverseRegistrar.address)
+  // console.log('ReverseRegistrar', reverseRegistrar.address)
 
   const chainId = (await waffle.provider.getNetwork()).chainId
   const networkName = NETWORK_MAP[chainId]
   let deployedAddresses = {}
   deployedAddresses[networkName] = {
-    ENSRegistry: ensRegistry.address,
+    // ENSRegistry: ensRegistry.address,
     ENSResolver: ensResolver.address,
     MirrorInviteToken: mirrorInviteToken.address,
     MirrorENSRegistrar: mirrorENSRegistrar.address,
-    ReverseRegistrar: reverseRegistrar.address,
+    // ReverseRegistrar: reverseRegistrar.address,
   }
 
   fs.writeFileSync(
