@@ -11,7 +11,8 @@ import "./Owned.sol";
 import "./ens/ENS.sol";
 import "./strings.sol";
 
-contract MirrorENSRegistrar is IENSManager, Owned {
+contract MirrorENSManager is IENSManager, Owned {
+
     using strings for *;
 
     // The managed root name
@@ -19,10 +20,11 @@ contract MirrorENSRegistrar is IENSManager, Owned {
     // The managed root node
     bytes32 public rootNode;
 
-    ENS public ensRegistry;
-    address public override ensResolver;
-
+    // Invite token to burn upon registration.
     address public mirrorInviteToken;
+
+    ENS public ensRegistry;
+    IENSResolver public ensResolver;
 
     // namehash('addr.reverse')
     bytes32 constant public ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
@@ -38,11 +40,17 @@ contract MirrorENSRegistrar is IENSManager, Owned {
      * @param _ensRegistry The address of the ENS registry
      * @param _ensResolver The address of the ENS resolver
      */
-    constructor(string memory _rootName, bytes32 _rootNode, address _ensRegistry, address _ensResolver, address _mirrorInviteToken) public {
+    constructor(
+        string memory _rootName,
+        bytes32 _rootNode,
+        address _ensRegistry,
+        address _ensResolver,
+        address _mirrorInviteToken
+    ) public {
         rootName = _rootName;
         rootNode = _rootNode;
         ensRegistry = ENS(_ensRegistry);
-        ensResolver = _ensResolver;
+        ensResolver = IENSResolver(_ensResolver);
 
         // The mirror token is added for burning before registering.
         mirrorInviteToken = _mirrorInviteToken;
@@ -66,7 +74,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
      */
     function changeENSResolver(address _ensResolver) external onlyOwner {
         require(_ensResolver != address(0), "MirrorENSRegistrar: address cannot be null");
-        ensResolver = _ensResolver;
+        ensResolver = IENSResolver(_ensResolver);
         emit ENSResolverChanged(_ensResolver);
     }
 
@@ -86,7 +94,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
 
       uint256 balanceAfterBurn = IERC20(mirrorInviteToken).balanceOf(_spender);
 
-      require(balanceAfterBurn == balancePriorToBurn - 1, "MirrorENSRegistrar: Failed to burn");
+      require(balanceAfterBurn == balancePriorToBurn - 1, "MirrorENSManager: Failed to burn");
       emit MirrorTokenBurned(_spender);
 
       _register(_label, _owner);
@@ -102,11 +110,11 @@ contract MirrorENSRegistrar is IENSManager, Owned {
         bytes32 labelNode = keccak256(abi.encodePacked(_label));
         bytes32 node = keccak256(abi.encodePacked(rootNode, labelNode));
         address currentOwner = ensRegistry.owner(node);
-        require(currentOwner == address(0), "MirrorENSRegistrar: _label is already owned");
+        require(currentOwner == address(0), "MirrorENSManager: _label is alrealdy owned");
 
         // Forward ENS
         ensRegistry.setSubnodeRecord(rootNode, labelNode, _owner, address(ensResolver), 0);
-        IENSResolver(ensResolver).setAddr(node, _owner);
+        ensResolver.setAddr(node, _owner);
 
         // Reverse ENS
         strings.slice[] memory parts = new strings.slice[](2);
@@ -115,7 +123,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
         string memory name = ".".toSlice().join(parts);
         ENSReverseRegistrar reverseRegistrar = ENSReverseRegistrar(_getENSReverseRegistrar());
         bytes32 reverseNode = reverseRegistrar.node(_owner);
-        IENSResolver(ensResolver).setName(reverseNode, name);
+        ensResolver.setName(reverseNode, name);
 
         emit Registered(_owner, name);
     }
@@ -135,7 +143,7 @@ contract MirrorENSRegistrar is IENSManager, Owned {
      * @param _subnode The target subnode.
      * @return true if the subnode is available.
      */
-    function isAvailable(bytes32 _subnode) public override view returns (bool) {
+    function isAvailable(bytes32 _subnode) public view returns (bool) {
         bytes32 node = keccak256(abi.encodePacked(rootNode, _subnode));
         address currentOwner = ensRegistry.owner(node);
         if (currentOwner == address(0)) {

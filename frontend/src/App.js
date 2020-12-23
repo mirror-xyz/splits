@@ -8,7 +8,7 @@ import {Transaction} from '@ethereumjs/tx'
 import './App.css';
 
 import MirrorInviteTokenABI from './abi/MirrorInviteToken.json'
-import MirrorENSRegistrarABI from './abi/MirrorENSRegistrar.json'
+import MirrorENSManagerABI from './abi/MirrorENSManager.json'
 import ENSRegistryABI from './abi/ENSRegistry.json'
 import deployedAddresses from './config/deployed-addresses.json'
 
@@ -20,6 +20,11 @@ const NETWORK_MAP = {
     '31337': 'hardhat',
 }
 const ZERO_BYTES32 = ethers.constants.HashZero;
+
+const ENS_REGISTRY_ADDRESS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
+
+const rootName = 'mirror.test'
+const rootNode = ethers.utils.namehash(rootName)
 
 let web3
 
@@ -39,12 +44,15 @@ function App() {
     );
 }
 
+const mirrorENSManagerName = 'MirrorENSRegistrar';
+
 class Signer extends Component {
     constructor(props) {
         super(props)
         this.state = {
             label: '',
             mintAmount: '',
+            newENSOwner: '',
         }
     }
 
@@ -55,13 +63,22 @@ class Signer extends Component {
         const mirrorInviteTokenAddress = deployedAddresses[NETWORK_MAP[chainId]]['MirrorInviteToken']
         const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), mirrorInviteTokenAddress)
         const numTokens = await mirrorInviteToken.methods.balanceOf(account).call()
+        const ensRegistry= new web3.eth.Contract(
+            ENSRegistryABI,
+            ENS_REGISTRY_ADDRESS
+        );
+        console.log(ensRegistry.methods);
+        const ensOwner = await ensRegistry.methods.owner(rootNode).call();
+
+        console.log({ensOwner});
 
         this.setState({
             ...this.state,
             chainId,
             account,
             numTokens,
-            mirrorInviteTokenAddress
+            mirrorInviteTokenAddress,
+            ensOwner
         });
     }
 
@@ -69,6 +86,26 @@ class Signer extends Component {
         this.setState({
             label: event.target.value
         })
+    }
+
+    handleChangeENSOwnerInput(event) {
+        const newENSOwner = event.target.value;
+        console.log({newENSOwner});
+
+        this.setState({
+            newENSOwner,
+        })
+    }
+
+    handleChangeENSOwner() {
+        const { newENSOwner } = this.state;
+
+        const mirrorENS = new web3.eth.Contract(
+            MirrorENSManagerABI,
+            deployedAddresses[NETWORK_MAP[this.state.chainId]][mirrorENSManagerName]
+        );
+
+        mirrorENS.methods.changeRootnodeOwner(newENSOwner).send({from: this.state.account});
     }
 
     async sign(input) {
@@ -184,39 +221,6 @@ class Signer extends Component {
         mirrorInviteToken.methods.register(this.state.label, this.state.account).send({from: this.state.account})
     }
 
-    async loadFields() {
-        const mirrorInviteToken = new web3.eth.Contract((MirrorInviteTokenABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['MirrorInviteToken'])
-        const domainSeparator = await mirrorInviteToken.methods.DOMAIN_SEPARATOR().call({
-            from: this.state.account,
-            gas: '800000'
-        })
-        console.log('domainSeparator', domainSeparator)
-
-        const {v, r, s} = this.state.signature
-        const recovered = await mirrorInviteToken.methods.debug(this.state.account, this.state.label, '0', '1639082582', '0x0', '0x' + v.toString(16), r, s).call({
-            from: this.state.account,
-            gas: '800000'
-        })
-        console.log('recovered', recovered)
-
-        const mirrorENSRegistrar = new web3.eth.Contract((MirrorENSRegistrarABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['MirrorENSRegistrar'])
-        const available = await mirrorENSRegistrar.methods.isAvailable(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(this.state.label))).call({
-            from: this.state.account,
-            gas: '800000'
-        })
-        console.log('available', available)
-
-        const ensRegistry = new web3.eth.Contract((ENSRegistryABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['ENSRegistry'])
-        const fullLabel = `${this.state.label}.mirror.test`
-        console.log('node', fullLabel, ethers.utils.namehash(fullLabel))
-        const owner = await ensRegistry.methods.owner(ethers.utils.namehash(fullLabel)).call({
-            from: this.state.account,
-            gas: '800000'
-        })
-        console.log('owner', owner)
-
-    }
-
     async queryLabel() {
         const ensRegistry = new web3.eth.Contract((ENSRegistryABI), deployedAddresses[NETWORK_MAP[this.state.chainId]]['ENSRegistry'])
         const fullLabel = `${this.state.readLabel}.mirror.test`
@@ -266,6 +270,10 @@ class Signer extends Component {
                                 <td>{this.state.chainId}</td>
                             </tr>
                             <tr>
+                                <td>ENS Manager Controller Address</td>
+                                <td>{this.state.ensOwner}</td>
+                            </tr>
+                            <tr>
                                 <td>Mirror Token Address</td>
                                 <td>{this.state.mirrorInviteTokenAddress}</td>
                             </tr>
@@ -284,7 +292,7 @@ class Signer extends Component {
                         <h3>Mint Tokens</h3>
                         <label htmlFor="receiverAddress">Receiver Address</label>
                         <input
-                            class="u-full-width"
+                            className="u-full-width"
                             placeholder={"0x"}
                             id="receiverAddress"
                             value={this.state.mintAddress}
@@ -325,7 +333,27 @@ class Signer extends Component {
                         <div>
                             <button className="button-primary" onClick={() => {
                                 this.submitTx()
-                            }}>Submit Normal
+                            }}>Register ENS
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h3>Change ENS Owner</h3>
+                        <label htmlFor="ownerAddress">New owner address</label>
+                        <input
+                            id={"ownerAddress"}
+                            className="u-full-width"
+                            placeholder={"0x"}
+                            value={this.state.newENSOwner}
+                            onChange={(event) => {
+                                this.handleChangeENSOwnerInput(event)
+                            }}
+                        />
+                        <div>
+                            <button className="button-primary" onClick={() => {
+                                this.handleChangeENSOwner()
+                            }}>Change Owner
                             </button>
                         </div>
                     </div>
