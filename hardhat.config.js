@@ -26,6 +26,7 @@ module.exports = {
       runs: 200,
     }
   },
+  defaultNetwork: "rinkeby",
   networks: {
     mainnet: {
       url: `http://eth-mainnet.ws.alchemyapi.io/v2/${alchemyAPIKey}`,

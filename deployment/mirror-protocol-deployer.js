@@ -1,6 +1,6 @@
-import {ethers, waffle} from "hardhat";
+import {ethers, waffle, network} from "hardhat";
 import fs from "fs";
-import {CONTRACT_NAMES, ENS_REGISTRY_ADDRESS, NETWORK_MAP, ROOT_NAME, ROOT_NODE, TOKEN_NAME} from "./config/constants";
+import {CONTRACT_NAMES, ENS_REGISTRY_ADDRESS, NETWORK_MAP, ROOT_NAME, ROOT_NODE, TOKEN_NAME} from "../config/constants";
 
 const deploymentAddressFile = './frontend/src/config/deployed-addresses.json';
 
@@ -19,7 +19,7 @@ class MirrorProtocolDeployer {
         console.log("\n🏭  Setting Factories...");
         await this.setFactories();
 
-        console.log("\n🤖  Deploying Contracts...");
+        console.log(`\n🤖  Deploying Contracts to "${network.name}"...`);
         await this.deployContracts();
 
         console.log("\n🐘  Setting Contract State...");
@@ -46,9 +46,9 @@ class MirrorProtocolDeployer {
 
         const deployedAddresses = {
             [networkName]:  {
-                ENSResolver: this.contracts.ensResolver.address,
-                MirrorInviteToken: this.contracts.mirrorInviteToken.address,
-                MirrorENSRegistrar: this.contracts.mirrorENSManager.address,
+                [CONTRACT_NAMES.ENS_RESOLVER]: this.contracts.ensResolver.address,
+                [CONTRACT_NAMES.INVITE_TOKEN]: this.contracts.mirrorInviteToken.address,
+                [CONTRACT_NAMES.ENS_MANAGER]: this.contracts.mirrorENSManager.address,
             }
         };
 
@@ -74,8 +74,8 @@ class MirrorProtocolDeployer {
             TOKEN_NAME
         );
 
-        await this.contracts.mirrorInviteToken.deployed();
         await this.contracts.ensResolver.deployed();
+        await this.contracts.mirrorInviteToken.deployed();
 
         console.log("   - Deploying Mirror ENS Manager");
         this.contracts.mirrorENSManager = await this.factories.MirrorENSManager.deploy(
