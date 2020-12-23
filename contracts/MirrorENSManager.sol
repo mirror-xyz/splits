@@ -24,7 +24,8 @@ contract MirrorENSManager is IENSManager, Owned {
     address public mirrorInviteToken;
 
     ENS public ensRegistry;
-    IENSResolver public ensResolver;
+    address public override ensResolver;
+
 
     // namehash('addr.reverse')
     bytes32 constant public ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
@@ -50,7 +51,7 @@ contract MirrorENSManager is IENSManager, Owned {
         rootName = _rootName;
         rootNode = _rootNode;
         ensRegistry = ENS(_ensRegistry);
-        ensResolver = IENSResolver(_ensResolver);
+        ensResolver = _ensResolver;
 
         // The mirror token is added for burning before registering.
         mirrorInviteToken = _mirrorInviteToken;
@@ -74,7 +75,7 @@ contract MirrorENSManager is IENSManager, Owned {
      */
     function changeENSResolver(address _ensResolver) external onlyOwner {
         require(_ensResolver != address(0), "MirrorENSRegistrar: address cannot be null");
-        ensResolver = IENSResolver(_ensResolver);
+        ensResolver = _ensResolver;
         emit ENSResolverChanged(_ensResolver);
     }
 
@@ -113,8 +114,8 @@ contract MirrorENSManager is IENSManager, Owned {
         require(currentOwner == address(0), "MirrorENSManager: _label is alrealdy owned");
 
         // Forward ENS
-        ensRegistry.setSubnodeRecord(rootNode, labelNode, _owner, address(ensResolver), 0);
-        ensResolver.setAddr(node, _owner);
+        ensRegistry.setSubnodeRecord(rootNode, labelNode, _owner, ensResolver, 0);
+        IENSResolver(ensResolver).setAddr(node, _owner);
 
         // Reverse ENS
         strings.slice[] memory parts = new strings.slice[](2);
@@ -123,7 +124,7 @@ contract MirrorENSManager is IENSManager, Owned {
         string memory name = ".".toSlice().join(parts);
         ENSReverseRegistrar reverseRegistrar = ENSReverseRegistrar(_getENSReverseRegistrar());
         bytes32 reverseNode = reverseRegistrar.node(_owner);
-        ensResolver.setName(reverseNode, name);
+        IENSResolver(ensResolver).setName(reverseNode, name);
 
         emit Registered(_owner, name);
     }
@@ -143,7 +144,7 @@ contract MirrorENSManager is IENSManager, Owned {
      * @param _subnode The target subnode.
      * @return true if the subnode is available.
      */
-    function isAvailable(bytes32 _subnode) public view returns (bool) {
+    function isAvailable(bytes32 _subnode) public override view returns (bool) {
         bytes32 node = keccak256(abi.encodePacked(rootNode, _subnode));
         address currentOwner = ensRegistry.owner(node);
         if (currentOwner == address(0)) {

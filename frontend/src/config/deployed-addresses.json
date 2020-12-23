@@ -1,7 +1,7 @@
 {
-  "rinkeby": {
-    "ENSResolver": "0x6A4E77905d107bFC8BAC70afDdb14F9a9D41CfC4",
-    "MirrorInviteToken": "0xb8735D76245FBfD6E42CfaD1F98F2B2FE0c47E53",
-    "MirrorENSRegistrar": "0xc11796439c3202f4EF836EB126CC67eB378D52c8"
+  "hardhat": {
+    "ENSResolver": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "MirrorInviteToken": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "MirrorENSRegistrar": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
   }
 }
