@@ -17,7 +17,7 @@ contract MirrorPublicationFactoryV1 {
     function _deployNewPublication(
         address contributor
     ) internal returns (address publication) {
-        // Place creation code & constructor args of new proxy instance in memory.
+        // Place creation code publication instance in memory.
         bytes memory bytecode = type(MirrorPublicationV1).creationCode;
 
         // Salt is derived from the contributor address.
