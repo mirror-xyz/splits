@@ -1,13 +1,11 @@
 pragma solidity ^0.6.12;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import "./Mintable.sol";
 import "./IENSManager.sol";
-import "./EIP712.sol";
+import "../publication/implementation/IMirrorPublicationV1.sol";
 
-contract MirrorInviteToken is ERC20Burnable, Mintable {
+contract MirrorInviteToken is IMirrorPublicationV1, ERC20Burnable, Mintable {
     address private _registrar;
 
     constructor(string memory name, string memory symbol) Mintable(name, symbol) public {

@@ -1,7 +1,9 @@
 node_modules/
-
-#Hardhat files
+outputs/
+Reports/
+coverage/
+.env
 cache
 artifacts
-
-config/secrets.json
+build
+*.DS_Store
