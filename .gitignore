@@ -2,8 +2,8 @@ node_modules/
 outputs/
 Reports/
 coverage/
+cache/
+artifacts/
+build/
 .env
-cache
-artifacts
-build
 *.DS_Store
