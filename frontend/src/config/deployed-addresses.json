@@ -1,7 +1,0 @@
-{
-  "rinkeby": {
-    "ArgentENSResolver": "0xE3FD455efd5E9b09ef28378bb50675d0Ec65a7b5",
-    "MirrorInviteToken": "0x29cCF84D3591f74CA437c1F28f0F00bDB6AFf429",
-    "MirrorENSManager": "0x1038E3B083c85C206F9175A5E5A472FEAbC7AdeF"
-  }
-}
