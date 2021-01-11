@@ -15,7 +15,7 @@ contract Mintable is Ownable, ERC20 {
     _;
   }
 
-  constructor(string memory name, string memory symbol) ERC20(name, symbol) public {
+  constructor(string memory name, string memory symbol) ERC20(name, symbol) {
   }
 
   /**

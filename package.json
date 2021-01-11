@@ -5,6 +5,9 @@
   "repository": "git@github.com:mirror-xyz/ethereum-protocol.git",
   "author": "<graemelearn@protonmail.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "hardhat test"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^3.3.0",
     "hardhat": "^2.0.7"

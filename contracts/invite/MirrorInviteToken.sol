@@ -12,7 +12,7 @@ contract MirrorInviteToken is ERC20Burnable, Mintable {
 
     address private _registrar;
 
-    constructor(string memory name, string memory symbol) Mintable(name, symbol) public {
+    constructor(string memory name, string memory symbol) Mintable(name, symbol) {
         _setupDecimals(0);
     }
 
