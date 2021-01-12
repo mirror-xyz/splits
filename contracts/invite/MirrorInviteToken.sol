@@ -40,7 +40,7 @@ contract MirrorInviteToken is ERC20Burnable, Mintable {
         string calldata tokenSymbol,
         uint8 tokenDecimals
     ) private {
-        burnFrom(msg.sender, 1);
+        burn(1);
         
         IMirrorENSRegistrar(_ensRegistrar).register(label, msg.sender);
 

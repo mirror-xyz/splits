@@ -25,7 +25,8 @@ async function setup() {
     await mirrorInviteToken.setRegistrar(mirrorENSRegistrar.address);
   
     return [
-        mirrorInviteToken
+        mirrorInviteToken,
+        mirrorENSRegistrar
     ];
   }
 
