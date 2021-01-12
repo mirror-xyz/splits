@@ -1,11 +1,11 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.7.0;
 
-interface IMirrorRegistrar {
+interface IMirrorENSRegistrar {
     event RootnodeOwnerChange(bytes32 indexed _rootnode, address indexed _newOwner);
     event ENSResolverChanged(address addr);
-    event Registered(address indexed _owner, string _ens, address publication);
-    event Unregistered(string _ens);
+    event RegisteredENS(address indexed _owner, string _ens);
+    event UnregisteredENS(string _ens);
 
     /**
      * @notice This function must be called when the ENS Manager contract is replaced
@@ -19,9 +19,8 @@ interface IMirrorRegistrar {
     * Registers both the forward and reverse ENS.
     * @param _label The subdomain label.
     * @param _owner The owner of the subdomain.
-    * @param _spender The spender funding the registration.
     */
-    function register(string calldata _label, address payable _owner, address _spender) external;
+    function register(string calldata _label, address _owner) external;
 
     /**
      * @notice Returns true is a given subnode is available.

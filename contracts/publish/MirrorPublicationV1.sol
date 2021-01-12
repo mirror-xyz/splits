@@ -21,15 +21,17 @@ contract MirrorPublicationV1 is IMirrorPublicationV1 {
 
     /*
      * Operation properties
-     *  - Publications have an operator account that can manage contributors.
+     *  - Publications have an operator account (equal to owner) that can manage contributors.
      */
 
-    address private _operator;
+    address private _owner;
   
-    modifier onlyOperator() {
-        require(isOperator(), "MirrorPublicationV1: caller is not the operator.");
+    modifier onlyOwner() {
+        require(isOwner(), "MirrorPublicationV1: caller is not the owner.");
         _;
     }
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /*
      * Contributor properties
@@ -66,12 +68,12 @@ contract MirrorPublicationV1 is IMirrorPublicationV1 {
     }
 
     function initialize(
-        address operator,
-        string calldata tokenName,
-        string calldata tokenSymbol,
+        address owner,
+        string memory tokenName,
+        string memory tokenSymbol,
         uint8 tokenDecimals
     ) external override onlyFactory {
-        _operator = operator;
+        _transferOwnership(owner);
 
         name = tokenName;
         symbol = tokenSymbol;
@@ -90,22 +92,37 @@ contract MirrorPublicationV1 is IMirrorPublicationV1 {
         Operation Functionality
     */
 
-    function operator() external override view returns (address) {
-        return _operator;
+    function owner() public override view returns (address) {
+        return _owner;
     }
 
-    function isOperator() public view returns (bool) {
-        return msg.sender == _operator;
+    function isOwner() public view returns (bool) {
+        return msg.sender == _owner;
     }
 
-    function disableContributor(address account) external override onlyOperator {
+    function disableContributor(address account) external override onlyOwner {
         _contributors[account] = false;
         emit ContributorDisabled(account);
     }
 
-    function addContributor(address account) external override onlyOperator {
+    function addContributor(address account) external override onlyOwner {
         _contributors[account] = true;
         emit ContributorAdded(account);
+    }
+
+    function renounceOwnership() external override onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
+
+    function transferOwnership(address newOwner) external override onlyOwner {
+        _transferOwnership(newOwner);
+    }
+
+    function _transferOwnership(address newOwner) internal {
+        require(newOwner != address(0), "MirrorPublicationV1: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
     }
 
     /*
@@ -124,9 +141,9 @@ contract MirrorPublicationV1 is IMirrorPublicationV1 {
         emit Transfer(from, address(0), value);
     }
 
-    function _approve(address owner, address spender, uint value) private {
-        allowance[owner][spender] = value;
-        emit Approval(owner, spender, value);
+    function _approve(address tokenOwner, address spender, uint value) private {
+        allowance[tokenOwner][spender] = value;
+        emit Approval(tokenOwner, spender, value);
     }
 
     function _transfer(address from, address to, uint value) private {
@@ -153,7 +170,7 @@ contract MirrorPublicationV1 is IMirrorPublicationV1 {
         return true;
     }
 
-    function mint(address to, uint256 amount) external override onlyOperator returns (bool) {
+    function mint(address to, uint256 amount) external override onlyOwner returns (bool) {
         _mint(to, amount);
         return true;
     }

@@ -3,29 +3,43 @@ pragma solidity ^0.7.0;
 
 import "../MirrorPublicationV1.sol";
 import "../interfaces/IMirrorPublicationV1.sol";
-
 import "./interfaces/IMirrorPublicationFactoryV1.sol";
 
 contract MirrorPublicationFactoryV1 is IMirrorPublicationFactoryV1 {
-    event PublicationCreated(address publication, address creator);
 
-    function createPublication(address payable creator) external override returns (address publication) {
-        publication = _deployNewPublication(creator);
+    address public mirrorInviteToken;
+
+    modifier onlyInviteToken() {
+        require(isInviteToken(), "MirrorENSRegistrar: caller is not the invite token");
+        _;
     }
 
-    function _deployNewPublication(address payable creator) internal returns (address publication) {
-        // Place creation code of the instance in memory.
+    event PublicationCreated(address publication, address owner);
+
+    function createPublication(
+        address owner, 
+        string memory tokenName,
+        string memory tokenSymbol,
+        uint8 tokenDecimals
+    ) external override onlyInviteToken returns (address publication) {
         bytes memory bytecode = type(MirrorPublicationV1).creationCode;
+        bytes32 salt = keccak256(abi.encodePacked(owner));
 
-        bytes32 salt = keccak256(abi.encodePacked(creator));
-
-        // Deploy new publication contract via create2.
         assembly {
             publication := create2(0, add(32, bytecode), mload(bytecode), salt)
         }
 
-        IMirrorPublicationV1(publication).initialize(creator);
+        IMirrorPublicationV1(publication).initialize(
+            owner,
+            tokenName,
+            tokenSymbol,
+            tokenDecimals
+        );
 
-        emit PublicationCreated(publication, creator);
+        emit PublicationCreated(publication, owner);
+    }
+
+    function isInviteToken() public view returns (bool) {
+        return msg.sender == mirrorInviteToken;
     }
 }

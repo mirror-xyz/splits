@@ -1,23 +1,17 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.7.0;
 
-// Open-Zepplin
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
-// ENS
-import "./ENS/interfaces/IENS.sol";
-import "./ENS/interfaces/IENSResolver.sol";
-import "./ENS/interfaces/IENSReverseRegistrar.sol";
-// Utils
 import "./utils/strings.sol";
-// Current Interface
-import "./interfaces/IMirrorRegistrar.sol";
-
+import "./interfaces/IENS.sol";
+import "./interfaces/IENSResolver.sol";
+import "./interfaces/IENSReverseRegistrar.sol";
+import "./interfaces/IMirrorENSRegistrar.sol";
 import "../publish/factory/interfaces/IMirrorPublicationFactoryV1.sol";
 
-
-contract MirrorRegistrar is IMirrorRegistrar, Ownable {
+contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
 
     using strings for *;
 
@@ -26,19 +20,18 @@ contract MirrorRegistrar is IMirrorRegistrar, Ownable {
     // The managed root node
     bytes32 public rootNode;
 
-    // Invite token to burn upon registration.
-    address public mirrorInviteToken;
-    // Address to deploy a new publication.
-    address public mirrorPublicationFactory;
-
     IENS public ensRegistry;
     address public override ensResolver;
-
 
     // namehash('addr.reverse')
     bytes32 constant public ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
-    event MirrorTokenBurned(address _address);
+    address public mirrorInviteToken;
+
+    modifier onlyInviteToken() {
+        require(isInviteToken(), "MirrorENSRegistrar: caller is not the invite token");
+        _;
+    }
 
     // *************** Constructor ********************** //
 
@@ -87,25 +80,7 @@ contract MirrorRegistrar is IMirrorRegistrar, Ownable {
         emit ENSResolverChanged(_ensResolver);
     }
 
-    function register(string calldata _label, address payable _owner, address _spender) external override {
-      // Verify that the sender can burn a token.
-      require(
-        msg.sender == _spender || msg.sender == mirrorInviteToken,
-        "MirrorENSRegistrar: caller must be user or token contract"
-      );
-
-      uint256 balancePriorToBurn = IERC20(mirrorInviteToken).balanceOf(_spender);
-      require(
-          balancePriorToBurn > 0, "Must have a token balance."
-      );
-
-      ERC20Burnable(mirrorInviteToken).burnFrom(_spender, 1);
-
-      uint256 balanceAfterBurn = IERC20(mirrorInviteToken).balanceOf(_spender);
-
-      require(balanceAfterBurn == balancePriorToBurn - 1, "MirrorENSManager: Failed to burn");
-      emit MirrorTokenBurned(_spender);
-
+    function register(string calldata _label, address _owner) external override onlyInviteToken {
       _register(_label, _owner);
     }
 
@@ -115,11 +90,11 @@ contract MirrorRegistrar is IMirrorRegistrar, Ownable {
     * @param _label The subdomain label.
     * @param _owner The owner of the subdomain.
     */
-    function _register(string memory _label, address payable _owner) internal {
+    function _register(string memory _label, address _owner) internal {
         bytes32 labelNode = keccak256(abi.encodePacked(_label));
         bytes32 node = keccak256(abi.encodePacked(rootNode, labelNode));
         address currentOwner = ensRegistry.owner(node);
-        require(currentOwner == address(0), "MirrorENSManager: _label is alrealdy owned");
+        require(currentOwner == address(0), "MirrorENSManager: _label is already owned");
 
         // Forward ENS
         ensRegistry.setSubnodeRecord(rootNode, labelNode, _owner, ensResolver, 0);
@@ -133,10 +108,8 @@ contract MirrorRegistrar is IMirrorRegistrar, Ownable {
         IENSReverseRegistrar reverseRegistrar = IENSReverseRegistrar(_getENSReverseRegistrar());
         bytes32 reverseNode = reverseRegistrar.node(_owner);
         IENSResolver(ensResolver).setName(reverseNode, name);
-
-        address publication = IMirrorPublicationFactoryV1(mirrorPublicationFactory).createPublication(_owner);
-
-        emit Registered(_owner, name, publication);
+        
+        emit RegisteredENS(_owner, name);
     }
 
     /**
@@ -147,7 +120,9 @@ contract MirrorRegistrar is IMirrorRegistrar, Ownable {
         return _getENSReverseRegistrar();
     }
 
-    // *************** Public Functions ********************* //
+    function isInviteToken() public view returns (bool) {
+        return msg.sender == mirrorInviteToken;
+    }
 
     /**
      * @notice Returns true is a given subnode is available.
