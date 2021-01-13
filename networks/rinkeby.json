@@ -1,0 +1,8 @@
+{
+  "Contracts": {
+    "MirrorInviteToken": "0x96695ad9cbCFe1779FE2E9246Caa23Cb1A43C971",
+    "MirrorENSResolver": "0xb75c45621e8928D4A3332F39311Cd55D081EEF65",
+    "MirrorENSRegistrar": "0xd5cA42B27F5b37dA1B08DbA71a53056B0C939204",
+    "MirrorPublicationFactoryV1": "0x49F70F2968990981d11e2808e25e011b7672dF95"
+  }
+}

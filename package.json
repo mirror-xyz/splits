@@ -6,7 +6,9 @@
   "author": "<graemelearn@protonmail.com>",
   "license": "MIT",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "deploy:default": "hardhat run scripts/deploy.ts",
+    "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.ts"
   },
   "dependencies": {
     "@nomiclabs/hardhat-solhint": "^2.0.0",
