@@ -4,6 +4,9 @@ import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-solhint';
 import 'hardhat-typechain';
 
+const { alchemyAPIKey, deployerPrivateKey } = require('./env.json');
+
+
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   solidity: {
@@ -18,6 +21,12 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: 'ts-types/contracts',
     target: 'ethers-v5'
+  },
+  networks: {
+    rinkeby: {
+      url: `http://eth-rinkeby.alchemyapi.io/v2/${alchemyAPIKey}`,
+      accounts: [deployerPrivateKey],
+    },
   }
 };
 
