@@ -22,13 +22,6 @@ async function main() {
 
   console.log(`Deploying to ${networkName}`);
 
-//   const ENSRegistry = await ethers.getContractFactory('ENSRegistry')
-//   const ensRegistry = await ENSRegistry.deploy()
-//   await ensRegistry.deployed()
-
-//   const rootOwner = await ensRegistry.owner(ZERO_BYTES32)
-//   const xyzOwner = await ensRegistry.owner(ethers.utils.namehash(ROOT_NAME))
-
   const MirrorInviteToken = await ethers.getContractFactory("MirrorInviteToken");
   const mirrorInviteToken = await MirrorInviteToken.deploy("MirrorInviteToken", "WRITE");
   await mirrorInviteToken.deployed();
@@ -47,9 +40,6 @@ async function main() {
   );
   await mirrorENSRegistrar.deployed();
 
-//   const ReverseRegistrar = await ethers.getContractFactory('MirrorENSReverseRegistrar')
-//   const reverseRegistrar = await ReverseRegistrar.deploy(ensRegistry.address, mirrorENSRegistrar.address)
-
   const MirrorPublicationFactoryV1 = await ethers.getContractFactory("MirrorPublicationFactoryV1");
   const mirrorPublicationFactoryV1 = await MirrorPublicationFactoryV1.deploy();
   await mirrorPublicationFactoryV1.deployed();
@@ -59,28 +49,6 @@ async function main() {
   await mirrorInviteToken.setPublicationFactory(mirrorPublicationFactoryV1.address);
 
   await mirrorENSResolver.transferOwnership(mirrorENSRegistrar.address)
-
-  // Setup root.
-//   await ensRegistry.setSubnodeOwner(
-//     ZERO_BYTES32,
-//     ethers.utils.keccak256(ethers.utils.toUtf8Bytes("xyz")),
-//     owner.address
-//   );
-//   await ensRegistry.setSubnodeOwner(
-//     ethers.utils.namehash("xyz"),
-//     ethers.utils.keccak256(ethers.utils.toUtf8Bytes("mirror")),
-//     mirrorENSRegistrar.address
-//   );
-//   await ensRegistry.setSubnodeOwner(
-//     ZERO_BYTES32,
-//     ethers.utils.keccak256(ethers.utils.toUtf8Bytes('reverse')),
-//     owner.address
-//   )
-//   await ensRegistry.setSubnodeOwner(
-//     ethers.utils.namehash('reverse'),
-//     ethers.utils.keccak256(ethers.utils.toUtf8Bytes('addr')),
-//     reverseRegistrar.address,
-//   )
 
     const info = {
       Contracts: {
@@ -95,8 +63,6 @@ async function main() {
 
     fs.writeFileSync(`${__dirname}/../networks/${networkName}.json`, JSON.stringify(info, null, 2));
 }
-
-
 
 main()
   .then(() => process.exit(0))
