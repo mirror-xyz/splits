@@ -2,5 +2,11 @@
 pragma solidity ^0.7.0;
 
 interface IMirrorPublicationFactoryV1 {
-    function createPublication(address payable creator) external returns (address publication);
+    function createPublication(
+        address creator, 
+        string memory label,
+        string memory tokenName,
+        string memory tokenSymbol,
+        uint8 tokenDecimals
+    ) external returns (address publication);
 }
