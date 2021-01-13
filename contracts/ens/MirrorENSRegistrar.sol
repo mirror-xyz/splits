@@ -94,6 +94,7 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
         bytes32 labelNode = keccak256(abi.encodePacked(_label));
         bytes32 node = keccak256(abi.encodePacked(rootNode, labelNode));
         address currentOwner = ensRegistry.owner(node);
+
         require(currentOwner == address(0), "MirrorENSManager: _label is already owned");
 
         // Forward ENS

@@ -29,16 +29,18 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     "burnFrom(address,uint256)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
+    "ensRegistrar()": FunctionFragment;
     "finishMinting()": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "mintingFinished()": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
+    "publicationFactory()": FunctionFragment;
     "register(string,string,string,uint8)": FunctionFragment;
-    "registrar()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "setRegistrar(address)": FunctionFragment;
+    "setENSRegistrar(address)": FunctionFragment;
+    "setPublicationFactory(address)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -66,6 +68,10 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "ensRegistrar",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "finishMinting",
     values?: undefined
   ): string;
@@ -84,16 +90,23 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "publicationFactory",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "register",
     values: [string, string, string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "registrar", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setRegistrar",
+    functionFragment: "setENSRegistrar",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setPublicationFactory",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
@@ -125,6 +138,10 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "ensRegistrar",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "finishMinting",
     data: BytesLike
   ): Result;
@@ -139,14 +156,21 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "publicationFactory",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "registrar", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setRegistrar",
+    functionFragment: "setENSRegistrar",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setPublicationFactory",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
@@ -264,6 +288,10 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    ensRegistrar(overrides?: CallOverrides): Promise<[string]>;
+
+    "ensRegistrar()"(overrides?: CallOverrides): Promise<[string]>;
+
     finishMinting(overrides?: Overrides): Promise<ContractTransaction>;
 
     "finishMinting()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -304,6 +332,10 @@ export class MirrorInviteToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
+    publicationFactory(overrides?: CallOverrides): Promise<[string]>;
+
+    "publicationFactory()"(overrides?: CallOverrides): Promise<[string]>;
+
     register(
       label: string,
       tokenName: string,
@@ -320,21 +352,27 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    registrar(overrides?: CallOverrides): Promise<[string]>;
-
-    "registrar()"(overrides?: CallOverrides): Promise<[string]>;
-
     renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
 
-    setRegistrar(
-      ensRegistrar: string,
+    setENSRegistrar(
+      ensRegistrar_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "setRegistrar(address)"(
-      ensRegistrar: string,
+    "setENSRegistrar(address)"(
+      ensRegistrar_: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    setPublicationFactory(
+      publicationFactory_: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setPublicationFactory(address)"(
+      publicationFactory_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -452,6 +490,10 @@ export class MirrorInviteToken extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  ensRegistrar(overrides?: CallOverrides): Promise<string>;
+
+  "ensRegistrar()"(overrides?: CallOverrides): Promise<string>;
+
   finishMinting(overrides?: Overrides): Promise<ContractTransaction>;
 
   "finishMinting()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -492,6 +534,10 @@ export class MirrorInviteToken extends Contract {
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
+  publicationFactory(overrides?: CallOverrides): Promise<string>;
+
+  "publicationFactory()"(overrides?: CallOverrides): Promise<string>;
+
   register(
     label: string,
     tokenName: string,
@@ -508,21 +554,27 @@ export class MirrorInviteToken extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  registrar(overrides?: CallOverrides): Promise<string>;
-
-  "registrar()"(overrides?: CallOverrides): Promise<string>;
-
   renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
   "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
 
-  setRegistrar(
-    ensRegistrar: string,
+  setENSRegistrar(
+    ensRegistrar_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "setRegistrar(address)"(
-    ensRegistrar: string,
+  "setENSRegistrar(address)"(
+    ensRegistrar_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  setPublicationFactory(
+    publicationFactory_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setPublicationFactory(address)"(
+    publicationFactory_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -637,6 +689,10 @@ export class MirrorInviteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    ensRegistrar(overrides?: CallOverrides): Promise<string>;
+
+    "ensRegistrar()"(overrides?: CallOverrides): Promise<string>;
+
     finishMinting(overrides?: CallOverrides): Promise<boolean>;
 
     "finishMinting()"(overrides?: CallOverrides): Promise<boolean>;
@@ -677,6 +733,10 @@ export class MirrorInviteToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
 
+    publicationFactory(overrides?: CallOverrides): Promise<string>;
+
+    "publicationFactory()"(overrides?: CallOverrides): Promise<string>;
+
     register(
       label: string,
       tokenName: string,
@@ -693,21 +753,27 @@ export class MirrorInviteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    registrar(overrides?: CallOverrides): Promise<string>;
-
-    "registrar()"(overrides?: CallOverrides): Promise<string>;
-
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     "renounceOwnership()"(overrides?: CallOverrides): Promise<void>;
 
-    setRegistrar(
-      ensRegistrar: string,
+    setENSRegistrar(
+      ensRegistrar_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setRegistrar(address)"(
-      ensRegistrar: string,
+    "setENSRegistrar(address)"(
+      ensRegistrar_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setPublicationFactory(
+      publicationFactory_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setPublicationFactory(address)"(
+      publicationFactory_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -844,6 +910,10 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    ensRegistrar(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "ensRegistrar()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     finishMinting(overrides?: Overrides): Promise<BigNumber>;
 
     "finishMinting()"(overrides?: Overrides): Promise<BigNumber>;
@@ -884,6 +954,10 @@ export class MirrorInviteToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    publicationFactory(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "publicationFactory()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     register(
       label: string,
       tokenName: string,
@@ -900,21 +974,27 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    registrar(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "registrar()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     renounceOwnership(overrides?: Overrides): Promise<BigNumber>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<BigNumber>;
 
-    setRegistrar(
-      ensRegistrar: string,
+    setENSRegistrar(
+      ensRegistrar_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "setRegistrar(address)"(
-      ensRegistrar: string,
+    "setENSRegistrar(address)"(
+      ensRegistrar_: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    setPublicationFactory(
+      publicationFactory_: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setPublicationFactory(address)"(
+      publicationFactory_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -1036,6 +1116,10 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    ensRegistrar(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "ensRegistrar()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     finishMinting(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "finishMinting()"(overrides?: Overrides): Promise<PopulatedTransaction>;
@@ -1078,6 +1162,14 @@ export class MirrorInviteToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    publicationFactory(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "publicationFactory()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     register(
       label: string,
       tokenName: string,
@@ -1094,21 +1186,27 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    registrar(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "registrar()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     renounceOwnership(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
-    setRegistrar(
-      ensRegistrar: string,
+    setENSRegistrar(
+      ensRegistrar_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "setRegistrar(address)"(
-      ensRegistrar: string,
+    "setENSRegistrar(address)"(
+      ensRegistrar_: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    setPublicationFactory(
+      publicationFactory_: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setPublicationFactory(address)"(
+      publicationFactory_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

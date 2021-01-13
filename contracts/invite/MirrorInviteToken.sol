@@ -8,8 +8,8 @@ import "../publish/factory/interfaces/IMirrorPublicationFactoryV1.sol";
 
 contract MirrorInviteToken is ERC20Burnable, Mintable {
 
-    address private _ensRegistrar;
-    address private _publicationFactory;
+    address public ensRegistrar;
+    address public publicationFactory;
 
     event InviteTokenBurned(address _address);
 
@@ -17,12 +17,12 @@ contract MirrorInviteToken is ERC20Burnable, Mintable {
         _setupDecimals(0);
     }
 
-    function registrar() external view returns (address) {
-        return _ensRegistrar;
+    function setENSRegistrar(address ensRegistrar_) onlyOwner external {
+        ensRegistrar = ensRegistrar_;
     }
 
-    function setRegistrar(address ensRegistrar) onlyOwner external {
-        _ensRegistrar = ensRegistrar;
+    function setPublicationFactory(address publicationFactory_) onlyOwner external {
+        publicationFactory = publicationFactory_;
     }
 
     function register(
@@ -42,10 +42,11 @@ contract MirrorInviteToken is ERC20Burnable, Mintable {
     ) private {
         burn(1);
         
-        IMirrorENSRegistrar(_ensRegistrar).register(label, msg.sender);
+        IMirrorENSRegistrar(ensRegistrar).register(label, msg.sender);
 
-        IMirrorPublicationFactoryV1(_publicationFactory).createPublication(
+        IMirrorPublicationFactoryV1(publicationFactory).createPublication(
             msg.sender,
+            label,
             tokenName,
             tokenSymbol,
             tokenDecimals

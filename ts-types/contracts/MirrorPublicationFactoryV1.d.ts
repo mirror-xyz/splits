@@ -22,14 +22,18 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface MirrorPublicationFactoryV1Interface extends ethers.utils.Interface {
   functions: {
-    "createPublication(address,string,string,uint8)": FunctionFragment;
+    "createPublication(address,string,string,string,uint8)": FunctionFragment;
     "isInviteToken()": FunctionFragment;
     "mirrorInviteToken()": FunctionFragment;
+    "owner()": FunctionFragment;
+    "renounceOwnership()": FunctionFragment;
+    "setInviteToken(address)": FunctionFragment;
+    "transferOwnership(address)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createPublication",
-    values: [string, string, string, BigNumberish]
+    values: [string, string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isInviteToken",
@@ -38,6 +42,19 @@ interface MirrorPublicationFactoryV1Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "mirrorInviteToken",
     values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "renounceOwnership",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setInviteToken",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferOwnership",
+    values: [string]
   ): string;
 
   decodeFunctionResult(
@@ -50,13 +67,28 @@ interface MirrorPublicationFactoryV1Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "mirrorInviteToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setInviteToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
 
   events: {
-    "PublicationCreated(address,address)": EventFragment;
+    "OwnershipTransferred(address,address)": EventFragment;
+    "PublicationCreated(address,string,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PublicationCreated"): EventFragment;
 }
 
@@ -76,14 +108,16 @@ export class MirrorPublicationFactoryV1 extends Contract {
   functions: {
     createPublication(
       owner: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createPublication(address,string,string,uint8)"(
+    "createPublication(address,string,string,string,uint8)"(
       owner: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
@@ -97,18 +131,48 @@ export class MirrorPublicationFactoryV1 extends Contract {
     mirrorInviteToken(overrides?: CallOverrides): Promise<[string]>;
 
     "mirrorInviteToken()"(overrides?: CallOverrides): Promise<[string]>;
+
+    owner(overrides?: CallOverrides): Promise<[string]>;
+
+    "owner()"(overrides?: CallOverrides): Promise<[string]>;
+
+    renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+    setInviteToken(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setInviteToken(address)"(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "transferOwnership(address)"(
+      newOwner: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
   };
 
   createPublication(
     owner: string,
+    label: string,
     tokenName: string,
     tokenSymbol: string,
     tokenDecimals: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createPublication(address,string,string,uint8)"(
+  "createPublication(address,string,string,string,uint8)"(
     owner: string,
+    label: string,
     tokenName: string,
     tokenSymbol: string,
     tokenDecimals: BigNumberish,
@@ -123,17 +187,47 @@ export class MirrorPublicationFactoryV1 extends Contract {
 
   "mirrorInviteToken()"(overrides?: CallOverrides): Promise<string>;
 
+  owner(overrides?: CallOverrides): Promise<string>;
+
+  "owner()"(overrides?: CallOverrides): Promise<string>;
+
+  renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+  setInviteToken(
+    inviteToken_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setInviteToken(address)"(
+    inviteToken_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  transferOwnership(
+    newOwner: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "transferOwnership(address)"(
+    newOwner: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     createPublication(
       owner: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createPublication(address,string,string,uint8)"(
+    "createPublication(address,string,string,string,uint8)"(
       owner: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
@@ -147,23 +241,62 @@ export class MirrorPublicationFactoryV1 extends Contract {
     mirrorInviteToken(overrides?: CallOverrides): Promise<string>;
 
     "mirrorInviteToken()"(overrides?: CallOverrides): Promise<string>;
+
+    owner(overrides?: CallOverrides): Promise<string>;
+
+    "owner()"(overrides?: CallOverrides): Promise<string>;
+
+    renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    "renounceOwnership()"(overrides?: CallOverrides): Promise<void>;
+
+    setInviteToken(
+      inviteToken_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setInviteToken(address)"(
+      inviteToken_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "transferOwnership(address)"(
+      newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
-    PublicationCreated(publication: null, owner: null): EventFilter;
+    OwnershipTransferred(
+      previousOwner: string | null,
+      newOwner: string | null
+    ): EventFilter;
+
+    PublicationCreated(
+      publication: null,
+      label: null,
+      owner: null
+    ): EventFilter;
   };
 
   estimateGas: {
     createPublication(
       owner: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createPublication(address,string,string,uint8)"(
+    "createPublication(address,string,string,string,uint8)"(
       owner: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
@@ -177,19 +310,49 @@ export class MirrorPublicationFactoryV1 extends Contract {
     mirrorInviteToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     "mirrorInviteToken()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    renounceOwnership(overrides?: Overrides): Promise<BigNumber>;
+
+    "renounceOwnership()"(overrides?: Overrides): Promise<BigNumber>;
+
+    setInviteToken(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setInviteToken(address)"(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "transferOwnership(address)"(
+      newOwner: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     createPublication(
       owner: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createPublication(address,string,string,uint8)"(
+    "createPublication(address,string,string,string,uint8)"(
       owner: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
@@ -204,6 +367,34 @@ export class MirrorPublicationFactoryV1 extends Contract {
 
     "mirrorInviteToken()"(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    renounceOwnership(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "renounceOwnership()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    setInviteToken(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setInviteToken(address)"(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "transferOwnership(address)"(
+      newOwner: string,
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };
 }

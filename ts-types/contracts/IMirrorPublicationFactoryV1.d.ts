@@ -22,12 +22,12 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface IMirrorPublicationFactoryV1Interface extends ethers.utils.Interface {
   functions: {
-    "createPublication(address,string,string,uint8)": FunctionFragment;
+    "createPublication(address,string,string,string,uint8)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createPublication",
-    values: [string, string, string, BigNumberish]
+    values: [string, string, string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -54,14 +54,16 @@ export class IMirrorPublicationFactoryV1 extends Contract {
   functions: {
     createPublication(
       creator: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createPublication(address,string,string,uint8)"(
+    "createPublication(address,string,string,string,uint8)"(
       creator: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
@@ -71,14 +73,16 @@ export class IMirrorPublicationFactoryV1 extends Contract {
 
   createPublication(
     creator: string,
+    label: string,
     tokenName: string,
     tokenSymbol: string,
     tokenDecimals: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createPublication(address,string,string,uint8)"(
+  "createPublication(address,string,string,string,uint8)"(
     creator: string,
+    label: string,
     tokenName: string,
     tokenSymbol: string,
     tokenDecimals: BigNumberish,
@@ -88,14 +92,16 @@ export class IMirrorPublicationFactoryV1 extends Contract {
   callStatic: {
     createPublication(
       creator: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createPublication(address,string,string,uint8)"(
+    "createPublication(address,string,string,string,uint8)"(
       creator: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
@@ -108,14 +114,16 @@ export class IMirrorPublicationFactoryV1 extends Contract {
   estimateGas: {
     createPublication(
       creator: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createPublication(address,string,string,uint8)"(
+    "createPublication(address,string,string,string,uint8)"(
       creator: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
@@ -126,14 +134,16 @@ export class IMirrorPublicationFactoryV1 extends Contract {
   populateTransaction: {
     createPublication(
       creator: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createPublication(address,string,string,uint8)"(
+    "createPublication(address,string,string,string,uint8)"(
       creator: string,
+      label: string,
       tokenName: string,
       tokenSymbol: string,
       tokenDecimals: BigNumberish,

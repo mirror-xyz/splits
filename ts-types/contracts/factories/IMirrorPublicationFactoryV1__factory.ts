@@ -30,6 +30,11 @@ const _abi = [
       },
       {
         internalType: "string",
+        name: "label",
+        type: "string",
+      },
+      {
+        internalType: "string",
         name: "tokenName",
         type: "string",
       },
