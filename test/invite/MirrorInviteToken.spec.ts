@@ -193,20 +193,6 @@ describe("MirrorInviteToken", () => {
 				expect(accountBalance.toString()).to.equal("0");
 			});
 
-			it("registers the requested ENS label", async () => {
-				const subdomainOwner = await ensRegistry.owner(ethers.utils.namehash('test.mirror.xyz'))
-				expect(subdomainOwner).to.eq(account1.address);
-
-				// test reverse resolving, too.
-				const node = await reverseRegistrar.node(account1.address);
-				const name = await mirrorENSResolver.name(node);
-				expect(name).to.eq("test.mirror.xyz");
-			});
-
-			it("emits an event", async () => {
-				const {events} = receipt;
-			});
-
 			it("deploys a contract to the create2 address with the correct name, symbol and decimals", async () => {
 				const publication = new ethers.Contract(create2Address, JSON.stringify(MirrorPublicationV1.abi), waffle.provider);
 
@@ -215,9 +201,19 @@ describe("MirrorInviteToken", () => {
 				expect(await publication.decimals()).to.eq(0);
 			});
 
-			it("uses 1025090 gas", () => {
+			it("registers the requested ENS label and assigns ownership to the publication", async () => {
+				const subdomainOwner = await ensRegistry.owner(ethers.utils.namehash('test.mirror.xyz'))
+				expect(subdomainOwner).to.eq(create2Address);
+
+				// test reverse resolving, too.
+				const node = await reverseRegistrar.node(create2Address);
+				const name = await mirrorENSResolver.name(node);
+				expect(name).to.eq("test.mirror.xyz");
+			});
+
+			it("uses 1025161 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(1025090);
+				expect(gasUsed).to.eq(1025161);
 			});
 		});
 	});

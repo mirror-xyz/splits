@@ -41,15 +41,15 @@ contract MirrorInviteToken is ERC20Burnable, Mintable {
         uint8 tokenDecimals
     ) private {
         burn(1);
-        
-        IMirrorENSRegistrar(ensRegistrar).register(label, msg.sender);
 
-        IMirrorPublicationFactoryV1(publicationFactory).createPublication(
+        address publication = IMirrorPublicationFactoryV1(publicationFactory).createPublication(
             msg.sender,
             label,
             tokenName,
             tokenSymbol,
             tokenDecimals
         );
+
+        IMirrorENSRegistrar(ensRegistrar).register(label, publication);
     }
 }
