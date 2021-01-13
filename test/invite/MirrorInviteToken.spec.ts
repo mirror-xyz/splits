@@ -203,11 +203,6 @@ describe("MirrorInviteToken", () => {
 				expect(name).to.eq("test.mirror.xyz");
 			});
 
-			it("uses 1025090 gas", () => {
-				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(1025090);
-			});
-
 			it("emits an event", async () => {
 				const {events} = receipt;
 			});
@@ -218,7 +213,12 @@ describe("MirrorInviteToken", () => {
 				expect(await publication.name()).to.eq("TestToken");
 				expect(await publication.symbol()).to.eq("TEST");
 				expect(await publication.decimals()).to.eq(0);
-			})
+			});
+
+			it("uses 1025090 gas", () => {
+				const { gasUsed } = receipt;
+				expect(gasUsed).to.eq(1025090);
+			});
 		});
 	});
 });
