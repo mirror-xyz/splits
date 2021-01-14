@@ -2,9 +2,10 @@
 pragma solidity ^0.7.0;
 
 import "./interfaces/IMirrorPublicationV1.sol";
+import "./interfaces/IERC20.sol";
 import "./lib/SafeMath.sol";
 
-contract MirrorPublicationV1 is IMirrorPublicationV1 {
+contract MirrorPublicationV1 is IMirrorPublicationV1, IERC20 {
     using SafeMath for uint;
 
     /*

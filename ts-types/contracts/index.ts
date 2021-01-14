@@ -19,6 +19,7 @@ export type { Mintable } from "./Mintable";
 export type { MirrorInviteToken } from "./MirrorInviteToken";
 export type { IMirrorPublicationFactoryV1 } from "./IMirrorPublicationFactoryV1";
 export type { MirrorPublicationFactoryV1 } from "./MirrorPublicationFactoryV1";
+export type { IERC20 } from "./IERC20";
 export type { IMirrorPublicationV1 } from "./IMirrorPublicationV1";
 export type { MirrorPublicationV1 } from "./MirrorPublicationV1";
 
@@ -40,5 +41,6 @@ export { Mintable__factory } from "./factories/Mintable__factory";
 export { MirrorInviteToken__factory } from "./factories/MirrorInviteToken__factory";
 export { IMirrorPublicationFactoryV1__factory } from "./factories/IMirrorPublicationFactoryV1__factory";
 export { MirrorPublicationFactoryV1__factory } from "./factories/MirrorPublicationFactoryV1__factory";
+export { IERC20__factory } from "./factories/IERC20__factory";
 export { IMirrorPublicationV1__factory } from "./factories/IMirrorPublicationV1__factory";
 export { MirrorPublicationV1__factory } from "./factories/MirrorPublicationV1__factory";
