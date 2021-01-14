@@ -211,9 +211,9 @@ describe("MirrorInviteToken", () => {
 				expect(name).to.eq("test.mirror.xyz");
 			});
 
-			it("uses 1025161 gas", () => {
+			it("uses 1049954 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(1025161);
+				expect(gasUsed).to.eq(1049954);
 			});
 		});
 	});

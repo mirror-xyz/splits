@@ -79,6 +79,8 @@ contract MirrorPublicationV1 is IMirrorPublicationV1, IERC20 {
         name = tokenName;
         symbol = tokenSymbol;
         decimals = tokenDecimals;
+
+        _addContributor(owner);
     }
 
     function factory() external override view returns (address) {
@@ -107,6 +109,10 @@ contract MirrorPublicationV1 is IMirrorPublicationV1, IERC20 {
     }
 
     function addContributor(address account) external override onlyOwner {
+        _addContributor(account);   
+    }
+
+    function _addContributor(address account) internal {
         _contributors[account] = true;
         emit ContributorAdded(account);
     }
