@@ -1,31 +1,26 @@
 //SPDX-License-Identifier: BSD-2-Clause
+pragma solidity 0.6.8;
+
+import {IENS} from "./interfaces/IENS.sol";
+import {IENSResolver} from "./interfaces/IENSResolver.sol";
 
 /**
- * ENS ReverseRegistrar implementation.
+ * @title MirrorENSReverseRegister
  * Reference: https://github.com/ensdomains/ens/blob/master/contracts/ReverseRegistrar.sol
  */
- 
-pragma solidity ^0.7.0;
-
-import "./lib/ENS.sol";
-
-interface Resolver {
-    function setName(bytes32 node, string calldata name) external;
-}
-
 contract MirrorENSReverseRegistrar {
     // namehash('addr.reverse')
     bytes32 public constant ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
     ENS public ens;
-    Resolver public defaultResolver;
+    IENSResolver public defaultResolver;
 
     /**
      * @dev Constructor
      * @param ensAddr The address of the ENS registry.
      * @param resolverAddr The address of the default reverse resolver.
      */
-    constructor(ENS ensAddr, Resolver resolverAddr) {
+    constructor(ENS ensAddr, Resolver resolverAddr) public {
         ens = ensAddr;
         defaultResolver = resolverAddr;
 

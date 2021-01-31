@@ -10,7 +10,7 @@ const { alchemyAPIKey, deployerPrivateKey } = require('./env.json');
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   solidity: {
-    version: '0.7.3',
+    version: '0.6.8',
     settings: {
       optimizer: {
         enabled: true,

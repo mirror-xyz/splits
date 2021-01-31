@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity ^0.7.0;
+pragma solidity 0.6.8;
 
 interface IENS {
     // Logged when the owner of a node assigns a new owner to a subnode.

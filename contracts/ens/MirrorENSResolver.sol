@@ -1,24 +1,29 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.5.4;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./interfaces/IENSResolver.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {IENSResolver} from "./interfaces/IENSResolver.sol";
 
 contract MirrorENSResolver is Ownable, IENSResolver {
+    // ============ Constants ============
 
     bytes4 constant SUPPORT_INTERFACE_ID = 0x01ffc9a7;
     bytes4 constant ADDR_INTERFACE_ID = 0x3b3b57de;
     bytes4 constant NAME_INTERFACE_ID = 0x691f3431;
 
-    // mapping between namehash and resolved records
-    mapping (bytes32 => Record) records;
+    // ============ Structs ============
 
     struct Record {
         address addr;
         string name;
     }
 
-    // *************** Public Functions ********************* //
+    // ============ Mappings ============
+
+    // mapping between namehash and resolved records
+    mapping(bytes32 => Record) records;
+
+    // ============ Public Functions ============
 
     /**
      * @notice Lets the manager set the address associated with an ENS node.
@@ -35,7 +40,11 @@ contract MirrorENSResolver is Ownable, IENSResolver {
      * @param _node The node to update.
      * @param _name The name to set.
      */
-    function setName(bytes32 _node, string memory _name) public override onlyOwner {
+    function setName(bytes32 _node, string memory _name)
+        public
+        override
+        onlyOwner
+    {
         records[_node].name = _name;
         emit NameChanged(_node, _name);
     }
@@ -45,7 +54,7 @@ contract MirrorENSResolver is Ownable, IENSResolver {
      * @param _node The target node.
      * @return the address of the target node.
      */
-    function addr(bytes32 _node) public override view returns (address) {
+    function addr(bytes32 _node) public view override returns (address) {
         return records[_node].addr;
     }
 
@@ -54,7 +63,7 @@ contract MirrorENSResolver is Ownable, IENSResolver {
      * @param _node The target ENS node.
      * @return the name of the target ENS node.
      */
-    function name(bytes32 _node) public override view returns (string memory) {
+    function name(bytes32 _node) public view override returns (string memory) {
         return records[_node].name;
     }
 
@@ -64,7 +73,9 @@ contract MirrorENSResolver is Ownable, IENSResolver {
      * @return True if the contract implements the requested interface.
      */
     function supportsInterface(bytes4 _interfaceID) public pure returns (bool) {
-        return _interfaceID == SUPPORT_INTERFACE_ID || _interfaceID == ADDR_INTERFACE_ID || _interfaceID == NAME_INTERFACE_ID;
+        return
+            _interfaceID == SUPPORT_INTERFACE_ID ||
+            _interfaceID == ADDR_INTERFACE_ID ||
+            _interfaceID == NAME_INTERFACE_ID;
     }
-
 }
