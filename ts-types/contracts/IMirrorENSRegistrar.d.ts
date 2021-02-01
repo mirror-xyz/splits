@@ -22,21 +22,23 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface IMirrorENSRegistrarInterface extends ethers.utils.Interface {
   functions: {
+    "changeInviteToken(address)": FunctionFragment;
     "changeRootnodeOwner(address)": FunctionFragment;
-    "ensResolver()": FunctionFragment;
+    "getENS()": FunctionFragment;
     "getENSReverseRegistrar()": FunctionFragment;
     "isAvailable(bytes32)": FunctionFragment;
     "register(string,address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "changeRootnodeOwner",
+    functionFragment: "changeInviteToken",
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "ensResolver",
-    values?: undefined
+    functionFragment: "changeRootnodeOwner",
+    values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "getENS", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getENSReverseRegistrar",
     values?: undefined
@@ -51,13 +53,14 @@ interface IMirrorENSRegistrarInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "changeRootnodeOwner",
+    functionFragment: "changeInviteToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "ensResolver",
+    functionFragment: "changeRootnodeOwner",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getENS", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getENSReverseRegistrar",
     data: BytesLike
@@ -68,17 +71,7 @@ interface IMirrorENSRegistrarInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
 
-  events: {
-    "ENSResolverChanged(address)": EventFragment;
-    "RegisteredENS(address,string)": EventFragment;
-    "RootnodeOwnerChange(bytes32,address)": EventFragment;
-    "UnregisteredENS(string)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "ENSResolverChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RegisteredENS"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RootnodeOwnerChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "UnregisteredENS"): EventFragment;
+  events: {};
 }
 
 export class IMirrorENSRegistrar extends Contract {
@@ -95,195 +88,234 @@ export class IMirrorENSRegistrar extends Contract {
   interface: IMirrorENSRegistrarInterface;
 
   functions: {
+    changeInviteToken(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "changeInviteToken(address)"(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     changeRootnodeOwner(
-      _newOwner: string,
+      newOwner_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
     "changeRootnodeOwner(address)"(
-      _newOwner: string,
+      newOwner_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    ensResolver(overrides?: CallOverrides): Promise<[string]>;
+    getENS(overrides?: CallOverrides): Promise<[string]>;
 
-    "ensResolver()"(overrides?: CallOverrides): Promise<[string]>;
+    "getENS()"(overrides?: CallOverrides): Promise<[string]>;
 
     getENSReverseRegistrar(overrides?: CallOverrides): Promise<[string]>;
 
     "getENSReverseRegistrar()"(overrides?: CallOverrides): Promise<[string]>;
 
     isAvailable(
-      _subnode: BytesLike,
+      subnode_: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     "isAvailable(bytes32)"(
-      _subnode: BytesLike,
+      subnode_: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     register(
-      _label: string,
-      _owner: string,
+      label_: string,
+      owner_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
     "register(string,address)"(
-      _label: string,
-      _owner: string,
+      label_: string,
+      owner_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
   };
 
+  changeInviteToken(
+    inviteToken_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "changeInviteToken(address)"(
+    inviteToken_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   changeRootnodeOwner(
-    _newOwner: string,
+    newOwner_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   "changeRootnodeOwner(address)"(
-    _newOwner: string,
+    newOwner_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  ensResolver(overrides?: CallOverrides): Promise<string>;
+  getENS(overrides?: CallOverrides): Promise<string>;
 
-  "ensResolver()"(overrides?: CallOverrides): Promise<string>;
+  "getENS()"(overrides?: CallOverrides): Promise<string>;
 
   getENSReverseRegistrar(overrides?: CallOverrides): Promise<string>;
 
   "getENSReverseRegistrar()"(overrides?: CallOverrides): Promise<string>;
 
-  isAvailable(_subnode: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+  isAvailable(subnode_: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
   "isAvailable(bytes32)"(
-    _subnode: BytesLike,
+    subnode_: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   register(
-    _label: string,
-    _owner: string,
+    label_: string,
+    owner_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   "register(string,address)"(
-    _label: string,
-    _owner: string,
+    label_: string,
+    owner_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    changeInviteToken(
+      inviteToken_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "changeInviteToken(address)"(
+      inviteToken_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     changeRootnodeOwner(
-      _newOwner: string,
+      newOwner_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "changeRootnodeOwner(address)"(
-      _newOwner: string,
+      newOwner_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    ensResolver(overrides?: CallOverrides): Promise<string>;
+    getENS(overrides?: CallOverrides): Promise<string>;
 
-    "ensResolver()"(overrides?: CallOverrides): Promise<string>;
+    "getENS()"(overrides?: CallOverrides): Promise<string>;
 
     getENSReverseRegistrar(overrides?: CallOverrides): Promise<string>;
 
     "getENSReverseRegistrar()"(overrides?: CallOverrides): Promise<string>;
 
     isAvailable(
-      _subnode: BytesLike,
+      subnode_: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     "isAvailable(bytes32)"(
-      _subnode: BytesLike,
+      subnode_: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     register(
-      _label: string,
-      _owner: string,
+      label_: string,
+      owner_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "register(string,address)"(
-      _label: string,
-      _owner: string,
+      label_: string,
+      owner_: string,
       overrides?: CallOverrides
     ): Promise<void>;
   };
 
-  filters: {
-    ENSResolverChanged(addr: null): EventFilter;
-
-    RegisteredENS(_owner: string | null, _ens: null): EventFilter;
-
-    RootnodeOwnerChange(
-      _rootnode: BytesLike | null,
-      _newOwner: string | null
-    ): EventFilter;
-
-    UnregisteredENS(_ens: null): EventFilter;
-  };
+  filters: {};
 
   estimateGas: {
+    changeInviteToken(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "changeInviteToken(address)"(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     changeRootnodeOwner(
-      _newOwner: string,
+      newOwner_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
     "changeRootnodeOwner(address)"(
-      _newOwner: string,
+      newOwner_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    ensResolver(overrides?: CallOverrides): Promise<BigNumber>;
+    getENS(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "ensResolver()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "getENS()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     getENSReverseRegistrar(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getENSReverseRegistrar()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     isAvailable(
-      _subnode: BytesLike,
+      subnode_: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "isAvailable(bytes32)"(
-      _subnode: BytesLike,
+      subnode_: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     register(
-      _label: string,
-      _owner: string,
+      label_: string,
+      owner_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
     "register(string,address)"(
-      _label: string,
-      _owner: string,
+      label_: string,
+      owner_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    changeInviteToken(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "changeInviteToken(address)"(
+      inviteToken_: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     changeRootnodeOwner(
-      _newOwner: string,
+      newOwner_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     "changeRootnodeOwner(address)"(
-      _newOwner: string,
+      newOwner_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    ensResolver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getENS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "ensResolver()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "getENS()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getENSReverseRegistrar(
       overrides?: CallOverrides
@@ -294,24 +326,24 @@ export class IMirrorENSRegistrar extends Contract {
     ): Promise<PopulatedTransaction>;
 
     isAvailable(
-      _subnode: BytesLike,
+      subnode_: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "isAvailable(bytes32)"(
-      _subnode: BytesLike,
+      subnode_: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     register(
-      _label: string,
-      _owner: string,
+      label_: string,
+      owner_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     "register(string,address)"(
-      _label: string,
-      _owner: string,
+      label_: string,
+      owner_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };

@@ -25,9 +25,9 @@ interface MirrorENSReverseRegistrarInterface extends ethers.utils.Interface {
     "ADDR_REVERSE_NODE()": FunctionFragment;
     "claim(address)": FunctionFragment;
     "claimWithResolver(address,address)": FunctionFragment;
-    "defaultResolver()": FunctionFragment;
     "ens()": FunctionFragment;
     "node(address)": FunctionFragment;
+    "resolver()": FunctionFragment;
     "setName(string)": FunctionFragment;
   };
 
@@ -40,12 +40,9 @@ interface MirrorENSReverseRegistrarInterface extends ethers.utils.Interface {
     functionFragment: "claimWithResolver",
     values: [string, string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "defaultResolver",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "ens", values?: undefined): string;
   encodeFunctionData(functionFragment: "node", values: [string]): string;
+  encodeFunctionData(functionFragment: "resolver", values?: undefined): string;
   encodeFunctionData(functionFragment: "setName", values: [string]): string;
 
   decodeFunctionResult(
@@ -57,12 +54,9 @@ interface MirrorENSReverseRegistrarInterface extends ethers.utils.Interface {
     functionFragment: "claimWithResolver",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "defaultResolver",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "ens", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "node", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "resolver", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
 
   events: {};
@@ -105,10 +99,6 @@ export class MirrorENSReverseRegistrar extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    defaultResolver(overrides?: CallOverrides): Promise<[string]>;
-
-    "defaultResolver()"(overrides?: CallOverrides): Promise<[string]>;
-
     ens(overrides?: CallOverrides): Promise<[string]>;
 
     "ens()"(overrides?: CallOverrides): Promise<[string]>;
@@ -116,6 +106,10 @@ export class MirrorENSReverseRegistrar extends Contract {
     node(addr: string, overrides?: CallOverrides): Promise<[string]>;
 
     "node(address)"(addr: string, overrides?: CallOverrides): Promise<[string]>;
+
+    resolver(overrides?: CallOverrides): Promise<[string]>;
+
+    "resolver()"(overrides?: CallOverrides): Promise<[string]>;
 
     setName(name: string, overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -148,10 +142,6 @@ export class MirrorENSReverseRegistrar extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  defaultResolver(overrides?: CallOverrides): Promise<string>;
-
-  "defaultResolver()"(overrides?: CallOverrides): Promise<string>;
-
   ens(overrides?: CallOverrides): Promise<string>;
 
   "ens()"(overrides?: CallOverrides): Promise<string>;
@@ -159,6 +149,10 @@ export class MirrorENSReverseRegistrar extends Contract {
   node(addr: string, overrides?: CallOverrides): Promise<string>;
 
   "node(address)"(addr: string, overrides?: CallOverrides): Promise<string>;
+
+  resolver(overrides?: CallOverrides): Promise<string>;
+
+  "resolver()"(overrides?: CallOverrides): Promise<string>;
 
   setName(name: string, overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -188,10 +182,6 @@ export class MirrorENSReverseRegistrar extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    defaultResolver(overrides?: CallOverrides): Promise<string>;
-
-    "defaultResolver()"(overrides?: CallOverrides): Promise<string>;
-
     ens(overrides?: CallOverrides): Promise<string>;
 
     "ens()"(overrides?: CallOverrides): Promise<string>;
@@ -199,6 +189,10 @@ export class MirrorENSReverseRegistrar extends Contract {
     node(addr: string, overrides?: CallOverrides): Promise<string>;
 
     "node(address)"(addr: string, overrides?: CallOverrides): Promise<string>;
+
+    resolver(overrides?: CallOverrides): Promise<string>;
+
+    "resolver()"(overrides?: CallOverrides): Promise<string>;
 
     setName(name: string, overrides?: CallOverrides): Promise<string>;
 
@@ -228,10 +222,6 @@ export class MirrorENSReverseRegistrar extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    defaultResolver(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "defaultResolver()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     ens(overrides?: CallOverrides): Promise<BigNumber>;
 
     "ens()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -242,6 +232,10 @@ export class MirrorENSReverseRegistrar extends Contract {
       addr: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    resolver(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "resolver()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     setName(name: string, overrides?: Overrides): Promise<BigNumber>;
 
@@ -274,12 +268,6 @@ export class MirrorENSReverseRegistrar extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    defaultResolver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "defaultResolver()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     ens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "ens()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -293,6 +281,10 @@ export class MirrorENSReverseRegistrar extends Contract {
       addr: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    resolver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "resolver()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setName(name: string, overrides?: Overrides): Promise<PopulatedTransaction>;
 

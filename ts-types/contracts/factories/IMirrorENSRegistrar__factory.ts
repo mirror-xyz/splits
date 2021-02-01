@@ -18,74 +18,23 @@ export class IMirrorENSRegistrar__factory {
 
 const _abi = [
   {
-    anonymous: false,
     inputs: [
       {
-        indexed: false,
         internalType: "address",
-        name: "addr",
+        name: "inviteToken_",
         type: "address",
       },
     ],
-    name: "ENSResolverChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "_owner",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "_ens",
-        type: "string",
-      },
-    ],
-    name: "RegisteredENS",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "_rootnode",
-        type: "bytes32",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "_newOwner",
-        type: "address",
-      },
-    ],
-    name: "RootnodeOwnerChange",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "string",
-        name: "_ens",
-        type: "string",
-      },
-    ],
-    name: "UnregisteredENS",
-    type: "event",
+    name: "changeInviteToken",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [
       {
         internalType: "address",
-        name: "_newOwner",
+        name: "newOwner_",
         type: "address",
       },
     ],
@@ -96,10 +45,10 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "ensResolver",
+    name: "getENS",
     outputs: [
       {
-        internalType: "address",
+        internalType: "contract IENS",
         name: "",
         type: "address",
       },
@@ -124,7 +73,7 @@ const _abi = [
     inputs: [
       {
         internalType: "bytes32",
-        name: "_subnode",
+        name: "subnode_",
         type: "bytes32",
       },
     ],
@@ -143,12 +92,12 @@ const _abi = [
     inputs: [
       {
         internalType: "string",
-        name: "_label",
+        name: "label_",
         type: "string",
       },
       {
         internalType: "address",
-        name: "_owner",
+        name: "owner_",
         type: "address",
       },
     ],
