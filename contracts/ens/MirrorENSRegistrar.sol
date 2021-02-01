@@ -41,7 +41,7 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
     /**
      * The address of the MirrorENSResolver.
      */
-    address public override ensResolver;
+    address public ensResolver;
     /**
      * The address of the MirrorInviteToken.
      */
@@ -100,11 +100,12 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
      * @param label_ The subdomain label.
      * @param owner_ The owner of the subdomain.
      */
-    function register(string memory label_, address owner_)
+    function register(string calldata label_, address owner_)
         external
+        override
         onlyInviteToken
     {
-        bytes32 labelNode = keccak256(abi.encodePacked(_label));
+        bytes32 labelNode = keccak256(abi.encodePacked(label_));
         bytes32 node = keccak256(abi.encodePacked(rootNode, labelNode));
         // TODO: Can be optimized.
         address currentOwner = getENS().owner(node);
@@ -182,7 +183,7 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
      * @return true if the subnode is available.
      */
     function isAvailable(bytes32 subnode_) public view override returns (bool) {
-        bytes32 node = keccak256(abi.encodePacked(rootNode, _subnode));
+        bytes32 node = keccak256(abi.encodePacked(rootNode, subnode_));
         // TODO: Can be optimized.
         address currentOwner = getENS().owner(node);
         if (currentOwner == address(0)) {
@@ -195,11 +196,11 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
      * @notice Gets the official ENS reverse registrar.
      * @return Address of the ENS reverse registrar.
      */
-    function getENSReverseRegistrar() public view returns (address) {
+    function getENSReverseRegistrar() public view override returns (address) {
         return getENS().owner(ADDR_REVERSE_NODE);
     }
 
-    function getENS() public view returns (EnsRegistry) {
+    function getENS() public view override returns (IENS) {
         return IENS(ensRegistry);
     }
 }

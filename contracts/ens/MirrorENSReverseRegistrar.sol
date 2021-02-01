@@ -10,27 +10,29 @@ import {IENSResolver} from "./interfaces/IENSResolver.sol";
  */
 contract MirrorENSReverseRegistrar {
     // namehash('addr.reverse')
-    bytes32 public constant ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
+    bytes32 public constant ADDR_REVERSE_NODE =
+        0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
-    ENS public ens;
-    IENSResolver public defaultResolver;
+    address public ens;
+    address public resolver;
 
     /**
      * @dev Constructor
-     * @param ensAddr The address of the ENS registry.
-     * @param resolverAddr The address of the default reverse resolver.
+     * @param ens_ The address of the ENS registry.
+     * @param resolver_ The address of the default reverse resolver.
      */
-    constructor(ENS ensAddr, Resolver resolverAddr) public {
-        ens = ensAddr;
-        defaultResolver = resolverAddr;
+    constructor(address ens_, address resolver_) public {
+        ens = ens_;
+        resolver = resolver_;
 
         // Assign ownership of the reverse record to our deployer
-        MirrorENSReverseRegistrar oldRegistrar = MirrorENSReverseRegistrar(ens.owner(ADDR_REVERSE_NODE));
+        MirrorENSReverseRegistrar oldRegistrar =
+            MirrorENSReverseRegistrar(IENS(ens).owner(ADDR_REVERSE_NODE));
         if (address(oldRegistrar) != address(0x0)) {
             oldRegistrar.claim(msg.sender);
         }
     }
-    
+
     /**
      * @dev Transfers ownership of the reverse ENS record associated with the
      *      calling account.
@@ -48,24 +50,31 @@ contract MirrorENSReverseRegistrar {
      * @param resolver The address of the resolver to set; 0 to leave unchanged.
      * @return The ENS node hash of the reverse record.
      */
-    function claimWithResolver(address owner, address resolver) public returns (bytes32) {
+    function claimWithResolver(address owner, address resolver)
+        public
+        returns (bytes32)
+    {
         bytes32 label = sha3HexAddress(msg.sender);
         bytes32 node = keccak256(abi.encodePacked(ADDR_REVERSE_NODE, label));
-        address currentOwner = ens.owner(node);
+        address currentOwner = IENS(ens).owner(node);
 
         // Update the resolver if required
-        if (resolver != address(0x0) && resolver != ens.resolver(node)) {
+        if (resolver != address(0x0) && resolver != IENS(ens).resolver(node)) {
             // Transfer the name to us first if it's not already
             if (currentOwner != address(this)) {
-                ens.setSubnodeOwner(ADDR_REVERSE_NODE, label, address(this));
+                IENS(ens).setSubnodeOwner(
+                    ADDR_REVERSE_NODE,
+                    label,
+                    address(this)
+                );
                 currentOwner = address(this);
             }
-            ens.setResolver(node, resolver);
+            IENS(ens).setResolver(node, resolver);
         }
 
         // Update the owner if required
         if (currentOwner != owner) {
-            ens.setSubnodeOwner(ADDR_REVERSE_NODE, label, owner);
+            IENS(ens).setSubnodeOwner(ADDR_REVERSE_NODE, label, owner);
         }
 
         return node;
@@ -79,8 +88,8 @@ contract MirrorENSReverseRegistrar {
      * @return The ENS node hash of the reverse record.
      */
     function setName(string memory name) public returns (bytes32) {
-        bytes32 node = claimWithResolver(address(this), address(defaultResolver));
-        defaultResolver.setName(node, name);
+        bytes32 node = claimWithResolver(address(this), resolver);
+        IENSResolver(resolver).setName(node, name);
         return node;
     }
 
@@ -90,7 +99,10 @@ contract MirrorENSReverseRegistrar {
      * @return The ENS node hash.
      */
     function node(address addr) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(ADDR_REVERSE_NODE, sha3HexAddress(addr)));
+        return
+            keccak256(
+                abi.encodePacked(ADDR_REVERSE_NODE, sha3HexAddress(addr))
+            );
     }
 
     /**
@@ -104,9 +116,15 @@ contract MirrorENSReverseRegistrar {
         addr;
         ret; // Stop warning us about unused variables
         assembly {
-            let lookup := 0x3031323334353637383961626364656600000000000000000000000000000000
+            let
+                lookup
+            := 0x3031323334353637383961626364656600000000000000000000000000000000
 
-            for { let i := 40 } gt(i, 0) { } {
+            for {
+                let i := 40
+            } gt(i, 0) {
+
+            } {
                 i := sub(i, 1)
                 mstore8(i, byte(and(addr, 0xf), lookup))
                 addr := div(addr, 0x10)

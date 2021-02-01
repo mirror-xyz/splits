@@ -26,7 +26,7 @@ contract ENSRegistry is IENS {
     /**
      * @dev Constructs a new ENS registrar.
      */
-    constructor() {
+    constructor() public {
         records[0x0].owner = msg.sender;
     }
 
