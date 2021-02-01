@@ -36,7 +36,7 @@ describe("MirrorInviteToken", () => {
 
 		it("has the correct number of decimals", async () => {
 			const decimals = await mirrorInviteToken.decimals();
-			expect(decimals.toString()).to.eq("0");
+			expect(decimals.toString()).to.eq("18");
 		});
 
 		it("has the correct registrar", async () => {
@@ -127,7 +127,7 @@ describe("MirrorInviteToken", () => {
 	describe("#register", () => {
 		describe("when the account does not have an invite token", () => {
 			it("reverts the transaction", async () => {
-				const transaction = mirrorInviteToken.connect(account1).register("test");
+				const transaction = mirrorInviteToken.connect(account1).register("test", account1.address);
 				await expect(transaction).to.be.revertedWith('ERC20: burn amount exceeds balance');
 			});
 		});
@@ -141,7 +141,8 @@ describe("MirrorInviteToken", () => {
 				const label = "test";
 				await mirrorInviteToken.connect(owner).mint(account1.address, 1);
 				transaction = await mirrorInviteToken.connect(account1).register(
-					"test"
+					"test",
+					account1.address
 				);
 				receipt = await transaction.wait();
 			});
@@ -162,9 +163,9 @@ describe("MirrorInviteToken", () => {
 				expect(name).to.eq("test.mirror.xyz");
 			});
 
-			it("uses 139180 gas", () => {
+			it("uses 142331 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(139180);
+				expect(gasUsed).to.eq(142331);
 			});
 		});
 	});

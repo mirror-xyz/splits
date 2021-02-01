@@ -25,20 +25,18 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "burn(uint256)": FunctionFragment;
-    "burnFrom(address,uint256)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "ensRegistrar()": FunctionFragment;
-    "finishMinting()": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
-    "mintingFinished()": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
-    "register(string)": FunctionFragment;
+    "register(string,address)": FunctionFragment;
+    "registrable()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "setENSRegistrar(address)": FunctionFragment;
+    "setRegistrable(bool)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -55,11 +53,6 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
-  encodeFunctionData(
-    functionFragment: "burnFrom",
-    values: [string, BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "decreaseAllowance",
@@ -70,10 +63,6 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "finishMinting",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "increaseAllowance",
     values: [string, BigNumberish]
   ): string;
@@ -81,13 +70,16 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     functionFragment: "mint",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "mintingFinished",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "register", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "register",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registrable",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
@@ -95,6 +87,10 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "setENSRegistrar",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setRegistrable",
+    values: [boolean]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -117,8 +113,6 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burnFrom", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -129,27 +123,27 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "finishMinting",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "increaseAllowance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "mintingFinished",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "registrable",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "setENSRegistrar",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setRegistrable",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
@@ -169,18 +163,16 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
-    "InviteTokenBurned(address)": EventFragment;
     "Mint(address,uint256)": EventFragment;
-    "MintFinished()": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "Registered(string,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "InviteTokenBurned"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Mint"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "MintFinished"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Registered"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
@@ -229,28 +221,6 @@ export class MirrorInviteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    burn(
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "burn(uint256)"(
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    burnFrom(
-      account: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "burnFrom(address,uint256)"(
-      account: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     "decimals()"(overrides?: CallOverrides): Promise<[number]>;
@@ -270,10 +240,6 @@ export class MirrorInviteToken extends Contract {
     ensRegistrar(overrides?: CallOverrides): Promise<[string]>;
 
     "ensRegistrar()"(overrides?: CallOverrides): Promise<[string]>;
-
-    finishMinting(overrides?: Overrides): Promise<ContractTransaction>;
-
-    "finishMinting()"(overrides?: Overrides): Promise<ContractTransaction>;
 
     increaseAllowance(
       spender: string,
@@ -299,10 +265,6 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    mintingFinished(overrides?: CallOverrides): Promise<[boolean]>;
-
-    "mintingFinished()"(overrides?: CallOverrides): Promise<[boolean]>;
-
     name(overrides?: CallOverrides): Promise<[string]>;
 
     "name()"(overrides?: CallOverrides): Promise<[string]>;
@@ -313,13 +275,19 @@ export class MirrorInviteToken extends Contract {
 
     register(
       label: string,
+      owner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "register(string)"(
+    "register(string,address)"(
       label: string,
+      owner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    registrable(overrides?: CallOverrides): Promise<[boolean]>;
+
+    "registrable()"(overrides?: CallOverrides): Promise<[boolean]>;
 
     renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -332,6 +300,16 @@ export class MirrorInviteToken extends Contract {
 
     "setENSRegistrar(address)"(
       ensRegistrar_: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    setRegistrable(
+      registrable_: boolean,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setRegistrable(bool)"(
+      registrable_: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -411,28 +389,6 @@ export class MirrorInviteToken extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  burn(
-    amount: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "burn(uint256)"(
-    amount: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  burnFrom(
-    account: string,
-    amount: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "burnFrom(address,uint256)"(
-    account: string,
-    amount: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   decimals(overrides?: CallOverrides): Promise<number>;
 
   "decimals()"(overrides?: CallOverrides): Promise<number>;
@@ -452,10 +408,6 @@ export class MirrorInviteToken extends Contract {
   ensRegistrar(overrides?: CallOverrides): Promise<string>;
 
   "ensRegistrar()"(overrides?: CallOverrides): Promise<string>;
-
-  finishMinting(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "finishMinting()"(overrides?: Overrides): Promise<ContractTransaction>;
 
   increaseAllowance(
     spender: string,
@@ -481,10 +433,6 @@ export class MirrorInviteToken extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  mintingFinished(overrides?: CallOverrides): Promise<boolean>;
-
-  "mintingFinished()"(overrides?: CallOverrides): Promise<boolean>;
-
   name(overrides?: CallOverrides): Promise<string>;
 
   "name()"(overrides?: CallOverrides): Promise<string>;
@@ -493,12 +441,21 @@ export class MirrorInviteToken extends Contract {
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
-  register(label: string, overrides?: Overrides): Promise<ContractTransaction>;
-
-  "register(string)"(
+  register(
     label: string,
+    owner: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
+
+  "register(string,address)"(
+    label: string,
+    owner: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  registrable(overrides?: CallOverrides): Promise<boolean>;
+
+  "registrable()"(overrides?: CallOverrides): Promise<boolean>;
 
   renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -511,6 +468,16 @@ export class MirrorInviteToken extends Contract {
 
   "setENSRegistrar(address)"(
     ensRegistrar_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  setRegistrable(
+    registrable_: boolean,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setRegistrable(bool)"(
+    registrable_: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -590,25 +557,6 @@ export class MirrorInviteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    burn(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    "burn(uint256)"(
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    burnFrom(
-      account: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "burnFrom(address,uint256)"(
-      account: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     decimals(overrides?: CallOverrides): Promise<number>;
 
     "decimals()"(overrides?: CallOverrides): Promise<number>;
@@ -629,10 +577,6 @@ export class MirrorInviteToken extends Contract {
 
     "ensRegistrar()"(overrides?: CallOverrides): Promise<string>;
 
-    finishMinting(overrides?: CallOverrides): Promise<boolean>;
-
-    "finishMinting()"(overrides?: CallOverrides): Promise<boolean>;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
@@ -649,17 +593,13 @@ export class MirrorInviteToken extends Contract {
       to: string,
       amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     "mint(address,uint256)"(
       to: string,
       amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    mintingFinished(overrides?: CallOverrides): Promise<boolean>;
-
-    "mintingFinished()"(overrides?: CallOverrides): Promise<boolean>;
+    ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -669,9 +609,21 @@ export class MirrorInviteToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
 
-    register(label: string, overrides?: CallOverrides): Promise<void>;
+    register(
+      label: string,
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    "register(string)"(label: string, overrides?: CallOverrides): Promise<void>;
+    "register(string,address)"(
+      label: string,
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registrable(overrides?: CallOverrides): Promise<boolean>;
+
+    "registrable()"(overrides?: CallOverrides): Promise<boolean>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -684,6 +636,16 @@ export class MirrorInviteToken extends Contract {
 
     "setENSRegistrar(address)"(
       ensRegistrar_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setRegistrable(
+      registrable_: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setRegistrable(bool)"(
+      registrable_: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -739,16 +701,14 @@ export class MirrorInviteToken extends Contract {
       value: null
     ): EventFilter;
 
-    InviteTokenBurned(_address: null): EventFilter;
-
     Mint(to: string | null, amount: null): EventFilter;
-
-    MintFinished(): EventFilter;
 
     OwnershipTransferred(
       previousOwner: string | null,
       newOwner: string | null
     ): EventFilter;
+
+    Registered(label: null, owner: null): EventFilter;
 
     Transfer(from: string | null, to: string | null, value: null): EventFilter;
   };
@@ -785,25 +745,6 @@ export class MirrorInviteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    burn(amount: BigNumberish, overrides?: Overrides): Promise<BigNumber>;
-
-    "burn(uint256)"(
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    burnFrom(
-      account: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "burnFrom(address,uint256)"(
-      account: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -823,10 +764,6 @@ export class MirrorInviteToken extends Contract {
     ensRegistrar(overrides?: CallOverrides): Promise<BigNumber>;
 
     "ensRegistrar()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    finishMinting(overrides?: Overrides): Promise<BigNumber>;
-
-    "finishMinting()"(overrides?: Overrides): Promise<BigNumber>;
 
     increaseAllowance(
       spender: string,
@@ -852,10 +789,6 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    mintingFinished(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "mintingFinished()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     "name()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -864,12 +797,21 @@ export class MirrorInviteToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    register(label: string, overrides?: Overrides): Promise<BigNumber>;
-
-    "register(string)"(
+    register(
       label: string,
+      owner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    "register(string,address)"(
+      label: string,
+      owner: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    registrable(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "registrable()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(overrides?: Overrides): Promise<BigNumber>;
 
@@ -882,6 +824,16 @@ export class MirrorInviteToken extends Contract {
 
     "setENSRegistrar(address)"(
       ensRegistrar_: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    setRegistrable(
+      registrable_: boolean,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setRegistrable(bool)"(
+      registrable_: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -965,28 +917,6 @@ export class MirrorInviteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    burn(
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "burn(uint256)"(
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    burnFrom(
-      account: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "burnFrom(address,uint256)"(
-      account: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1006,10 +936,6 @@ export class MirrorInviteToken extends Contract {
     ensRegistrar(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "ensRegistrar()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    finishMinting(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    "finishMinting()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     increaseAllowance(
       spender: string,
@@ -1035,12 +961,6 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    mintingFinished(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "mintingFinished()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1051,13 +971,19 @@ export class MirrorInviteToken extends Contract {
 
     register(
       label: string,
+      owner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "register(string)"(
+    "register(string,address)"(
       label: string,
+      owner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    registrable(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "registrable()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(overrides?: Overrides): Promise<PopulatedTransaction>;
 
@@ -1070,6 +996,16 @@ export class MirrorInviteToken extends Contract {
 
     "setENSRegistrar(address)"(
       ensRegistrar_: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    setRegistrable(
+      registrable_: boolean,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setRegistrable(bool)"(
+      registrable_: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

@@ -2,13 +2,11 @@
 pragma solidity 0.6.8;
 
 import {
-    ERC20Burnable
-} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
-import {Mintable} from "./lib/Mintable.sol";
-import {IMirrorENSRegistrar} from "../ens/interfaces/IMirrorENSRegistrar.sol";
-import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {IMirrorENSRegistrar} from "../ens/interfaces/IMirrorENSRegistrar.sol";
 
 /**
  * @title MirrorInviteToken
@@ -17,38 +15,76 @@ import {
  *  An ERC20 that grants access to the ENS namespace through a
  *  burn-and-register model.
  */
-contract MirrorInviteToken is ERC20Burnable, Mintable, ReentrancyGuard {
+contract MirrorInviteToken is Ownable, ERC20, ReentrancyGuard {
     // ============ Mutable Storage ============
 
+    bool public registrable = true;
     address public ensRegistrar;
 
     // ============ Events ============
 
-    event InviteTokenBurned(address _address);
+    event Registered(string label, address owner);
+    event Mint(address indexed to, uint256 amount);
+
+    // ============ Modifiers ============
+
+    modifier canRegister() {
+        require(registrable, "MirrorInviteToken: Registration is closed");
+        _;
+    }
 
     // ============ Constructor ============
 
     constructor(string memory name, string memory symbol)
         public
-        Mintable("Mirror Invite Token", "WRITE")
-    {
-        _setupDecimals(0);
+        ERC20("Mirror Invite Token", "WRITE")
+    {}
+
+    // ============ Minting ============
+
+    /**
+     * @dev Function to mint tokens
+     * @param to The address that will receive the minted tokens.
+     * @param amount The amount of tokens to mint.
+     */
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
+
+        emit Mint(to, amount);
     }
 
     // ============ Registration ============
 
     /**
-     * Burns the user's invite token and registers their ENS label.
+     * Burns the sender's invite token and registers an ENS given label to a given address.
      * @param label The user's ENS label, e.g. "dev" for dev.mirror.xyz.
+     * @param owner The address that should own the label.
      */
-    function register(string calldata label) external nonReentrant {
-        burn(1);
-        IMirrorENSRegistrar(ensRegistrar).register(label, msg.sender);
+    function register(string calldata label, address owner)
+        external
+        nonReentrant
+        canRegister
+    {
+        _burn(msg.sender, 1);
+
+        IMirrorENSRegistrar(ensRegistrar).register(label, owner);
+
+        emit Registered(label, owner);
     }
 
     // ============ Configuration Management ============
 
+    /**
+     * Allows the owner to change the ENS Registrary address.
+     */
     function setENSRegistrar(address ensRegistrar_) external onlyOwner {
         ensRegistrar = ensRegistrar_;
+    }
+
+    /**
+     * Allows the owner to pause registration.
+     */
+    function setRegistrable(bool registrable_) external onlyOwner {
+        registrable = registrable_;
     }
 }
