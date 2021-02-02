@@ -21,19 +21,6 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "inviteToken_",
-        type: "address",
-      },
-    ],
-    name: "changeInviteToken",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
         name: "newOwner_",
         type: "address",
       },
@@ -41,51 +28,6 @@ const _abi = [
     name: "changeRootnodeOwner",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getENS",
-    outputs: [
-      {
-        internalType: "contract IENS",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getENSReverseRegistrar",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "subnode_",
-        type: "bytes32",
-      },
-    ],
-    name: "isAvailable",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -102,6 +44,13 @@ const _abi = [
       },
     ],
     name: "register",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "updateENSReverseRegistrar",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

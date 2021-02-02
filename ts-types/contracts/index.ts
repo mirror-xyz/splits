@@ -13,7 +13,6 @@ export type { ENSRegistry } from "./ENSRegistry";
 export type { MirrorENSRegistrar } from "./MirrorENSRegistrar";
 export type { MirrorENSResolver } from "./MirrorENSResolver";
 export type { MirrorENSReverseRegistrar } from "./MirrorENSReverseRegistrar";
-export type { Mintable } from "./Mintable";
 export type { MirrorInviteToken } from "./MirrorInviteToken";
 
 export { Ownable__factory } from "./factories/Ownable__factory";
@@ -28,5 +27,4 @@ export { ENSRegistry__factory } from "./factories/ENSRegistry__factory";
 export { MirrorENSRegistrar__factory } from "./factories/MirrorENSRegistrar__factory";
 export { MirrorENSResolver__factory } from "./factories/MirrorENSResolver__factory";
 export { MirrorENSReverseRegistrar__factory } from "./factories/MirrorENSReverseRegistrar__factory";
-export { Mintable__factory } from "./factories/Mintable__factory";
 export { MirrorInviteToken__factory } from "./factories/MirrorInviteToken__factory";

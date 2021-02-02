@@ -1,12 +1,13 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.8;
+pragma experimental ABIEncoderV2;
 
 import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {IMirrorENSRegistrar} from "../ens/interfaces/IMirrorENSRegistrar.sol";
+import {IMirrorENSRegistrar} from "./ens/interfaces/IMirrorENSRegistrar.sol";
 
 /**
  * @title MirrorInviteToken
@@ -66,9 +67,30 @@ contract MirrorInviteToken is Ownable, ERC20, ReentrancyGuard {
         canRegister
     {
         _burn(msg.sender, 1);
+        _register(label, owner);
+    }
 
+    /**
+     * Given an array of labels and owners, we burn tokens from the sender equal to
+     * the length of the array, and register each label to each owner via 1:1 mapping through index.
+     * Preconditions: labels and owners arrays should correspond exactly.
+     * @param labels The list of ENS labels to register.
+     * @param owners The list of addresses that should own the labels.
+     */
+    function registerBatch(string[] calldata labels, address[] calldata owners)
+        external
+        nonReentrant
+        canRegister
+    {
+        _burn(msg.sender, labels.length);
+
+        for (uint256 i = 0; i < labels.length; i++) {
+            _register(labels[i], owners[i]);
+        }
+    }
+
+    function _register(string memory label, address owner) private {
         IMirrorENSRegistrar(ensRegistrar).register(label, owner);
-
         emit Registered(label, owner);
     }
 

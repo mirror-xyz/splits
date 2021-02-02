@@ -2,14 +2,11 @@ import { ethers } from "hardhat";
 import { ENS_REGISTRY_ADDRESS, ROOT_NAME, ROOT_NODE, ZERO_BYTES32 } from "../config/constants";
 
 async function setup() {
-  const [owner, user1, user2] = await ethers.getSigners();
+  const [owner] = await ethers.getSigners();
 
   const ENSRegistry = await ethers.getContractFactory('ENSRegistry')
   const ensRegistry = await ENSRegistry.deploy()
   await ensRegistry.deployed()
-
-  const rootOwner = await ensRegistry.owner(ZERO_BYTES32)
-  const xyzOwner = await ensRegistry.owner(ethers.utils.namehash(ROOT_NAME))
 
   const MirrorInviteToken = await ethers.getContractFactory("MirrorInviteToken");
   const mirrorInviteToken = await MirrorInviteToken.deploy("MirrorInviteToken", "WRITE");
@@ -56,6 +53,8 @@ async function setup() {
     ethers.utils.keccak256(ethers.utils.toUtf8Bytes('addr')),
     reverseRegistrar.address,
   )
+
+  await mirrorENSRegistrar.updateENSReverseRegistrar();
 
   return [
     mirrorInviteToken,

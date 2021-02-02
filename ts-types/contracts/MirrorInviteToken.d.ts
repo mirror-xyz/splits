@@ -33,6 +33,7 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "register(string,address)": FunctionFragment;
+    "registerBatch(string[],address[])": FunctionFragment;
     "registrable()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "setENSRegistrar(address)": FunctionFragment;
@@ -75,6 +76,10 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "register",
     values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerBatch",
+    values: [string[], string[]]
   ): string;
   encodeFunctionData(
     functionFragment: "registrable",
@@ -130,6 +135,10 @@ interface MirrorInviteTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "registerBatch",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "registrable",
     data: BytesLike
@@ -282,6 +291,18 @@ export class MirrorInviteToken extends Contract {
     "register(string,address)"(
       label: string,
       owner: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    registerBatch(
+      labels: string[],
+      owners: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "registerBatch(string[],address[])"(
+      labels: string[],
+      owners: string[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -453,6 +474,18 @@ export class MirrorInviteToken extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  registerBatch(
+    labels: string[],
+    owners: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "registerBatch(string[],address[])"(
+    labels: string[],
+    owners: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   registrable(overrides?: CallOverrides): Promise<boolean>;
 
   "registrable()"(overrides?: CallOverrides): Promise<boolean>;
@@ -618,6 +651,18 @@ export class MirrorInviteToken extends Contract {
     "register(string,address)"(
       label: string,
       owner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registerBatch(
+      labels: string[],
+      owners: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "registerBatch(string[],address[])"(
+      labels: string[],
+      owners: string[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -809,6 +854,18 @@ export class MirrorInviteToken extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    registerBatch(
+      labels: string[],
+      owners: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "registerBatch(string[],address[])"(
+      labels: string[],
+      owners: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     registrable(overrides?: CallOverrides): Promise<BigNumber>;
 
     "registrable()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -978,6 +1035,18 @@ export class MirrorInviteToken extends Contract {
     "register(string,address)"(
       label: string,
       owner: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    registerBatch(
+      labels: string[],
+      owners: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "registerBatch(string[],address[])"(
+      labels: string[],
+      owners: string[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
