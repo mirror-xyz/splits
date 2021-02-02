@@ -67,7 +67,8 @@ contract MirrorInviteToken is Ownable, ERC20, ReentrancyGuard {
         canRegister
     {
         _burn(msg.sender, 1);
-        _register(label, owner);
+        IMirrorENSRegistrar(ensRegistrar).register(label, owner);
+        emit Registered(label, owner);
     }
 
     /**
@@ -85,19 +86,17 @@ contract MirrorInviteToken is Ownable, ERC20, ReentrancyGuard {
         _burn(msg.sender, labels.length);
 
         for (uint256 i = 0; i < labels.length; i++) {
-            _register(labels[i], owners[i]);
+            // NOTE: This is duplicated rather than extracted from `register`
+            // to ensure no possibility of reentrancy during the loop.
+            IMirrorENSRegistrar(ensRegistrar).register(labels[i], owners[i]);
+            emit Registered(labels[i], owners[i]);
         }
-    }
-
-    function _register(string memory label, address owner) private {
-        IMirrorENSRegistrar(ensRegistrar).register(label, owner);
-        emit Registered(label, owner);
     }
 
     // ============ Configuration Management ============
 
     /**
-     * Allows the owner to change the ENS Registrary address.
+     * Allows the owner to change the ENS Registrar address.
      */
     function setENSRegistrar(address ensRegistrar_) external onlyOwner {
         ensRegistrar = ensRegistrar_;

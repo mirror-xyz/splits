@@ -203,9 +203,9 @@ describe("MirrorInviteToken", () => {
 				expect(name).to.eq(`${label}.mirror.xyz`);
 			});
 
-			it("uses 163537 gas", () => {
+			it("uses 163036 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(163537);
+				expect(gasUsed).to.eq(163036);
 			});
 		});
 	});
@@ -263,9 +263,9 @@ describe("MirrorInviteToken", () => {
 				}
 			});
 
-			it("uses 384943 gas", () => {
+			it("uses 384793 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(384943);
+				expect(gasUsed).to.eq(384793);
 			});
 		});
 	});
