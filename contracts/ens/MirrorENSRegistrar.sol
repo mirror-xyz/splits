@@ -167,7 +167,7 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
     /**
      * @notice Updates to the reverse registrar.
      */
-    function updateENSReverseRegistrar() public override {
+    function updateENSReverseRegistrar() external override onlyOwner {
         reverseRegistrar = IENSReverseRegistrar(
             ensRegistry.owner(ADDR_REVERSE_NODE)
         );

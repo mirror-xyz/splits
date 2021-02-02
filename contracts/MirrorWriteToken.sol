@@ -27,6 +27,10 @@ contract MirrorWriteToken is ReentrancyGuard {
     // ============ Mutable Ownership Configuration ============
 
     address private _owner;
+    /**
+     * @dev Allows for two-step ownership transfer, whereby the next owner
+     * needs to accept the ownership transfer explicitly.
+     */
     address private _nextOwner;
 
     // ============ Mutable Registration Configuration ============
@@ -57,13 +61,21 @@ contract MirrorWriteToken is ReentrancyGuard {
 
     // ============ Modifiers ============
 
+    modifier canRegister() {
+        require(registrable, "MirrorWriteToken: registration is closed.");
+        _;
+    }
+
     modifier onlyOwner() {
         require(isOwner(), "MirrorWriteToken: caller is not the owner.");
         _;
     }
 
-    modifier canRegister() {
-        require(registrable, "MirrorWriteToken: registration is closed");
+    modifier onlyNextOwner() {
+        require(
+            isNextOwner(),
+            "MirrorWriteToken: current owner must set caller as next owner."
+        );
         _;
     }
 
@@ -136,10 +148,17 @@ contract MirrorWriteToken is ReentrancyGuard {
     }
 
     /**
+     * @dev Returns true if the caller is the next owner.
+     */
+    function isNextOwner() public view returns (bool) {
+        return msg.sender == _nextOwner;
+    }
+
+    /**
      * @dev Allows a new account (`newOwner`) to accept ownership.
      * Can only be called by the current owner.
      */
-    function transferOwnership(address nextOwner_) public onlyOwner {
+    function transferOwnership(address nextOwner_) external onlyOwner {
         require(
             nextOwner_ != address(0),
             "MirrorWriteToken: next owner is the zero address."
@@ -152,7 +171,7 @@ contract MirrorWriteToken is ReentrancyGuard {
      * @dev Cancel a transfer of ownership to a new account.
      * Can only be called by the current owner.
      */
-    function cancelOwnershipTransfer() public onlyOwner {
+    function cancelOwnershipTransfer() external onlyOwner {
         delete _nextOwner;
     }
 
@@ -160,12 +179,7 @@ contract MirrorWriteToken is ReentrancyGuard {
      * @dev Transfers ownership of the contract to the caller.
      * Can only be called by a new potential owner set by the current owner.
      */
-    function acceptOwnership() public {
-        require(
-            msg.sender == _nextOwner,
-            "MirrorWriteToken: current owner must set caller as next owner."
-        );
-
+    function acceptOwnership() external onlyNextOwner {
         delete _nextOwner;
 
         emit OwnershipTransferred(_owner, msg.sender);
