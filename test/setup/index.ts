@@ -8,9 +8,9 @@ async function setup() {
   const ensRegistry = await ENSRegistry.deploy()
   await ensRegistry.deployed()
 
-  const MirrorInviteToken = await ethers.getContractFactory("MirrorInviteToken");
-  const mirrorInviteToken = await MirrorInviteToken.deploy("MirrorInviteToken", "WRITE");
-  await mirrorInviteToken.deployed();
+  const MirrorWriteToken = await ethers.getContractFactory("MirrorWriteToken");
+  const mirrorWriteToken = await MirrorWriteToken.deploy();
+  await mirrorWriteToken.deployed();
 
   const MirrorENSResolver = await ethers.getContractFactory("MirrorENSResolver");
   const mirrorENSResolver = await MirrorENSResolver.deploy();
@@ -22,14 +22,14 @@ async function setup() {
     ROOT_NODE,
     ensRegistry.address,
     mirrorENSResolver.address,
-    mirrorInviteToken.address
+    mirrorWriteToken.address
   );
   await mirrorENSRegistrar.deployed();
 
   const ReverseRegistrar = await ethers.getContractFactory('MirrorENSReverseRegistrar')
   const reverseRegistrar = await ReverseRegistrar.deploy(ensRegistry.address, mirrorENSRegistrar.address)
 
-  await mirrorInviteToken.setENSRegistrar(mirrorENSRegistrar.address);
+  await mirrorWriteToken.setENSRegistrar(mirrorENSRegistrar.address);
   await mirrorENSResolver.transferOwnership(mirrorENSRegistrar.address)
 
   // Setup root.
@@ -57,7 +57,7 @@ async function setup() {
   await mirrorENSRegistrar.updateENSReverseRegistrar();
 
   return [
-    mirrorInviteToken,
+    mirrorWriteToken,
     mirrorENSRegistrar,
     ensRegistry,
     reverseRegistrar,

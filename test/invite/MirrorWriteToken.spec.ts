@@ -3,8 +3,8 @@ import { ethers } from "hardhat";
 
 import setup from "../setup";
 
-describe("MirrorInviteToken", () => {
-	let mirrorInviteToken;
+describe("MirrorWriteToken", () => {
+	let token;
 	let mirrorENSRegistrar;
 	let ensRegistry;
 	let reverseRegistrar;
@@ -17,7 +17,7 @@ describe("MirrorInviteToken", () => {
 
 	beforeEach(async () => {
 		[
-			mirrorInviteToken, mirrorENSRegistrar, ensRegistry, reverseRegistrar, mirrorENSResolver
+			token, mirrorENSRegistrar, ensRegistry, reverseRegistrar, mirrorENSResolver
 		] = await setup();
 
 		[owner, account1, account2, account3] = await ethers.getSigners();
@@ -25,22 +25,22 @@ describe("MirrorInviteToken", () => {
 
 	describe("deployed", () => {
 		it("has the correct name", async () => {
-			const name = await mirrorInviteToken.name();
-			expect(name).to.eq("Mirror Invite Token");
+			const name = await token.name();
+			expect(name).to.eq("Mirror Write Token");
 		});
 
 		it("has the correct token symbol", async () => {
-			const symbol = await mirrorInviteToken.symbol();
+			const symbol = await token.symbol();
 			expect(symbol).to.eq("WRITE");
 		});
 
 		it("has the correct number of decimals", async () => {
-			const decimals = await mirrorInviteToken.decimals();
+			const decimals = await token.decimals();
 			expect(decimals.toString()).to.eq("18");
 		});
 
 		it("has the correct registrar", async () => {
-			const registrar = await mirrorInviteToken.ensRegistrar();
+			const registrar = await token.ensRegistrar();
 			expect(registrar).to.eq(mirrorENSRegistrar.address);
 		});
 	});
@@ -54,16 +54,16 @@ describe("MirrorInviteToken", () => {
 				accountToReceive = account1;
 				accountNotToReceive = account2;
 
-				await mirrorInviteToken.connect(owner).mint(account1.address, 1);
+				await token.connect(owner).mint(account1.address, 1);
 			});
 
 			it("mints a token for the account", async () => {
-				const accountBalance = await mirrorInviteToken.balanceOf(accountToReceive.address);
+				const accountBalance = await token.balanceOf(accountToReceive.address);
 				expect(accountBalance.toString()).to.equal("1");
 			});
 
 			it("other accounts still have 0 balance", async () => {
-				const accountBalance = await mirrorInviteToken.balanceOf(accountNotToReceive.address);
+				const accountBalance = await token.balanceOf(accountNotToReceive.address);
 				expect(accountBalance.toString()).to.equal("0");
 			});
 		});
@@ -79,12 +79,12 @@ describe("MirrorInviteToken", () => {
 			});
 
 			it("reverts the transaction", async () => {
-				transaction = mirrorInviteToken.connect(nonOwner).mint(accountIntendedToReceive.address, 1);
-				await expect(transaction).to.be.revertedWith("Ownable: caller is not the owner");
+				transaction = token.connect(nonOwner).mint(accountIntendedToReceive.address, 1);
+				await expect(transaction).to.be.revertedWith("MirrorWriteToken: caller is not the owner");
 			});
 
 			it("the accounts all still have 0 balance", async () => {
-				const accountBalance = await mirrorInviteToken.balanceOf(accountIntendedToReceive.address);
+				const accountBalance = await token.balanceOf(accountIntendedToReceive.address);
 				expect(accountBalance.toString()).to.equal("0");
 			});
 		});
@@ -95,16 +95,16 @@ describe("MirrorInviteToken", () => {
 			it("updates the registrar appropriately", async () => {
 				// Set it to a new address, and check that it updated correctly.
 				const newAddress = "0xC85Ef1106632B9e7F8DE9cE0c0f1de1F70E67694";
-				await mirrorInviteToken.connect(owner).setENSRegistrar(newAddress);
+				await token.connect(owner).setENSRegistrar(newAddress);
 
 				expect(
-					await mirrorInviteToken.ensRegistrar()
+					await token.ensRegistrar()
 				).to.eq(newAddress);
 
 				// Set it back to the actual registrar, and check that it updated correctly again.
-				await mirrorInviteToken.connect(owner).setENSRegistrar(mirrorENSRegistrar.address);
+				await token.connect(owner).setENSRegistrar(mirrorENSRegistrar.address);
 				expect(
-					await mirrorInviteToken.ensRegistrar()
+					await token.ensRegistrar()
 				).to.eq(mirrorENSRegistrar.address);
 			});
 		});
@@ -113,12 +113,12 @@ describe("MirrorInviteToken", () => {
 			it("it reverts the transaction", async () => {
 				// Set it to a new address, and check that it updated correctly.
 				const newAddress = "0xC85Ef1106632B9e7F8DE9cE0c0f1de1F70E67694";
-				const transaction = mirrorInviteToken.connect(account1).setENSRegistrar(newAddress);
-				await expect(transaction).to.be.revertedWith("Ownable: caller is not the owner");
+				const transaction = token.connect(account1).setENSRegistrar(newAddress);
+				await expect(transaction).to.be.revertedWith("MirrorWriteToken: caller is not the owner");
 
 				// Original registrar still set.
 				expect(
-					await mirrorInviteToken.ensRegistrar()
+					await token.ensRegistrar()
 				).to.eq(mirrorENSRegistrar.address);
 			})
 		})
@@ -127,18 +127,18 @@ describe("MirrorInviteToken", () => {
 	describe("#setRegistrable", () => {
 		describe("when called by an address that is not the token owner", () => {
 			it("reverts the transaction", async () => {
-				const transaction = mirrorInviteToken.connect(account1).setRegistrable(false);
-				await expect(transaction).to.be.revertedWith("Ownable: caller is not the owner");
+				const transaction = token.connect(account1).setRegistrable(false);
+				await expect(transaction).to.be.revertedWith("MirrorWriteToken: caller is not the owner");
 			});
 		});
 
 		describe("when called by the token owner", () => {
 			it("updates the registrable variable appropriately", async () => {
-				await mirrorInviteToken.connect(owner).setRegistrable(false);
-				expect(await mirrorInviteToken.registrable()).to.eq(false);
+				await token.connect(owner).setRegistrable(false);
+				expect(await token.registrable()).to.eq(false);
 
-				await mirrorInviteToken.connect(owner).setRegistrable(true);
-				expect(await mirrorInviteToken.registrable()).to.eq(true);
+				await token.connect(owner).setRegistrable(true);
+				expect(await token.registrable()).to.eq(true);
 			});
 		});
 	});
@@ -146,8 +146,8 @@ describe("MirrorInviteToken", () => {
 	describe("#register", () => {
 		describe("when the account does not have an invite token", () => {
 			it("reverts the transaction", async () => {
-				const transaction = mirrorInviteToken.connect(account1).register("test", account1.address);
-				await expect(transaction).to.be.revertedWith("ERC20: burn amount exceeds balance");
+				const transaction = token.connect(account1).register("test", account1.address);
+				await expect(transaction).to.be.reverted;
 			});
 		});
 
@@ -158,10 +158,10 @@ describe("MirrorInviteToken", () => {
 			const initialTokens = 3;
 
 			beforeEach(async () => {
-				await mirrorInviteToken.connect(owner).mint(account1.address, initialTokens);
+				await token.connect(owner).mint(account1.address, initialTokens);
 				// Note: Here we actually register a label for a different account,
 				// to test that it doesn't have to be the msg.sender's account that's registered.
-				transaction = await mirrorInviteToken.connect(account1).register(
+				transaction = await token.connect(account1).register(
 					label,
 					account2.address,
 				);
@@ -170,16 +170,16 @@ describe("MirrorInviteToken", () => {
 
 			describe("when `registrable` is set to false", () => {
 				it("reverts the transaction", async () => {
-					await mirrorInviteToken.connect(owner).setRegistrable(false);
-					const transaction = mirrorInviteToken.connect(account1).register(label, account1.address);
-					await expect(transaction).to.be.revertedWith("MirrorInviteToken: Registration is closed");
-					await mirrorInviteToken.connect(owner).setRegistrable(false);
+					await token.connect(owner).setRegistrable(false);
+					const transaction = token.connect(account1).register(label, account1.address);
+					await expect(transaction).to.be.revertedWith("MirrorWriteToken: registration is closed");
+					await token.connect(owner).setRegistrable(false);
 				});
 			});
 
 			describe("when a label has already been taken", () => {
 				it("reverts the transaction", async () => {
-					const transaction = mirrorInviteToken.connect(account1).register(
+					const transaction = token.connect(account1).register(
 						label,
 						account1.address
 					);
@@ -188,7 +188,7 @@ describe("MirrorInviteToken", () => {
 			});
 
 			it("burns the user's token", async () => {
-				const accountBalance = await mirrorInviteToken.balanceOf(account1.address);
+				const accountBalance = await token.balanceOf(account1.address);
 				expect(accountBalance.toString()).to.equal((initialTokens - 1).toString());
 			});
 
@@ -203,9 +203,9 @@ describe("MirrorInviteToken", () => {
 				expect(name).to.eq(`${label}.mirror.xyz`);
 			});
 
-			it("uses 163036 gas", () => {
+			it("uses 162800 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(163036);
+				expect(gasUsed).to.eq(162800);
 			});
 		});
 	});
@@ -213,8 +213,8 @@ describe("MirrorInviteToken", () => {
 	describe("#registerBatch", () => {
 		describe("when the account does not have an invite token", () => {
 			it("reverts the transaction", async () => {
-				const transaction = mirrorInviteToken.connect(account1).registerBatch(["test"], [account1.address]);
-				await expect(transaction).to.be.revertedWith("ERC20: burn amount exceeds balance");
+				const transaction = token.connect(account1).registerBatch(["test"], [account1.address]);
+				await expect(transaction).to.be.reverted;
 			});
 		});
 
@@ -227,11 +227,11 @@ describe("MirrorInviteToken", () => {
 			let owners;
 
 			beforeEach(async () => {
-				await mirrorInviteToken.connect(owner).mint(account1.address, initialTokens);
+				await token.connect(owner).mint(account1.address, initialTokens);
 
 				labels = ["label1", "label2", "label3"];
 				owners = [account1.address, account2.address, account3.address];
-				transaction = await mirrorInviteToken.connect(account1).registerBatch(
+				transaction = await token.connect(account1).registerBatch(
 					labels,
 					owners
 				);
@@ -240,15 +240,15 @@ describe("MirrorInviteToken", () => {
 
 			describe("when `registrable` is set to false", () => {
 				it("reverts the transaction", async () => {
-					await mirrorInviteToken.connect(owner).setRegistrable(false);
-					const transaction = mirrorInviteToken.connect(account1).registerBatch(labels, owners);
-					await expect(transaction).to.be.revertedWith("MirrorInviteToken: Registration is closed");
-					await mirrorInviteToken.connect(owner).setRegistrable(false);
+					await token.connect(owner).setRegistrable(false);
+					const transaction = token.connect(account1).registerBatch(labels, owners);
+					await expect(transaction).to.be.revertedWith("MirrorWriteToken: registration is closed");
+					await token.connect(owner).setRegistrable(false);
 				});
 			});
 
 			it("burns the user's token", async () => {
-				const accountBalance = await mirrorInviteToken.balanceOf(account1.address);
+				const accountBalance = await token.balanceOf(account1.address);
 				expect(accountBalance.toString()).to.equal((initialTokens - 3).toString());
 			});
 
@@ -263,9 +263,9 @@ describe("MirrorInviteToken", () => {
 				}
 			});
 
-			it("uses 384793 gas", () => {
+			it("uses 384532 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(384793);
+				expect(gasUsed).to.eq(384532);
 			});
 		});
 	});

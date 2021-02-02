@@ -13,7 +13,7 @@ export type { ENSRegistry } from "./ENSRegistry";
 export type { MirrorENSRegistrar } from "./MirrorENSRegistrar";
 export type { MirrorENSResolver } from "./MirrorENSResolver";
 export type { MirrorENSReverseRegistrar } from "./MirrorENSReverseRegistrar";
-export type { MirrorInviteToken } from "./MirrorInviteToken";
+export type { MirrorWriteToken } from "./MirrorWriteToken";
 
 export { Ownable__factory } from "./factories/Ownable__factory";
 export { ERC20__factory } from "./factories/ERC20__factory";
@@ -27,4 +27,4 @@ export { ENSRegistry__factory } from "./factories/ENSRegistry__factory";
 export { MirrorENSRegistrar__factory } from "./factories/MirrorENSRegistrar__factory";
 export { MirrorENSResolver__factory } from "./factories/MirrorENSResolver__factory";
 export { MirrorENSReverseRegistrar__factory } from "./factories/MirrorENSReverseRegistrar__factory";
-export { MirrorInviteToken__factory } from "./factories/MirrorInviteToken__factory";
+export { MirrorWriteToken__factory } from "./factories/MirrorWriteToken__factory";
