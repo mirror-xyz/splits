@@ -1,24 +1,33 @@
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 
-import setup from "../setup";
+import setup from "./setup";
+
+const REGISTRATION_COST = "1000000000000000000";
 
 describe("MirrorWriteToken", () => {
+	// Contracts
 	let token;
 	let mirrorENSRegistrar;
 	let ensRegistry;
 	let reverseRegistrar;
 	let mirrorENSResolver;
 
+	// Accounts
 	let owner;
 	let account1;
 	let account2;
 	let account3;
 
 	beforeEach(async () => {
-		[
-			token, mirrorENSRegistrar, ensRegistry, reverseRegistrar, mirrorENSResolver
-		] = await setup();
+		({
+			mirrorWriteToken: token,
+			mirrorENSRegistrar,
+			ensRegistry,
+			reverseRegistrar,
+			mirrorENSResolver
+		} = await setup());
 
 		[owner, account1, account2, account3] = await ethers.getSigners();
 	});
@@ -37,6 +46,11 @@ describe("MirrorWriteToken", () => {
 		it("has the correct number of decimals", async () => {
 			const decimals = await token.decimals();
 			expect(decimals.toString()).to.eq("18");
+		});
+
+		it("has the correct registration cost", async () => {
+			const cost = await token.REGISTRATION_COST();
+			expect(cost.toString()).to.eq(REGISTRATION_COST);
 		});
 
 		it("has the correct registrar", async () => {
@@ -158,7 +172,8 @@ describe("MirrorWriteToken", () => {
 			const initialTokens = 3;
 
 			beforeEach(async () => {
-				await token.connect(owner).mint(account1.address, initialTokens);
+				const numTokens = BigNumber.from(REGISTRATION_COST).mul(initialTokens);
+				await token.connect(owner).mint(account1.address, numTokens);
 				// Note: Here we actually register a label for a different account,
 				// to test that it doesn't have to be the msg.sender's account that's registered.
 				transaction = await token.connect(account1).register(
@@ -189,7 +204,8 @@ describe("MirrorWriteToken", () => {
 
 			it("burns the user's token", async () => {
 				const accountBalance = await token.balanceOf(account1.address);
-				expect(accountBalance.toString()).to.equal((initialTokens - 1).toString());
+				const expectedBalance = BigNumber.from(REGISTRATION_COST).mul(initialTokens - 1);
+				expect(accountBalance.toString()).to.equal(expectedBalance.toString());
 			});
 
 			it("registers the requested ENS label and assigns ownership to the owner", async () => {
@@ -203,69 +219,9 @@ describe("MirrorWriteToken", () => {
 				expect(name).to.eq(`${label}.mirror.xyz`);
 			});
 
-			it("uses 162800 gas", () => {
+			it("uses 162794 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(162800);
-			});
-		});
-	});
-
-	describe("#registerBatch", () => {
-		describe("when the account does not have an invite token", () => {
-			it("reverts the transaction", async () => {
-				const transaction = token.connect(account1).registerBatch(["test"], [account1.address]);
-				await expect(transaction).to.be.reverted;
-			});
-		});
-
-		describe("when the account has an invite token", () => {
-			let transaction;
-			let receipt;
-			const initialTokens = 3;
-
-			let labels;
-			let owners;
-
-			beforeEach(async () => {
-				await token.connect(owner).mint(account1.address, initialTokens);
-
-				labels = ["label1", "label2", "label3"];
-				owners = [account1.address, account2.address, account3.address];
-				transaction = await token.connect(account1).registerBatch(
-					labels,
-					owners
-				);
-				receipt = await transaction.wait();
-			});
-
-			describe("when `registrable` is set to false", () => {
-				it("reverts the transaction", async () => {
-					await token.connect(owner).setRegistrable(false);
-					const transaction = token.connect(account1).registerBatch(labels, owners);
-					await expect(transaction).to.be.revertedWith("MirrorWriteToken: registration is closed");
-					await token.connect(owner).setRegistrable(false);
-				});
-			});
-
-			it("burns the user's token", async () => {
-				const accountBalance = await token.balanceOf(account1.address);
-				expect(accountBalance.toString()).to.equal((initialTokens - 3).toString());
-			});
-
-			it("registers the requested ENS label and assigns ownership to the owner", async () => {
-				for (let i = 0; i < labels.length; i++) {
-					const subdomainOwner = await ensRegistry.owner(ethers.utils.namehash(`${labels[i]}.mirror.xyz`))
-					expect(subdomainOwner).to.eq(owners[i]);
-
-					const node = await reverseRegistrar.node(owners[i]);
-					const name = await mirrorENSResolver.name(node);
-					expect(name).to.eq(`${labels[i]}.mirror.xyz`);
-				}
-			});
-
-			it("uses 384532 gas", () => {
-				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(384532);
+				expect(gasUsed).to.eq(162794);
 			});
 		});
 	});

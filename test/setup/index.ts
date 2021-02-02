@@ -12,6 +12,10 @@ async function setup() {
   const mirrorWriteToken = await MirrorWriteToken.deploy();
   await mirrorWriteToken.deployed();
 
+  const MirrorBatchRegistration = await ethers.getContractFactory("MirrorBatchRegistration");
+  const mirrorBatchRegistration = await MirrorBatchRegistration.deploy(mirrorWriteToken.address);
+  await mirrorBatchRegistration.deployed();
+
   const MirrorENSResolver = await ethers.getContractFactory("MirrorENSResolver");
   const mirrorENSResolver = await MirrorENSResolver.deploy();
   await mirrorENSResolver.deployed();
@@ -56,13 +60,14 @@ async function setup() {
 
   await mirrorENSRegistrar.updateENSReverseRegistrar();
 
-  return [
+  return {
     mirrorWriteToken,
     mirrorENSRegistrar,
     ensRegistry,
     reverseRegistrar,
-    mirrorENSResolver
-  ];
+    mirrorENSResolver,
+    mirrorBatchRegistration,
+  };
 }
 
 export default setup;

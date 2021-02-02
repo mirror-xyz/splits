@@ -13,6 +13,8 @@ export type { ENSRegistry } from "./ENSRegistry";
 export type { MirrorENSRegistrar } from "./MirrorENSRegistrar";
 export type { MirrorENSResolver } from "./MirrorENSResolver";
 export type { MirrorENSReverseRegistrar } from "./MirrorENSReverseRegistrar";
+export type { MirrorBatchRegistration } from "./MirrorBatchRegistration";
+export type { IMirrorWriteToken } from "./IMirrorWriteToken";
 export type { MirrorWriteToken } from "./MirrorWriteToken";
 
 export { Ownable__factory } from "./factories/Ownable__factory";
@@ -27,4 +29,6 @@ export { ENSRegistry__factory } from "./factories/ENSRegistry__factory";
 export { MirrorENSRegistrar__factory } from "./factories/MirrorENSRegistrar__factory";
 export { MirrorENSResolver__factory } from "./factories/MirrorENSResolver__factory";
 export { MirrorENSReverseRegistrar__factory } from "./factories/MirrorENSReverseRegistrar__factory";
+export { MirrorBatchRegistration__factory } from "./factories/MirrorBatchRegistration__factory";
+export { IMirrorWriteToken__factory } from "./factories/IMirrorWriteToken__factory";
 export { MirrorWriteToken__factory } from "./factories/MirrorWriteToken__factory";

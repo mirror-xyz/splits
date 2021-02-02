@@ -20,37 +20,23 @@ import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
-interface MirrorWriteTokenInterface extends ethers.utils.Interface {
+interface IMirrorWriteTokenInterface extends ethers.utils.Interface {
   functions: {
     "REGISTRATION_COST()": FunctionFragment;
-    "acceptOwnership()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "cancelOwnershipTransfer()": FunctionFragment;
     "decimals()": FunctionFragment;
-    "ensRegistrar()": FunctionFragment;
-    "isNextOwner()": FunctionFragment;
-    "isOwner()": FunctionFragment;
-    "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "register(string,address)": FunctionFragment;
-    "registrable()": FunctionFragment;
-    "setENSRegistrar(address)": FunctionFragment;
-    "setRegistrable(bool)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "REGISTRATION_COST",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "acceptOwnership",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -62,40 +48,11 @@ interface MirrorWriteTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "cancelOwnershipTransfer",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "ensRegistrar",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isNextOwner",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "isOwner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "mint",
-    values: [string, BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "register",
     values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "registrable",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setENSRegistrar",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setRegistrable",
-    values: [boolean]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -110,51 +67,17 @@ interface MirrorWriteTokenInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [string]
-  ): string;
 
   decodeFunctionResult(
     functionFragment: "REGISTRATION_COST",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "acceptOwnership",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelOwnershipTransfer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "ensRegistrar",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isNextOwner",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "isOwner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "registrable",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setENSRegistrar",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setRegistrable",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -165,27 +88,17 @@ interface MirrorWriteTokenInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
-    "Mint(address,uint256)": EventFragment;
-    "OwnershipTransferred(address,address)": EventFragment;
-    "Registered(string,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Mint"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Registered"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
-export class MirrorWriteToken extends Contract {
+export class IMirrorWriteToken extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -196,26 +109,22 @@ export class MirrorWriteToken extends Contract {
   removeAllListeners(eventName: EventFilter | string): this;
   removeListener(eventName: any, listener: Listener): this;
 
-  interface: MirrorWriteTokenInterface;
+  interface: IMirrorWriteTokenInterface;
 
   functions: {
     REGISTRATION_COST(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    acceptOwnership(overrides?: Overrides): Promise<ContractTransaction>;
-
-    "acceptOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
-
     allowance(
-      arg0: string,
-      arg1: string,
+      owner: string,
+      spender: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     "allowance(address,address)"(
-      arg0: string,
-      arg1: string,
+      owner: string,
+      spender: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -231,48 +140,16 @@ export class MirrorWriteToken extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    balanceOf(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "balanceOf(address)"(
-      arg0: string,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
-
-    cancelOwnershipTransfer(
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "cancelOwnershipTransfer()"(
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     "decimals()"(overrides?: CallOverrides): Promise<[number]>;
-
-    ensRegistrar(overrides?: CallOverrides): Promise<[string]>;
-
-    "ensRegistrar()"(overrides?: CallOverrides): Promise<[string]>;
-
-    isNextOwner(overrides?: CallOverrides): Promise<[boolean]>;
-
-    "isNextOwner()"(overrides?: CallOverrides): Promise<[boolean]>;
-
-    isOwner(overrides?: CallOverrides): Promise<[boolean]>;
-
-    "isOwner()"(overrides?: CallOverrides): Promise<[boolean]>;
-
-    mint(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "mint(address,uint256)"(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -287,30 +164,6 @@ export class MirrorWriteToken extends Contract {
     "register(string,address)"(
       label: string,
       owner: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    registrable(overrides?: CallOverrides): Promise<[boolean]>;
-
-    "registrable()"(overrides?: CallOverrides): Promise<[boolean]>;
-
-    setENSRegistrar(
-      ensRegistrar_: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setENSRegistrar(address)"(
-      ensRegistrar_: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setRegistrable(
-      registrable_: boolean,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setRegistrable(bool)"(
-      registrable_: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -347,35 +200,21 @@ export class MirrorWriteToken extends Contract {
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
-
-    transferOwnership(
-      nextOwner_: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "transferOwnership(address)"(
-      nextOwner_: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
   };
 
   REGISTRATION_COST(overrides?: CallOverrides): Promise<BigNumber>;
 
   "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  acceptOwnership(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "acceptOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
-
   allowance(
-    arg0: string,
-    arg1: string,
+    owner: string,
+    spender: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   "allowance(address,address)"(
-    arg0: string,
-    arg1: string,
+    owner: string,
+    spender: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -391,46 +230,16 @@ export class MirrorWriteToken extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  balanceOf(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+  balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "balanceOf(address)"(
-    arg0: string,
+    owner: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
-
-  cancelOwnershipTransfer(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "cancelOwnershipTransfer()"(
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
 
   decimals(overrides?: CallOverrides): Promise<number>;
 
   "decimals()"(overrides?: CallOverrides): Promise<number>;
-
-  ensRegistrar(overrides?: CallOverrides): Promise<string>;
-
-  "ensRegistrar()"(overrides?: CallOverrides): Promise<string>;
-
-  isNextOwner(overrides?: CallOverrides): Promise<boolean>;
-
-  "isNextOwner()"(overrides?: CallOverrides): Promise<boolean>;
-
-  isOwner(overrides?: CallOverrides): Promise<boolean>;
-
-  "isOwner()"(overrides?: CallOverrides): Promise<boolean>;
-
-  mint(
-    to: string,
-    amount: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "mint(address,uint256)"(
-    to: string,
-    amount: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -445,30 +254,6 @@ export class MirrorWriteToken extends Contract {
   "register(string,address)"(
     label: string,
     owner: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  registrable(overrides?: CallOverrides): Promise<boolean>;
-
-  "registrable()"(overrides?: CallOverrides): Promise<boolean>;
-
-  setENSRegistrar(
-    ensRegistrar_: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setENSRegistrar(address)"(
-    ensRegistrar_: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setRegistrable(
-    registrable_: boolean,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setRegistrable(bool)"(
-    registrable_: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -506,34 +291,20 @@ export class MirrorWriteToken extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  transferOwnership(
-    nextOwner_: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "transferOwnership(address)"(
-    nextOwner_: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   callStatic: {
     REGISTRATION_COST(overrides?: CallOverrides): Promise<BigNumber>;
 
     "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    acceptOwnership(overrides?: CallOverrides): Promise<void>;
-
-    "acceptOwnership()"(overrides?: CallOverrides): Promise<void>;
-
     allowance(
-      arg0: string,
-      arg1: string,
+      owner: string,
+      spender: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "allowance(address,address)"(
-      arg0: string,
-      arg1: string,
+      owner: string,
+      spender: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -549,44 +320,16 @@ export class MirrorWriteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    balanceOf(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "balanceOf(address)"(
-      arg0: string,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    cancelOwnershipTransfer(overrides?: CallOverrides): Promise<void>;
-
-    "cancelOwnershipTransfer()"(overrides?: CallOverrides): Promise<void>;
 
     decimals(overrides?: CallOverrides): Promise<number>;
 
     "decimals()"(overrides?: CallOverrides): Promise<number>;
-
-    ensRegistrar(overrides?: CallOverrides): Promise<string>;
-
-    "ensRegistrar()"(overrides?: CallOverrides): Promise<string>;
-
-    isNextOwner(overrides?: CallOverrides): Promise<boolean>;
-
-    "isNextOwner()"(overrides?: CallOverrides): Promise<boolean>;
-
-    isOwner(overrides?: CallOverrides): Promise<boolean>;
-
-    "isOwner()"(overrides?: CallOverrides): Promise<boolean>;
-
-    mint(
-      to: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "mint(address,uint256)"(
-      to: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -601,30 +344,6 @@ export class MirrorWriteToken extends Contract {
     "register(string,address)"(
       label: string,
       owner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registrable(overrides?: CallOverrides): Promise<boolean>;
-
-    "registrable()"(overrides?: CallOverrides): Promise<boolean>;
-
-    setENSRegistrar(
-      ensRegistrar_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setENSRegistrar(address)"(
-      ensRegistrar_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setRegistrable(
-      registrable_: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setRegistrable(bool)"(
-      registrable_: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -661,16 +380,6 @@ export class MirrorWriteToken extends Contract {
       value: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
-
-    transferOwnership(
-      nextOwner_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "transferOwnership(address)"(
-      nextOwner_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
   };
 
   filters: {
@@ -680,15 +389,6 @@ export class MirrorWriteToken extends Contract {
       value: null
     ): EventFilter;
 
-    Mint(to: string | null, amount: null): EventFilter;
-
-    OwnershipTransferred(
-      previousOwner: string | null,
-      newOwner: string | null
-    ): EventFilter;
-
-    Registered(label: null, owner: null): EventFilter;
-
     Transfer(from: string | null, to: string | null, value: null): EventFilter;
   };
 
@@ -697,19 +397,15 @@ export class MirrorWriteToken extends Contract {
 
     "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    acceptOwnership(overrides?: Overrides): Promise<BigNumber>;
-
-    "acceptOwnership()"(overrides?: Overrides): Promise<BigNumber>;
-
     allowance(
-      arg0: string,
-      arg1: string,
+      owner: string,
+      spender: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "allowance(address,address)"(
-      arg0: string,
-      arg1: string,
+      owner: string,
+      spender: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -725,44 +421,16 @@ export class MirrorWriteToken extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    balanceOf(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "balanceOf(address)"(
-      arg0: string,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    cancelOwnershipTransfer(overrides?: Overrides): Promise<BigNumber>;
-
-    "cancelOwnershipTransfer()"(overrides?: Overrides): Promise<BigNumber>;
 
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    ensRegistrar(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "ensRegistrar()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    isNextOwner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "isNextOwner()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    isOwner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "isOwner()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    mint(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "mint(address,uint256)"(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -777,30 +445,6 @@ export class MirrorWriteToken extends Contract {
     "register(string,address)"(
       label: string,
       owner: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    registrable(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "registrable()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    setENSRegistrar(
-      ensRegistrar_: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setENSRegistrar(address)"(
-      ensRegistrar_: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setRegistrable(
-      registrable_: boolean,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setRegistrable(bool)"(
-      registrable_: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -837,16 +481,6 @@ export class MirrorWriteToken extends Contract {
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
-
-    transferOwnership(
-      nextOwner_: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "transferOwnership(address)"(
-      nextOwner_: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -856,19 +490,15 @@ export class MirrorWriteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    acceptOwnership(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    "acceptOwnership()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
     allowance(
-      arg0: string,
-      arg1: string,
+      owner: string,
+      spender: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "allowance(address,address)"(
-      arg0: string,
-      arg1: string,
+      owner: string,
+      spender: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -885,50 +515,18 @@ export class MirrorWriteToken extends Contract {
     ): Promise<PopulatedTransaction>;
 
     balanceOf(
-      arg0: string,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "balanceOf(address)"(
-      arg0: string,
+      owner: string,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    cancelOwnershipTransfer(
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "cancelOwnershipTransfer()"(
-      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    ensRegistrar(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "ensRegistrar()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    isNextOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "isNextOwner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    isOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "isOwner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    mint(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "mint(address,uint256)"(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -943,30 +541,6 @@ export class MirrorWriteToken extends Contract {
     "register(string,address)"(
       label: string,
       owner: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    registrable(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "registrable()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    setENSRegistrar(
-      ensRegistrar_: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setENSRegistrar(address)"(
-      ensRegistrar_: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setRegistrable(
-      registrable_: boolean,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setRegistrable(bool)"(
-      registrable_: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -1001,16 +575,6 @@ export class MirrorWriteToken extends Contract {
       from: string,
       to: string,
       value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    transferOwnership(
-      nextOwner_: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "transferOwnership(address)"(
-      nextOwner_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };

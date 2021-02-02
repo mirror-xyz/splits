@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "test": "hardhat test",
-    "flatten": "npx hardhat flatten contracts/MirrorInviteToken.sol",
+    "flatten": "npx hardhat flatten contracts/MirrorWriteToken.sol > flattened/MirrorWriteToken.sol",
+    "fix:flatten": "sed -i '' '/\/\/SPDX/,+1 d' flattened/MirrorWriteToken.sol",
     "deploy:default": "hardhat run scripts/deploy.ts",
     "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.ts"
   },

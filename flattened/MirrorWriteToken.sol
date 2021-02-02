@@ -1,13 +1,165 @@
-//SPDX-License-Identifier: GPL-3.0-or-later
+// Sources flattened with hardhat v2.0.7 https://hardhat.org
+
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-import {
-    ReentrancyGuard
-} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import {SafeMath} from "./lib/SafeMath.sol";
-import {IMirrorENSRegistrar} from "./ens/interfaces/IMirrorENSRegistrar.sol";
-import {IMirrorWriteToken} from "./interfaces/IMirrorWriteToken.sol";
+// File @openzeppelin/contracts/utils/ReentrancyGuard.sol@v3.3.0
+
+// SPDX-License-Identifier: MIT
+
+/**
+ * @dev Contract module that helps prevent reentrant calls to a function.
+ *
+ * Inheriting from `ReentrancyGuard` will make the {nonReentrant} modifier
+ * available, which can be applied to functions to make sure there are no nested
+ * (reentrant) calls to them.
+ *
+ * Note that because there is a single `nonReentrant` guard, functions marked as
+ * `nonReentrant` may not call one another. This can be worked around by making
+ * those functions `private`, and then adding `external` `nonReentrant` entry
+ * points to them.
+ *
+ * TIP: If you would like to learn more about reentrancy and alternative ways
+ * to protect against it, check out our blog post
+ * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
+ */
+abstract contract ReentrancyGuard {
+    // Booleans are more expensive than uint256 or any type that takes up a full
+    // word because each write operation emits an extra SLOAD to first read the
+    // slot's contents, replace the bits taken up by the boolean, and then write
+    // back. This is the compiler's defense against contract upgrades and
+    // pointer aliasing, and it cannot be disabled.
+
+    // The values being non-zero value makes deployment a bit more expensive,
+    // but in exchange the refund on every call to nonReentrant will be lower in
+    // amount. Since refunds are capped to a percentage of the total
+    // transaction's gas, it is best to keep them low in cases like this one, to
+    // increase the likelihood of the full refund coming into effect.
+    uint256 private constant _NOT_ENTERED = 1;
+    uint256 private constant _ENTERED = 2;
+
+    uint256 private _status;
+
+    constructor () internal {
+        _status = _NOT_ENTERED;
+    }
+
+    /**
+     * @dev Prevents a contract from calling itself, directly or indirectly.
+     * Calling a `nonReentrant` function from another `nonReentrant`
+     * function is not supported. It is possible to prevent this from happening
+     * by making the `nonReentrant` function external, and make it call a
+     * `private` function that does the actual work.
+     */
+    modifier nonReentrant() {
+        // On the first call to nonReentrant, _notEntered will be true
+        require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+
+        // Any calls to nonReentrant after this point will fail
+        _status = _ENTERED;
+
+        _;
+
+        // By storing the original value once again, a refund is triggered (see
+        // https://eips.ethereum.org/EIPS/eip-2200)
+        _status = _NOT_ENTERED;
+    }
+}
+
+
+// File contracts/lib/SafeMath.sol
+
+// a library for performing overflow-safe math, courtesy of DappHub (https://github.com/dapphub/ds-math)
+
+library SafeMath {
+    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x + y) >= x, "ds-math-add-overflow");
+    }
+
+    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x, "ds-math-sub-underflow");
+    }
+
+    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
+    }
+}
+
+
+// File contracts/ens/interfaces/IENSReverseRegistrar.sol
+
+
+interface IENSReverseRegistrar {
+    function claim(address _owner) external returns (bytes32);
+
+    function claimWithResolver(address _owner, address _resolver)
+        external
+        returns (bytes32);
+
+    function setName(string calldata _name) external returns (bytes32);
+
+    function node(address _addr) external pure returns (bytes32);
+}
+
+
+// File contracts/ens/interfaces/IMirrorENSRegistrar.sol
+
+
+interface IMirrorENSRegistrar {
+    function changeRootnodeOwner(address newOwner_) external;
+
+    function register(string calldata label_, address owner_) external;
+
+    function updateENSReverseRegistrar() external;
+}
+
+
+// File contracts/interfaces/IMirrorWriteToken.sol
+
+
+interface IMirrorWriteToken {
+    function register(string calldata label, address owner) external;
+
+    function registrationCost() external view returns (uint256);
+
+    // ============ ERC20 Interface ============
+
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    function name() external view returns (string memory);
+
+    function symbol() external view returns (string memory);
+
+    function decimals() external view returns (uint8);
+
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address owner) external view returns (uint256);
+
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
+    function approve(address spender, uint256 value) external returns (bool);
+
+    function transfer(address to, uint256 value) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) external returns (bool);
+}
+
+
+// File contracts/MirrorWriteToken.sol
+
 
 /**
  * @title MirrorWriteToken
@@ -27,7 +179,7 @@ contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
 
     // ============ Immutable Registration Configuration ============
 
-    uint256 public constant override REGISTRATION_COST = 1e18;
+    uint256 public constant override registrationCost = 1e18;
 
     // ============ Mutable Ownership Configuration ============
 
@@ -117,7 +269,7 @@ contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
         nonReentrant
         canRegister
     {
-        _burn(msg.sender, REGISTRATION_COST);
+        _burn(msg.sender, registrationCost);
         IMirrorENSRegistrar(ensRegistrar).register(label, owner);
         emit Registered(label, owner);
     }
