@@ -27,7 +27,7 @@ contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
 
     // ============ Immutable Registration Configuration ============
 
-    uint256 public constant override REGISTRATION_COST = 1e18;
+    uint256 internal constant REGISTRATION_COST = 1e18;
 
     // ============ Mutable Ownership Configuration ============
 
@@ -105,6 +105,13 @@ contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
     }
 
     // ============ Registration ============
+
+    /**
+     * @dev Returns the cost of registration in tokens with full decimals.
+     */
+    function registrationCost() external view override returns (uint256) {
+        return REGISTRATION_COST;
+    }
 
     /**
      * Burns the sender's invite tokens and registers an ENS given label to a given address.

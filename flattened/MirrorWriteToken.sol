@@ -1,11 +1,10 @@
 // Sources flattened with hardhat v2.0.7 https://hardhat.org
 
-pragma solidity 0.6.8;
-pragma experimental ABIEncoderV2;
-
 // File @openzeppelin/contracts/utils/ReentrancyGuard.sol@v3.3.0
 
 // SPDX-License-Identifier: MIT
+
+pragma solidity 0.6.8;
 
 /**
  * @dev Contract module that helps prevent reentrant calls to a function.
@@ -69,6 +68,8 @@ abstract contract ReentrancyGuard {
 
 // File contracts/lib/SafeMath.sol
 
+pragma solidity 0.6.8;
+
 // a library for performing overflow-safe math, courtesy of DappHub (https://github.com/dapphub/ds-math)
 
 library SafeMath {
@@ -120,7 +121,7 @@ interface IMirrorENSRegistrar {
 interface IMirrorWriteToken {
     function register(string calldata label, address owner) external;
 
-    function registrationCost() external view returns (uint256);
+    function REGISTRATION_COST() external view returns (uint256);
 
     // ============ ERC20 Interface ============
 
@@ -160,6 +161,10 @@ interface IMirrorWriteToken {
 
 // File contracts/MirrorWriteToken.sol
 
+pragma experimental ABIEncoderV2;
+
+
+
 
 /**
  * @title MirrorWriteToken
@@ -179,7 +184,7 @@ contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
 
     // ============ Immutable Registration Configuration ============
 
-    uint256 public constant override registrationCost = 1e18;
+    uint256 public constant override REGISTRATION_COST = 1e18;
 
     // ============ Mutable Ownership Configuration ============
 
@@ -269,7 +274,7 @@ contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
         nonReentrant
         canRegister
     {
-        _burn(msg.sender, registrationCost);
+        _burn(msg.sender, REGISTRATION_COST);
         IMirrorENSRegistrar(ensRegistrar).register(label, owner);
         emit Registered(label, owner);
     }

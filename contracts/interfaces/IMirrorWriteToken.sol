@@ -4,7 +4,7 @@ pragma solidity 0.6.8;
 interface IMirrorWriteToken {
     function register(string calldata label, address owner) external;
 
-    function REGISTRATION_COST() external view returns (uint256);
+    function registrationCost() external view returns (uint256);
 
     // ============ ERC20 Interface ============
 

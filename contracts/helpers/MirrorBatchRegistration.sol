@@ -14,8 +14,6 @@ import {SafeMath} from "../lib/SafeMath.sol";
 contract MirrorBatchRegistration {
     using SafeMath for uint256;
 
-    uint256 internal constant REGISTRATION_COST = 1e18;
-
     IMirrorWriteToken token;
 
     constructor(address token_) public {
@@ -39,7 +37,7 @@ contract MirrorBatchRegistration {
         external
     {
         uint256 len = labels.length;
-        uint256 requiredTokens = REGISTRATION_COST.mul(len);
+        uint256 requiredTokens = token.registrationCost().mul(len);
 
         require(
             token.allowance(msg.sender, address(this)) >= requiredTokens,

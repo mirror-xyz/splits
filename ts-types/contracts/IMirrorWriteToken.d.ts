@@ -22,23 +22,19 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface IMirrorWriteTokenInterface extends ethers.utils.Interface {
   functions: {
-    "REGISTRATION_COST()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "decimals()": FunctionFragment;
     "name()": FunctionFragment;
     "register(string,address)": FunctionFragment;
+    "registrationCost()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "REGISTRATION_COST",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "allowance",
     values: [string, string]
@@ -54,6 +50,10 @@ interface IMirrorWriteTokenInterface extends ethers.utils.Interface {
     functionFragment: "register",
     values: [string, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "registrationCost",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -68,16 +68,16 @@ interface IMirrorWriteTokenInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "REGISTRATION_COST",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "registrationCost",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -112,10 +112,6 @@ export class IMirrorWriteToken extends Contract {
   interface: IMirrorWriteTokenInterface;
 
   functions: {
-    REGISTRATION_COST(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     allowance(
       owner: string,
       spender: string,
@@ -167,6 +163,10 @@ export class IMirrorWriteToken extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    registrationCost(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "registrationCost()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     "symbol()"(overrides?: CallOverrides): Promise<[string]>;
@@ -201,10 +201,6 @@ export class IMirrorWriteToken extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
   };
-
-  REGISTRATION_COST(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   allowance(
     owner: string,
@@ -257,6 +253,10 @@ export class IMirrorWriteToken extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  registrationCost(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "registrationCost()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   symbol(overrides?: CallOverrides): Promise<string>;
 
   "symbol()"(overrides?: CallOverrides): Promise<string>;
@@ -292,10 +292,6 @@ export class IMirrorWriteToken extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    REGISTRATION_COST(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     allowance(
       owner: string,
       spender: string,
@@ -347,6 +343,10 @@ export class IMirrorWriteToken extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    registrationCost(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "registrationCost()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     symbol(overrides?: CallOverrides): Promise<string>;
 
     "symbol()"(overrides?: CallOverrides): Promise<string>;
@@ -393,10 +393,6 @@ export class IMirrorWriteToken extends Contract {
   };
 
   estimateGas: {
-    REGISTRATION_COST(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     allowance(
       owner: string,
       spender: string,
@@ -448,6 +444,10 @@ export class IMirrorWriteToken extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    registrationCost(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "registrationCost()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -484,12 +484,6 @@ export class IMirrorWriteToken extends Contract {
   };
 
   populateTransaction: {
-    REGISTRATION_COST(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "REGISTRATION_COST()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     allowance(
       owner: string,
       spender: string,
@@ -542,6 +536,12 @@ export class IMirrorWriteToken extends Contract {
       label: string,
       owner: string,
       overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    registrationCost(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "registrationCost()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;

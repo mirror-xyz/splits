@@ -30,7 +30,7 @@ describe("MirrorBatchRegistration", () => {
 
         [owner, account1, account2, account3] = await ethers.getSigners();
 
-        registrationCost = await token.REGISTRATION_COST();
+        registrationCost = await token.registrationCost();
     });
 
     describe("#registerBatch", () => {
@@ -83,9 +83,9 @@ describe("MirrorBatchRegistration", () => {
                 }
             });
 
-            it("uses 414931 gas", () => {
+            it("uses 417750 gas", () => {
                 const { gasUsed } = receipt;
-                expect(gasUsed).to.eq(414931);
+                expect(gasUsed).to.eq(417750);
             });
         });
     });

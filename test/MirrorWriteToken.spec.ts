@@ -49,7 +49,7 @@ describe("MirrorWriteToken", () => {
 		});
 
 		it("has the correct registration cost", async () => {
-			const cost = await token.REGISTRATION_COST();
+			const cost = await token.registrationCost();
 			expect(cost.toString()).to.eq(REGISTRATION_COST);
 		});
 

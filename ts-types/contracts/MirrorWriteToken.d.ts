@@ -22,7 +22,6 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface MirrorWriteTokenInterface extends ethers.utils.Interface {
   functions: {
-    "REGISTRATION_COST()": FunctionFragment;
     "acceptOwnership()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
@@ -36,6 +35,7 @@ interface MirrorWriteTokenInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "register(string,address)": FunctionFragment;
     "registrable()": FunctionFragment;
+    "registrationCost()": FunctionFragment;
     "setENSRegistrar(address)": FunctionFragment;
     "setRegistrable(bool)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -45,10 +45,6 @@ interface MirrorWriteTokenInterface extends ethers.utils.Interface {
     "transferOwnership(address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "REGISTRATION_COST",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "acceptOwnership",
     values?: undefined
@@ -90,6 +86,10 @@ interface MirrorWriteTokenInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "registrationCost",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "setENSRegistrar",
     values: [string]
   ): string;
@@ -116,10 +116,6 @@ interface MirrorWriteTokenInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "REGISTRATION_COST",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "acceptOwnership",
     data: BytesLike
   ): Result;
@@ -145,6 +141,10 @@ interface MirrorWriteTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "registrable",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registrationCost",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -199,10 +199,6 @@ export class MirrorWriteToken extends Contract {
   interface: MirrorWriteTokenInterface;
 
   functions: {
-    REGISTRATION_COST(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     acceptOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
     "acceptOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -294,6 +290,10 @@ export class MirrorWriteToken extends Contract {
 
     "registrable()"(overrides?: CallOverrides): Promise<[boolean]>;
 
+    registrationCost(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "registrationCost()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     setENSRegistrar(
       ensRegistrar_: string,
       overrides?: Overrides
@@ -358,10 +358,6 @@ export class MirrorWriteToken extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
   };
-
-  REGISTRATION_COST(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   acceptOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -452,6 +448,10 @@ export class MirrorWriteToken extends Contract {
 
   "registrable()"(overrides?: CallOverrides): Promise<boolean>;
 
+  registrationCost(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "registrationCost()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   setENSRegistrar(
     ensRegistrar_: string,
     overrides?: Overrides
@@ -517,10 +517,6 @@ export class MirrorWriteToken extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    REGISTRATION_COST(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     acceptOwnership(overrides?: CallOverrides): Promise<void>;
 
     "acceptOwnership()"(overrides?: CallOverrides): Promise<void>;
@@ -608,6 +604,10 @@ export class MirrorWriteToken extends Contract {
 
     "registrable()"(overrides?: CallOverrides): Promise<boolean>;
 
+    registrationCost(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "registrationCost()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     setENSRegistrar(
       ensRegistrar_: string,
       overrides?: CallOverrides
@@ -693,10 +693,6 @@ export class MirrorWriteToken extends Contract {
   };
 
   estimateGas: {
-    REGISTRATION_COST(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "REGISTRATION_COST()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     acceptOwnership(overrides?: Overrides): Promise<BigNumber>;
 
     "acceptOwnership()"(overrides?: Overrides): Promise<BigNumber>;
@@ -784,6 +780,10 @@ export class MirrorWriteToken extends Contract {
 
     "registrable()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    registrationCost(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "registrationCost()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     setENSRegistrar(
       ensRegistrar_: string,
       overrides?: Overrides
@@ -850,12 +850,6 @@ export class MirrorWriteToken extends Contract {
   };
 
   populateTransaction: {
-    REGISTRATION_COST(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "REGISTRATION_COST()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     acceptOwnership(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "acceptOwnership()"(overrides?: Overrides): Promise<PopulatedTransaction>;
@@ -949,6 +943,12 @@ export class MirrorWriteToken extends Contract {
     registrable(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "registrable()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    registrationCost(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "registrationCost()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     setENSRegistrar(
       ensRegistrar_: string,
