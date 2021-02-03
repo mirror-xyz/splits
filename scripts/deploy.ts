@@ -5,15 +5,18 @@ export const ZERO_BYTES32 = ethers.constants.HashZero;
 export const ROOT = "xyz";
 export const subnameWallet = "mirror";
 
-// For production
-// export const ENS_REGISTRY_ADDRESS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
-// export const ROOT_NAME = 'mirror.xyz';
-// export const ROOT_NODE = ethers.utils.namehash(ROOT_NAME);
-
-// For test
-export const ENS_REGISTRY_ADDRESS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
-export const ROOT_NAME = 'mirror.test'
-export const ROOT_NODE = ethers.utils.namehash(ROOT_NAME)
+const config = {
+  production: {
+    ENS_REGISTRY_ADDRESS: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+    ROOT_NAME: "mirror.xyz",
+    ROOT_NODE: ethers.utils.namehash("mirror.xyz")
+  },
+  test: {
+    ENS_REGISTRY_ADDRESS: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+    ROOT_NAME: "mirror.test",
+    ROOT_NODE: ethers.utils.namehash("mirror.test")
+  }
+}
 
 const NETWORK_MAP = {
   '0': 'mainnet',
@@ -36,6 +39,23 @@ async function main() {
   let owner;
   let ensAddress;
   let ensRegistry;
+  let ENS_REGISTRY_ADDRESS;
+  let ROOT_NAME;
+  let ROOT_NODE;
+
+  if (networkName === "mainnet") {
+    ({
+      ENS_REGISTRY_ADDRESS,
+      ROOT_NAME,
+      ROOT_NODE,
+    } = config.production);
+  } else {
+    ({
+      ENS_REGISTRY_ADDRESS,
+      ROOT_NAME,
+      ROOT_NODE,
+    } = config.test);
+  }
 
   if (isLocal) {
     console.log("deploying ENS registry");
@@ -125,7 +145,9 @@ async function main() {
 
   console.log(info);
 
-  fs.writeFileSync(`${__dirname}/../networks/${networkName}.json`, JSON.stringify(info, null, 2));
+  if (!isLocal) {
+    fs.writeFileSync(`${__dirname}/../networks/${networkName}.json`, JSON.stringify(info, null, 2));
+  }
 }
 
 main()
