@@ -2,9 +2,6 @@
 pragma solidity 0.6.8;
 pragma experimental ABIEncoderV2;
 
-import {
-    ReentrancyGuard
-} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {SafeMath} from "./lib/SafeMath.sol";
 import {IMirrorENSRegistrar} from "./ens/interfaces/IMirrorENSRegistrar.sol";
 import {IMirrorWriteToken} from "./interfaces/IMirrorWriteToken.sol";
@@ -16,7 +13,7 @@ import {IMirrorWriteToken} from "./interfaces/IMirrorWriteToken.sol";
  *  An ERC20 that grants access to the ENS namespace through a
  *  burn-and-register model.
  */
-contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
+contract MirrorWriteToken is IMirrorWriteToken {
     using SafeMath for uint256;
 
     // ============ Immutable ERC20 Attributes ============
@@ -121,12 +118,13 @@ contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
     function register(string calldata label, address owner)
         external
         override
-        nonReentrant
         canRegister
     {
         _burn(msg.sender, REGISTRATION_COST);
-        IMirrorENSRegistrar(ensRegistrar).register(label, owner);
+
         emit Registered(label, owner);
+
+        IMirrorENSRegistrar(ensRegistrar).register(label, owner);
     }
 
     // ============ Ownership ============
@@ -176,6 +174,18 @@ contract MirrorWriteToken is IMirrorWriteToken, ReentrancyGuard {
         emit OwnershipTransferred(_owner, msg.sender);
 
         _owner = msg.sender;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() external onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
     }
 
     // ============ Configuration Management ============

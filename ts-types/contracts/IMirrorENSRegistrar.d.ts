@@ -22,13 +22,13 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface IMirrorENSRegistrarInterface extends ethers.utils.Interface {
   functions: {
-    "changeRootnodeOwner(address)": FunctionFragment;
+    "changeRootNodeOwner(address)": FunctionFragment;
     "register(string,address)": FunctionFragment;
     "updateENSReverseRegistrar()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "changeRootnodeOwner",
+    functionFragment: "changeRootNodeOwner",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -41,7 +41,7 @@ interface IMirrorENSRegistrarInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "changeRootnodeOwner",
+    functionFragment: "changeRootNodeOwner",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
@@ -67,12 +67,12 @@ export class IMirrorENSRegistrar extends Contract {
   interface: IMirrorENSRegistrarInterface;
 
   functions: {
-    changeRootnodeOwner(
+    changeRootNodeOwner(
       newOwner_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "changeRootnodeOwner(address)"(
+    "changeRootNodeOwner(address)"(
       newOwner_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -98,12 +98,12 @@ export class IMirrorENSRegistrar extends Contract {
     ): Promise<ContractTransaction>;
   };
 
-  changeRootnodeOwner(
+  changeRootNodeOwner(
     newOwner_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "changeRootnodeOwner(address)"(
+  "changeRootNodeOwner(address)"(
     newOwner_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -129,12 +129,12 @@ export class IMirrorENSRegistrar extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    changeRootnodeOwner(
+    changeRootNodeOwner(
       newOwner_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "changeRootnodeOwner(address)"(
+    "changeRootNodeOwner(address)"(
       newOwner_: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -159,12 +159,12 @@ export class IMirrorENSRegistrar extends Contract {
   filters: {};
 
   estimateGas: {
-    changeRootnodeOwner(
+    changeRootNodeOwner(
       newOwner_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "changeRootnodeOwner(address)"(
+    "changeRootNodeOwner(address)"(
       newOwner_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -187,12 +187,12 @@ export class IMirrorENSRegistrar extends Contract {
   };
 
   populateTransaction: {
-    changeRootnodeOwner(
+    changeRootNodeOwner(
       newOwner_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "changeRootnodeOwner(address)"(
+    "changeRootNodeOwner(address)"(
       newOwner_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;

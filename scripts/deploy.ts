@@ -23,52 +23,109 @@ const NETWORK_MAP = {
   '31337': 'hardhat',
 }
 
+let isLocal = false;
+
 async function main() {
   const chainId = (await waffle.provider.getNetwork()).chainId;
   const networkName = NETWORK_MAP[chainId];
 
   console.log(`Deploying to ${networkName}`);
 
-  const MirrorInviteToken = await ethers.getContractFactory("MirrorInviteToken");
-  const mirrorInviteToken = await MirrorInviteToken.deploy("MirrorInviteToken", "WRITE");
-  await mirrorInviteToken.deployed();
+  isLocal = (networkName === "hardhat");
 
+  let owner;
+  let ensAddress;
+  let ensRegistry;
+
+  if (isLocal) {
+    console.log("deploying ENS registry");
+    const ENSRegistry = await ethers.getContractFactory('ENSRegistry')
+    ensRegistry = await ENSRegistry.deploy()
+    await ensRegistry.deployed()
+
+    ensAddress = ensRegistry.address;
+  } else {
+    ensAddress = ENS_REGISTRY_ADDRESS;
+  }
+
+  console.log("Deploying $WRITE");
+  const MirrorWriteToken = await ethers.getContractFactory("MirrorWriteToken");
+  const mirrorWriteToken = await MirrorWriteToken.deploy();
+  await mirrorWriteToken.deployed();
+
+  console.log("Deploying Batch Registration");
+  const MirrorBatchRegistration = await ethers.getContractFactory("MirrorBatchRegistration");
+  const mirrorBatchRegistration = await MirrorBatchRegistration.deploy(mirrorWriteToken.address);
+  await mirrorBatchRegistration.deployed();
+
+  console.log("Deploying ENS Resolver");
   const MirrorENSResolver = await ethers.getContractFactory("MirrorENSResolver");
   const mirrorENSResolver = await MirrorENSResolver.deploy();
   await mirrorENSResolver.deployed();
 
+  console.log("Deploying ENS Registrar");
   const MirrorENSRegistrar = await ethers.getContractFactory("MirrorENSRegistrar");
   const mirrorENSRegistrar = await MirrorENSRegistrar.deploy(
     ROOT_NAME,
     ROOT_NODE,
-    ENS_REGISTRY_ADDRESS,
+    ensAddress,
     mirrorENSResolver.address,
-    mirrorInviteToken.address
+    mirrorWriteToken.address
   );
   await mirrorENSRegistrar.deployed();
 
-  const MirrorPublicationFactoryV1 = await ethers.getContractFactory("MirrorPublicationFactoryV1");
-  const mirrorPublicationFactoryV1 = await MirrorPublicationFactoryV1.deploy();
-  await mirrorPublicationFactoryV1.deployed();
-  await mirrorPublicationFactoryV1.setInviteToken(mirrorInviteToken.address);
+  console.log("is local", isLocal);
+  if (isLocal) {
+    const accounts = await ethers.getSigners();
+    owner = accounts[0].address;
+    owner = accounts[0];
 
-  await mirrorInviteToken.setENSRegistrar(mirrorENSRegistrar.address);
-  await mirrorInviteToken.setPublicationFactory(mirrorPublicationFactoryV1.address);
+    const ReverseRegistrar = await ethers.getContractFactory('MirrorENSReverseRegistrar')
+    const reverseRegistrar = await ReverseRegistrar.deploy(ensRegistry.address, mirrorENSRegistrar.address)
+    await reverseRegistrar.deployed()
 
-  await mirrorENSResolver.transferOwnership(mirrorENSRegistrar.address)
+    // Setup root.
+    await ensRegistry.setSubnodeOwner(
+      ZERO_BYTES32,
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("xyz")),
+      owner.address
+    );
+    await ensRegistry.setSubnodeOwner(
+      ethers.utils.namehash("xyz"),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("mirror")),
+      mirrorENSRegistrar.address
+    );
+    await ensRegistry.setSubnodeOwner(
+      ZERO_BYTES32,
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes('reverse')),
+      owner.address
+    )
+    await ensRegistry.setSubnodeOwner(
+      ethers.utils.namehash('reverse'),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes('addr')),
+      reverseRegistrar.address,
+    )
+  }
 
-    const info = {
-      Contracts: {
-        MirrorInviteToken: mirrorInviteToken.address,
-        MirrorENSResolver: mirrorENSResolver.address,
-        MirrorENSRegistrar: mirrorENSRegistrar.address,
-        MirrorPublicationFactoryV1: mirrorPublicationFactoryV1.address,
-      }
-    };
+  console.log("Setting registrar on $WRITE");
+  await mirrorWriteToken.setENSRegistrar(mirrorENSRegistrar.address);
+  console.log("Transferring ownership of Resolver to Registrar");
+  await mirrorENSResolver.transferOwnership(mirrorENSRegistrar.address);
+  console.log("Updating ENS Reverse Registrar");
+  await mirrorENSRegistrar.updateENSReverseRegistrar();
 
-    console.log(info);
+  const info = {
+    Contracts: {
+      MirrorWriteToken: mirrorWriteToken.address,
+      MirrorENSResolver: mirrorENSResolver.address,
+      MirrorENSRegistrar: mirrorENSRegistrar.address,
+      MirrorBatchRegistration: mirrorBatchRegistration.address,
+    }
+  };
 
-    fs.writeFileSync(`${__dirname}/../networks/${networkName}.json`, JSON.stringify(info, null, 2));
+  console.log(info);
+
+  fs.writeFileSync(`${__dirname}/../networks/${networkName}.json`, JSON.stringify(info, null, 2));
 }
 
 main()

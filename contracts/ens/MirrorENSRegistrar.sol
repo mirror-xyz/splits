@@ -41,9 +41,9 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
     IENS public immutable ensRegistry;
 
     /**
-     * The address of the MirrorInviteToken that gates access to this namespace.
+     * The address of the MirrorWriteToken that gates access to this namespace.
      */
-    address public immutable inviteToken;
+    address public immutable writeToken;
 
     /**
      * The address of the MirrorENSResolver.
@@ -60,22 +60,19 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
 
     // ============ Events ============
 
-    event RootnodeOwnerChange(bytes32 indexed node, address indexed owner);
-    event ENSResolverChanged(address addr);
-    event InviteTokenChanged(address addr);
+    event RootNodeOwnerChange(bytes32 indexed node, address indexed owner);
     event RegisteredENS(address indexed _owner, string _ens);
-    event UnregisteredENS(string _ens);
 
     // ============ Modifiers ============
 
     /**
-     * @dev Modifier to check whether the `msg.sender` is the MirrorInviteToken.
+     * @dev Modifier to check whether the `msg.sender` is the MirrorWriteToken.
      * If it is, it will run the function. Otherwise, it will revert.
      */
-    modifier onlyInviteToken() {
+    modifier onlyWriteToken() {
         require(
-            msg.sender == inviteToken,
-            "MirrorENSRegistrar: caller is not the invite token"
+            msg.sender == writeToken,
+            "MirrorENSRegistrar: caller is not the Mirror Write Token"
         );
         _;
     }
@@ -88,18 +85,19 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
      * @param rootNode_ The node of the root name (e.g. namehash(mirror.xyz)).
      * @param ensRegistry_ The address of the ENS registry
      * @param ensResolver_ The address of the ENS resolver
+     * @param writeToken_ The address of the Mirror Write Token
      */
     constructor(
         string memory rootName_,
         bytes32 rootNode_,
         address ensRegistry_,
         address ensResolver_,
-        address inviteToken_
+        address writeToken_
     ) public {
         rootName = rootName_;
         rootNode = rootNode_;
 
-        inviteToken = inviteToken_;
+        writeToken = writeToken_;
 
         // Registrations are cheaper if these are instantiated.
         ensRegistry = IENS(ensRegistry_);
@@ -110,14 +108,14 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
 
     /**
      * @notice Assigns an ENS subdomain of the root node to a target address.
-     * Registers both the forward and reverse ENS. Can only be called by InviteToken.
+     * Registers both the forward and reverse ENS. Can only be called by writeToken.
      * @param label_ The subdomain label.
      * @param owner_ The owner of the subdomain.
      */
     function register(string calldata label_, address owner_)
         external
         override
-        onlyInviteToken
+        onlyWriteToken
     {
         bytes32 labelNode = keccak256(abi.encodePacked(label_));
         bytes32 node = keccak256(abi.encodePacked(rootNode, labelNode));
@@ -155,13 +153,13 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
      * and the address of the new Manager should be provided.
      * @param _newOwner The address of the new ENS manager that will manage the root node.
      */
-    function changeRootnodeOwner(address _newOwner)
+    function changeRootNodeOwner(address _newOwner)
         external
         override
         onlyOwner
     {
         ensRegistry.setOwner(rootNode, _newOwner);
-        emit RootnodeOwnerChange(rootNode, _newOwner);
+        emit RootNodeOwnerChange(rootNode, _newOwner);
     }
 
     /**

@@ -83,9 +83,9 @@ describe("MirrorBatchRegistration", () => {
                 }
             });
 
-            it("uses 417750 gas", () => {
+            it("uses 410559 gas", () => {
                 const { gasUsed } = receipt;
-                expect(gasUsed).to.eq(417750);
+                expect(gasUsed).to.eq(410559);
             });
         });
     });

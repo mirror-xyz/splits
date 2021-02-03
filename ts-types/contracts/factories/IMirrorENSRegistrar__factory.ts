@@ -25,7 +25,7 @@ const _abi = [
         type: "address",
       },
     ],
-    name: "changeRootnodeOwner",
+    name: "changeRootNodeOwner",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

@@ -23,10 +23,9 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface MirrorENSRegistrarInterface extends ethers.utils.Interface {
   functions: {
     "ADDR_REVERSE_NODE()": FunctionFragment;
-    "changeRootnodeOwner(address)": FunctionFragment;
+    "changeRootNodeOwner(address)": FunctionFragment;
     "ensRegistry()": FunctionFragment;
     "ensResolver()": FunctionFragment;
-    "inviteToken()": FunctionFragment;
     "owner()": FunctionFragment;
     "register(string,address)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -35,6 +34,7 @@ interface MirrorENSRegistrarInterface extends ethers.utils.Interface {
     "rootNode()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "updateENSReverseRegistrar()": FunctionFragment;
+    "writeToken()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -42,7 +42,7 @@ interface MirrorENSRegistrarInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "changeRootnodeOwner",
+    functionFragment: "changeRootNodeOwner",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -51,10 +51,6 @@ interface MirrorENSRegistrarInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "ensResolver",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "inviteToken",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -80,13 +76,17 @@ interface MirrorENSRegistrarInterface extends ethers.utils.Interface {
     functionFragment: "updateENSReverseRegistrar",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "writeToken",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "ADDR_REVERSE_NODE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "changeRootnodeOwner",
+    functionFragment: "changeRootNodeOwner",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -95,10 +95,6 @@ interface MirrorENSRegistrarInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "ensResolver",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "inviteToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -121,22 +117,17 @@ interface MirrorENSRegistrarInterface extends ethers.utils.Interface {
     functionFragment: "updateENSReverseRegistrar",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "writeToken", data: BytesLike): Result;
 
   events: {
-    "ENSResolverChanged(address)": EventFragment;
-    "InviteTokenChanged(address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "RegisteredENS(address,string)": EventFragment;
-    "RootnodeOwnerChange(bytes32,address)": EventFragment;
-    "UnregisteredENS(string)": EventFragment;
+    "RootNodeOwnerChange(bytes32,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "ENSResolverChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "InviteTokenChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RegisteredENS"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RootnodeOwnerChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "UnregisteredENS"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RootNodeOwnerChange"): EventFragment;
 }
 
 export class MirrorENSRegistrar extends Contract {
@@ -157,12 +148,12 @@ export class MirrorENSRegistrar extends Contract {
 
     "ADDR_REVERSE_NODE()"(overrides?: CallOverrides): Promise<[string]>;
 
-    changeRootnodeOwner(
+    changeRootNodeOwner(
       _newOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "changeRootnodeOwner(address)"(
+    "changeRootNodeOwner(address)"(
       _newOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -174,10 +165,6 @@ export class MirrorENSRegistrar extends Contract {
     ensResolver(overrides?: CallOverrides): Promise<[string]>;
 
     "ensResolver()"(overrides?: CallOverrides): Promise<[string]>;
-
-    inviteToken(overrides?: CallOverrides): Promise<[string]>;
-
-    "inviteToken()"(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -228,18 +215,22 @@ export class MirrorENSRegistrar extends Contract {
     "updateENSReverseRegistrar()"(
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    writeToken(overrides?: CallOverrides): Promise<[string]>;
+
+    "writeToken()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   ADDR_REVERSE_NODE(overrides?: CallOverrides): Promise<string>;
 
   "ADDR_REVERSE_NODE()"(overrides?: CallOverrides): Promise<string>;
 
-  changeRootnodeOwner(
+  changeRootNodeOwner(
     _newOwner: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "changeRootnodeOwner(address)"(
+  "changeRootNodeOwner(address)"(
     _newOwner: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -251,10 +242,6 @@ export class MirrorENSRegistrar extends Contract {
   ensResolver(overrides?: CallOverrides): Promise<string>;
 
   "ensResolver()"(overrides?: CallOverrides): Promise<string>;
-
-  inviteToken(overrides?: CallOverrides): Promise<string>;
-
-  "inviteToken()"(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -306,17 +293,21 @@ export class MirrorENSRegistrar extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  writeToken(overrides?: CallOverrides): Promise<string>;
+
+  "writeToken()"(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
     ADDR_REVERSE_NODE(overrides?: CallOverrides): Promise<string>;
 
     "ADDR_REVERSE_NODE()"(overrides?: CallOverrides): Promise<string>;
 
-    changeRootnodeOwner(
+    changeRootNodeOwner(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "changeRootnodeOwner(address)"(
+    "changeRootNodeOwner(address)"(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -328,10 +319,6 @@ export class MirrorENSRegistrar extends Contract {
     ensResolver(overrides?: CallOverrides): Promise<string>;
 
     "ensResolver()"(overrides?: CallOverrides): Promise<string>;
-
-    inviteToken(overrides?: CallOverrides): Promise<string>;
-
-    "inviteToken()"(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -378,13 +365,13 @@ export class MirrorENSRegistrar extends Contract {
     updateENSReverseRegistrar(overrides?: CallOverrides): Promise<void>;
 
     "updateENSReverseRegistrar()"(overrides?: CallOverrides): Promise<void>;
+
+    writeToken(overrides?: CallOverrides): Promise<string>;
+
+    "writeToken()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
-    ENSResolverChanged(addr: null): EventFilter;
-
-    InviteTokenChanged(addr: null): EventFilter;
-
     OwnershipTransferred(
       previousOwner: string | null,
       newOwner: string | null
@@ -392,12 +379,10 @@ export class MirrorENSRegistrar extends Contract {
 
     RegisteredENS(_owner: string | null, _ens: null): EventFilter;
 
-    RootnodeOwnerChange(
+    RootNodeOwnerChange(
       node: BytesLike | null,
       owner: string | null
     ): EventFilter;
-
-    UnregisteredENS(_ens: null): EventFilter;
   };
 
   estimateGas: {
@@ -405,12 +390,12 @@ export class MirrorENSRegistrar extends Contract {
 
     "ADDR_REVERSE_NODE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    changeRootnodeOwner(
+    changeRootNodeOwner(
       _newOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "changeRootnodeOwner(address)"(
+    "changeRootNodeOwner(address)"(
       _newOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -422,10 +407,6 @@ export class MirrorENSRegistrar extends Contract {
     ensResolver(overrides?: CallOverrides): Promise<BigNumber>;
 
     "ensResolver()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    inviteToken(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "inviteToken()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -472,6 +453,10 @@ export class MirrorENSRegistrar extends Contract {
     updateENSReverseRegistrar(overrides?: Overrides): Promise<BigNumber>;
 
     "updateENSReverseRegistrar()"(overrides?: Overrides): Promise<BigNumber>;
+
+    writeToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "writeToken()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -481,12 +466,12 @@ export class MirrorENSRegistrar extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    changeRootnodeOwner(
+    changeRootNodeOwner(
       _newOwner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "changeRootnodeOwner(address)"(
+    "changeRootNodeOwner(address)"(
       _newOwner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -498,10 +483,6 @@ export class MirrorENSRegistrar extends Contract {
     ensResolver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "ensResolver()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    inviteToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "inviteToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -554,5 +535,9 @@ export class MirrorENSRegistrar extends Contract {
     "updateENSReverseRegistrar()"(
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    writeToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "writeToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

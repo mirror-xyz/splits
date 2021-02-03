@@ -1,8 +1,7 @@
 {
   "Contracts": {
-    "MirrorInviteToken": "0x8E88565A67398d72EE2d045170279d75b0Bb0095",
-    "MirrorENSResolver": "0xAA83f3c28E68BeF31C35D2D9B81744f310BdFB64",
-    "MirrorENSRegistrar": "0x9978bABFFA45A153Ee865D409F82e799378C8d97",
-    "MirrorPublicationFactoryV1": "0x5d5573e07Cc9C57Fa4afF38A27D4Fe963cB22e7b"
+    "MirrorWriteToken": "0x2B50248F70bfad9E2b50113dE48eFaae18048F32",
+    "MirrorENSResolver": "0x03dF40c273B74e837eE56275d3bcC9E6bD4b79BA",
+    "MirrorENSRegistrar": "0x2B117eFF13A159e059E206cE144F9E01F46a54CD"
   }
 }
