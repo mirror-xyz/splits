@@ -25,7 +25,7 @@ contract MirrorWriteToken is IMirrorWriteToken {
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
     bytes32 public constant PERMIT_TYPEHASH =
         0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
-    bytes32 public DOMAIN_SEPARATOR;
+    bytes32 public immutable override DOMAIN_SEPARATOR;
 
     // ============ Immutable Registration Configuration ============
 
@@ -50,7 +50,7 @@ contract MirrorWriteToken is IMirrorWriteToken {
     uint256 public override totalSupply;
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public override allowance;
-    mapping(address => uint256) public nonces;
+    mapping(address => uint256) public override nonces;
 
     // ============ Events ============
 
@@ -91,7 +91,7 @@ contract MirrorWriteToken is IMirrorWriteToken {
 
     constructor() public {
         uint256 chainId = _getChainId();
-        
+
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(
@@ -297,7 +297,7 @@ contract MirrorWriteToken is IMirrorWriteToken {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
+    ) external override {
         require(deadline >= block.timestamp, "MirrorWriteToken: EXPIRED");
         bytes32 digest =
             keccak256(
