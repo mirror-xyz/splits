@@ -22,6 +22,11 @@ contract MirrorWriteToken is IMirrorWriteToken {
     string public constant override name = "Mirror Write Token";
     uint8 public constant override decimals = 18;
 
+    // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
+    bytes32 public constant PERMIT_TYPEHASH =
+        0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+    bytes32 public DOMAIN_SEPARATOR;
+
     // ============ Immutable Registration Configuration ============
 
     uint256 internal constant REGISTRATION_COST = 1e18;
@@ -45,6 +50,7 @@ contract MirrorWriteToken is IMirrorWriteToken {
     uint256 public override totalSupply;
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public override allowance;
+    mapping(address => uint256) public nonces;
 
     // ============ Events ============
 
@@ -84,6 +90,20 @@ contract MirrorWriteToken is IMirrorWriteToken {
     // ============ Constructor ============
 
     constructor() public {
+        uint256 chainId = _getChainId();
+        
+        DOMAIN_SEPARATOR = keccak256(
+            abi.encode(
+                keccak256(
+                    "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+                ),
+                keccak256(bytes(name)),
+                keccak256(bytes("1")),
+                chainId,
+                address(this)
+            )
+        );
+
         _owner = tx.origin;
         emit OwnershipTransferred(address(0), _owner);
     }
@@ -267,5 +287,46 @@ contract MirrorWriteToken is IMirrorWriteToken {
         }
         _transfer(from, to, value);
         return true;
+    }
+
+    function permit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        require(deadline >= block.timestamp, "MirrorWriteToken: EXPIRED");
+        bytes32 digest =
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    DOMAIN_SEPARATOR,
+                    keccak256(
+                        abi.encode(
+                            PERMIT_TYPEHASH,
+                            owner,
+                            spender,
+                            value,
+                            nonces[owner]++,
+                            deadline
+                        )
+                    )
+                )
+            );
+        address recoveredAddress = ecrecover(digest, v, r, s);
+        require(
+            recoveredAddress != address(0) && recoveredAddress == owner,
+            "MirrorWriteToken: INVALID_SIGNATURE"
+        );
+        _approve(owner, spender, value);
+    }
+
+    function _getChainId() private pure returns (uint256 chainId) {
+        assembly {
+            chainId := chainid()
+        }
     }
 }
