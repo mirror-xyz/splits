@@ -1,8 +1,6 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.8;
 
-import "./utils/strings.sol";
-
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IENS} from "./interfaces/IENS.sol";
 import {IENSResolver} from "./interfaces/IENSResolver.sol";
@@ -10,8 +8,6 @@ import {IENSReverseRegistrar} from "./interfaces/IENSReverseRegistrar.sol";
 import {IMirrorENSRegistrar} from "./interfaces/IMirrorENSRegistrar.sol";
 
 contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
-    using strings for *;
-
     // ============ Constants ============
 
     /**
@@ -136,10 +132,7 @@ contract MirrorENSRegistrar is IMirrorENSRegistrar, Ownable {
         ensResolver.setAddr(node, owner_);
 
         // Reverse ENS
-        strings.slice[] memory parts = new strings.slice[](2);
-        parts[0] = label_.toSlice();
-        parts[1] = rootName.toSlice();
-        string memory name = ".".toSlice().join(parts);
+        string memory name = string(abi.encodePacked(label_, ".", rootName));
         bytes32 reverseNode = reverseRegistrar.node(owner_);
         ensResolver.setName(reverseNode, name);
 

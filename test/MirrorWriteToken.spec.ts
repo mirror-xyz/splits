@@ -219,9 +219,9 @@ describe("MirrorWriteToken", () => {
 				expect(name).to.eq(`${label}.mirror.xyz`);
 			});
 
-			it("uses 160375 gas", () => {
+			it("uses 157384 gas", () => {
 				const { gasUsed } = receipt;
-				expect(gasUsed).to.eq(160375);
+				expect(gasUsed).to.eq(157384);
 			});
 		});
 	});
