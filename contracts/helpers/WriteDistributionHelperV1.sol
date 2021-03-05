@@ -34,6 +34,7 @@ contract WriteDistributionHelperV1 {
      */
     address private _nextOwner;
     bytes32 public merkleRoot;
+    mapping(uint256 => uint256) private claimedBitMap;
 
     // ============ Events ============
 
@@ -145,8 +146,9 @@ contract WriteDistributionHelperV1 {
 
     // ============ Merkle-Tree Token Claim ============
 
-    // This is a packed array of booleans.
-    mapping(uint256 => uint256) private claimedBitMap;
+    function setMerkleRoot(bytes32 merkleRoot_) external onlyOwner {
+        merkleRoot = merkleRoot_;
+    }
 
     function isClaimed(uint256 index) public view returns (bool) {
         uint256 claimedWordIndex = index / 256;
