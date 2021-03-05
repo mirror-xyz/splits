@@ -39,7 +39,8 @@ contract WriteDistributionHelperV1 {
     // ============ Events ============
 
     event Distributed(address account);
-    event Claimed(uint256 index, address account, uint256 amount);
+    event RootUpdated(bytes32 oldRoot, bytes32 newRoot);
+    event Claimed(bytes32 index, address account, uint256 amount);
     event Transfer(address indexed from, address indexed to, uint256 value);
     event OwnershipTransferred(
         address indexed previousOwner,
@@ -147,6 +148,7 @@ contract WriteDistributionHelperV1 {
     // ============ Merkle-Tree Token Claim ============
 
     function setMerkleRoot(bytes32 merkleRoot_) external onlyOwner {
+        emit RootUpdated(merkleRoot, merkleRoot_);
         merkleRoot = merkleRoot_;
     }
 
