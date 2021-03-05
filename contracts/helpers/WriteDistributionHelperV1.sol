@@ -9,12 +9,12 @@ import {IMirrorWriteToken} from "../interfaces/IMirrorWriteToken.sol";
 import {SafeMath} from "../lib/SafeMath.sol";
 
 /**
- * @title WriteDistributionV1
+ * @title WriteDistributionHelperV1
  * @author MirrorXYZ
  *
  * A helper contract for distributing $WRITE token.
  */
-contract WriteDistributionV1 {
+contract WriteDistributionHelperV1 {
     using SafeMath for uint256;
 
     // ============ Constants ============
