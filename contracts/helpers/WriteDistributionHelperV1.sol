@@ -40,7 +40,7 @@ contract WriteDistributionHelperV1 {
 
     event Distributed(address account);
     event RootUpdated(bytes32 oldRoot, bytes32 newRoot);
-    event Claimed(bytes32 index, address account, uint256 amount);
+    event Claimed(uint256 index, address account, uint256 amount);
     event Transfer(address indexed from, address indexed to, uint256 value);
     event OwnershipTransferred(
         address indexed previousOwner,
@@ -134,7 +134,7 @@ contract WriteDistributionHelperV1 {
 
     // ============ Distribution ============
 
-    function distributeTo(address[] memory addresses) public returns (bool ok) {
+    function distributeTo(address[] memory addresses) public onlyOwner returns (bool ok) {
         IMirrorWriteToken tokenContract = IMirrorWriteToken(token);
 
         for (uint256 i = 0; i < addresses.length; i++) {
