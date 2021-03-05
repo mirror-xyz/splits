@@ -15,8 +15,6 @@ import {SafeMath} from "../lib/SafeMath.sol";
  * A helper contract for distributing $WRITE token.
  */
 contract WriteDistributionHelperV1 {
-    using SafeMath for uint256;
-
     // ============ Constants ============
 
     uint64 constant units = 1e18;
@@ -50,14 +48,14 @@ contract WriteDistributionHelperV1 {
     // ============ Modifiers ============
 
     modifier onlyOwner() {
-        require(isOwner(), "MirrorWriteToken: caller is not the owner.");
+        require(isOwner(), "WriteDistributionV1: caller is not the owner.");
         _;
     }
 
     modifier onlyNextOwner() {
         require(
             isNextOwner(),
-            "MirrorWriteToken: current owner must set caller as next owner."
+            "WriteDistributionV1: current owner must set caller as next owner."
         );
         _;
     }
@@ -94,7 +92,7 @@ contract WriteDistributionHelperV1 {
     function transferOwnership(address nextOwner_) external onlyOwner {
         require(
             nextOwner_ != address(0),
-            "MirrorWriteToken: next owner is the zero address."
+            "WriteDistributionV1: next owner is the zero address."
         );
 
         _nextOwner = nextOwner_;
