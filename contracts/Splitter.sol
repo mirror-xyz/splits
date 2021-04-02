@@ -17,10 +17,10 @@ interface IERC20 {
 }
 
 /**
- * @title MirrorWriteToken
+ * @title Splitter
  * @author MirrorXYZ
  *
- *  A contract that can split eth and tokens.
+ *  A contract that can split eth and tokens to a given allocation based on percentages.
  */
 contract Splitter is ISplitter {
     // An allocation comprises of an account and a percentage of the total
