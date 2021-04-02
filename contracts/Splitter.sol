@@ -66,7 +66,7 @@ contract Splitter is ISplitter {
      * to confirm that make sure that the split is valid before funds are
      * transferred into the splitted.
      */
-    constructor(Allocation[] calldata allocations_) {
+    constructor(Allocation[] memory allocations_) {
         allocations = allocations_;
     }
 
