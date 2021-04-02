@@ -1,10 +1,5 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.3;
-pragma experimental ABIEncoderV2;
-
-import {SafeMath} from "./lib/SafeMath.sol";
-import {IMirrorENSRegistrar} from "./ens/interfaces/IMirrorENSRegistrar.sol";
-import {IMirrorWriteToken} from "./interfaces/IMirrorWriteToken.sol";
 
 interface ISplitter {}
 
@@ -48,7 +43,7 @@ contract Splitter is ISplitter {
     );
 
     // The TransferToken event is emitted after each ERC20 transfer in the split is attempted.
-    event TransferETH(
+    event TransferToken(
         // The address of the ERC20 token to which the transfer was attempted.
         address token,
         // The account to which the transfer was attempted.
@@ -85,11 +80,11 @@ contract Splitter is ISplitter {
         return (totalAllocation == 100);
     }
 
-    function splitETH() returns (bool success) {
-        uint256 startingBalance = balanceOf((address(this)));
+    function splitETH() external returns (bool success) {
+        uint256 startingBalance = address(this).balance;
 
-        // Expect success in all things; especially ETH transfers via Splitter.
-        bool success = true;
+        // Expect success in all things; especially transfers via Splitter.
+        success = true;
         for (uint256 i = 0; i < allocations.length; i++) {
             bool didSucceed =
                 attemptETHTransfer(
@@ -105,7 +100,7 @@ contract Splitter is ISplitter {
             }
 
             emit TransferETH(
-                account,
+                allocations[i].account,
                 amountFromPercent(startingBalance, allocations[i].percent),
                 allocations[i].percent,
                 didSucceed
@@ -113,11 +108,11 @@ contract Splitter is ISplitter {
         }
     }
 
-    function splitToken(address token) returns (bool success) {
+    function splitToken(address token) external returns (bool success) {
         uint256 startingBalance = IERC20(token).balanceOf(address(this));
 
-        // Expect success in all things; especially ETH transfers via Splitter.
-        bool success = true;
+        // Expect success in all things; especially transfers via Splitter.
+        success = true;
         for (uint256 i = 0; i < allocations.length; i++) {
             bool didSucceed =
                 attemptTokenTransfer(
@@ -134,7 +129,7 @@ contract Splitter is ISplitter {
 
             emit TransferToken(
                 token,
-                account,
+                allocations[i].account,
                 amountFromPercent(startingBalance, allocations[i].percent),
                 allocations[i].percent,
                 didSucceed
@@ -142,7 +137,7 @@ contract Splitter is ISplitter {
         }
     }
 
-    function amountFromPercent(amount, percent) public pure {
+    function amountFromPercent(uint256 amount, uint32 percent) public pure {
         return amount.div(100).mul(percent);
     }
 
@@ -164,11 +159,7 @@ contract Splitter is ISplitter {
     ) internal {
         (bool success, bytes memory data) =
             token.call(
-                abi.encodeWithSelector(
-                    IERC20.transfer.selector,
-                    to,
-                    value
-                )
+                abi.encodeWithSelector(IERC20.transfer.selector, to, value)
             );
         return success && (data.length == 0 || abi.decode(data, (bool)));
     }
