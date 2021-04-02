@@ -1,7 +1,0 @@
-{
-  "Contracts": {
-    "MirrorWriteToken": "0x2B50248F70bfad9E2b50113dE48eFaae18048F32",
-    "MirrorENSResolver": "0x03dF40c273B74e837eE56275d3bcC9E6bD4b79BA",
-    "MirrorENSRegistrar": "0x2B117eFF13A159e059E206cE144F9E01F46a54CD"
-  }
-}
