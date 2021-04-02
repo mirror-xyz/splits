@@ -116,6 +116,7 @@ contract Splitter is ISplitter {
         for (uint256 i = 0; i < allocations.length; i++) {
             bool didSucceed =
                 attemptTokenTransfer(
+                    token,
                     // To the allocation's account address.
                     allocations[i].account,
                     // For an amount equal to the allocation's percent of the starting balance.
@@ -137,8 +138,9 @@ contract Splitter is ISplitter {
         }
     }
 
-    function amountFromPercent(uint256 amount, uint32 percent) public pure {
-        return amount.div(100).mul(percent);
+    function amountFromPercent(uint256 amount, uint32 percent) public pure returns(uint256) {
+        // Solidity 0.8.0 lets us do this without SafeMath.
+        return (amount * percent) / 100;
     }
 
     function attemptETHTransfer(address to, uint256 value)
@@ -156,7 +158,7 @@ contract Splitter is ISplitter {
         address token,
         address to,
         uint256 value
-    ) internal {
+    ) internal returns(bool) {
         (bool success, bytes memory data) =
             token.call(
                 abi.encodeWithSelector(IERC20.transfer.selector, to, value)
