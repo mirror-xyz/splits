@@ -1,7 +1,11 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.3;
 
-interface ISplitter {}
+interface ISplitter {
+    function validate() external view returns (bool isValid);
+    function splitETH() external returns (bool success);
+    function splitToken(address token) external returns (bool success);
+}
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
@@ -70,7 +74,7 @@ contract Splitter is ISplitter {
         allocations = allocations_;
     }
 
-    function validate() external view returns (bool isValid) {
+    function validate() external override view returns (bool isValid) {
         uint256 totalAllocation = 0;
 
         for (uint256 i = 0; i < allocations.length; i++) {
@@ -80,7 +84,7 @@ contract Splitter is ISplitter {
         return (totalAllocation == 100);
     }
 
-    function splitETH() external returns (bool success) {
+    function splitETH() external override returns (bool success) {
         uint256 startingBalance = address(this).balance;
 
         // Expect success in all things; especially transfers via Splitter.
@@ -108,7 +112,7 @@ contract Splitter is ISplitter {
         }
     }
 
-    function splitToken(address token) external returns (bool success) {
+    function splitToken(address token) external override returns (bool success) {
         uint256 startingBalance = IERC20(token).balanceOf(address(this));
 
         // Expect success in all things; especially transfers via Splitter.
@@ -158,7 +162,7 @@ contract Splitter is ISplitter {
         address token,
         address to,
         uint256 value
-    ) internal returns(bool) {
+    ) private returns(bool) {
         (bool success, bytes memory data) =
             token.call(
                 abi.encodeWithSelector(IERC20.transfer.selector, to, value)
