@@ -6,11 +6,10 @@ import 'hardhat-typechain';
 
 const { alchemyAPIKey, deployerPrivateKey } = require('./env.json');
 
-
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   solidity: {
-    version: '0.6.8',
+    version: '0.8.3',
     settings: {
       optimizer: {
         enabled: true,

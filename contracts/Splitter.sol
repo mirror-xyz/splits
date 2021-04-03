@@ -3,7 +3,9 @@ pragma solidity 0.8.3;
 
 interface ISplitter {
     function validate() external view returns (bool isValid);
+
     function splitETH() external returns (bool success);
+
     function splitToken(address token) external returns (bool success);
 }
 
@@ -24,15 +26,10 @@ interface IERC20 {
 contract Splitter is ISplitter {
     // An allocation comprises of an account and a percentage of the total
     // balance that that account should receive once the split is executed.
-    struct Allocation {
-        // The recipient's Ethereum account.
-        address account;
-        // The percent of the total balance that this account should receive.
-        uint32 percent;
-    }
-
-    // Splits are made across an array of allocations, described in the struct above.
-    Allocation[] allocations;
+    uint32[] public percentages;
+    address[] public accounts;
+    // True if initialized.
+    bool private _initialized;
 
     // The TransferETH event is emitted after each eth transfer in the split is attempted.
     event TransferETH(
@@ -68,17 +65,24 @@ contract Splitter is ISplitter {
      *
      * Once the Splitter is deployed, `validate()` can be called for free
      * to confirm that make sure that the split is valid before funds are
-     * transferred into the splitted.
+     * transferred into the splitter.
      */
-    constructor(Allocation[] memory allocations_) {
-        allocations = allocations_;
+    function initialize(
+        address[] calldata accounts_,
+        uint32[] calldata percentages_
+    ) external {
+        // Basic validation that the Splitter hasn't been initialized.
+        require(!_initialized, "Splitter already initialized");
+        // Initialize storage.
+        accounts = accounts_;
+        percentages = percentages_;
     }
 
-    function validate() external override view returns (bool isValid) {
+    function validate() external view override returns (bool isValid) {
         uint256 totalAllocation = 0;
 
-        for (uint256 i = 0; i < allocations.length; i++) {
-            totalAllocation += allocations[i].percent;
+        for (uint256 i = 0; i < accounts.length; i++) {
+            totalAllocation += percentages[i];
         }
 
         return (totalAllocation == 100);
@@ -89,13 +93,13 @@ contract Splitter is ISplitter {
 
         // Expect success in all things; especially transfers via Splitter.
         success = true;
-        for (uint256 i = 0; i < allocations.length; i++) {
+        for (uint256 i = 0; i < accounts.length; i++) {
             bool didSucceed =
                 attemptETHTransfer(
                     // To the allocation's account address.
-                    allocations[i].account,
+                    accounts[i],
                     // For an amount equal to the allocation's percent of the starting balance.
-                    amountFromPercent(startingBalance, allocations[i].percent)
+                    amountFromPercent(startingBalance, percentages[i])
                 );
 
             // If the operation did not succeed, we should return false from this function.
@@ -104,27 +108,31 @@ contract Splitter is ISplitter {
             }
 
             emit TransferETH(
-                allocations[i].account,
-                amountFromPercent(startingBalance, allocations[i].percent),
-                allocations[i].percent,
+                accounts[i],
+                amountFromPercent(startingBalance, percentages[i]),
+                percentages[i],
                 didSucceed
             );
         }
     }
 
-    function splitToken(address token) external override returns (bool success) {
+    function splitToken(address token)
+        external
+        override
+        returns (bool success)
+    {
         uint256 startingBalance = IERC20(token).balanceOf(address(this));
 
         // Expect success in all things; especially transfers via Splitter.
         success = true;
-        for (uint256 i = 0; i < allocations.length; i++) {
+        for (uint256 i = 0; i < accounts.length; i++) {
             bool didSucceed =
                 attemptTokenTransfer(
                     token,
                     // To the allocation's account address.
-                    allocations[i].account,
+                    accounts[i],
                     // For an amount equal to the allocation's percent of the starting balance.
-                    amountFromPercent(startingBalance, allocations[i].percent)
+                    amountFromPercent(startingBalance, percentages[i])
                 );
 
             // If the operation did not succeed, we should return false from this function.
@@ -134,15 +142,19 @@ contract Splitter is ISplitter {
 
             emit TransferToken(
                 token,
-                allocations[i].account,
-                amountFromPercent(startingBalance, allocations[i].percent),
-                allocations[i].percent,
+                accounts[i],
+                amountFromPercent(startingBalance, percentages[i]),
+                percentages[i],
                 didSucceed
             );
         }
     }
 
-    function amountFromPercent(uint256 amount, uint32 percent) public pure returns(uint256) {
+    function amountFromPercent(uint256 amount, uint32 percent)
+        public
+        pure
+        returns (uint256)
+    {
         // Solidity 0.8.0 lets us do this without SafeMath.
         return (amount * percent) / 100;
     }
@@ -162,11 +174,15 @@ contract Splitter is ISplitter {
         address token,
         address to,
         uint256 value
-    ) private returns(bool) {
+    ) private returns (bool) {
         (bool success, bytes memory data) =
             token.call(
                 abi.encodeWithSelector(IERC20.transfer.selector, to, value)
             );
         return success && (data.length == 0 || abi.decode(data, (bool)));
+    }
+
+    receive() external payable {
+        // This is expected.
     }
 }
