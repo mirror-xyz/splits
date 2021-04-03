@@ -17,6 +17,12 @@ interface IERC20 {
         returns (bool);
 }
 
+interface IWETH {
+    function deposit() external payable;
+
+    function transfer(address to, uint256 value) external returns (bool);
+}
+
 /**
  * @title Splitter
  * @author MirrorXYZ
@@ -24,6 +30,10 @@ interface IERC20 {
  *  A contract that can split eth and tokens to a given allocation based on percentages.
  */
 contract Splitter is ISplitter {
+    // The address of the WETH contract, so that ETH can be transferred via
+    // WETH if native ETH transfers fail.
+    address public immutable wethAddress;
+
     // An allocation comprises of an account and a percentage of the total
     // balance that that account should receive once the split is executed.
     uint32[] public percentages;
@@ -56,6 +66,10 @@ contract Splitter is ISplitter {
         // Whether or not the transfer succeeded.
         bool success
     );
+
+    constructor(address wethAddress_) {
+        wethAddress = wethAddress_;
+    }
 
     /**
      * Allows the instantiation of an array of allocations for splitting.
@@ -95,7 +109,7 @@ contract Splitter is ISplitter {
         success = true;
         for (uint256 i = 0; i < accounts.length; i++) {
             bool didSucceed =
-                attemptETHTransfer(
+                transferETHOrWETH(
                     // To the allocation's account address.
                     accounts[i],
                     // For an amount equal to the allocation's percent of the starting balance.
@@ -157,6 +171,23 @@ contract Splitter is ISplitter {
     {
         // Solidity 0.8.0 lets us do this without SafeMath.
         return (amount * percent) / 100;
+    }
+
+    // Will attempt to transfer ETH, but will transfer WETH instead if it fails.
+    function transferETHOrWETH(address to, uint256 value)
+        private
+        returns (bool didSucceed)
+    {
+        // Try to transfer ETH to the given recipient.
+        didSucceed = attemptETHTransfer(to, value);
+        if (!didSucceed) {
+            // If the transfer fails, wrap and send as WETH, so that
+            // the auction is not impeded and the recipient still
+            // can claim ETH via the WETH contract (similar to escrow).
+            IWETH(wethAddress).deposit{value: value}();
+            IWETH(wethAddress).transfer(to, value);
+            // At this point, the recipient can unwrap WETH.
+        }
     }
 
     function attemptETHTransfer(address to, uint256 value)

@@ -29,6 +29,7 @@ interface SplitterInterface extends ethers.utils.Interface {
     "splitETH()": FunctionFragment;
     "splitToken(address)": FunctionFragment;
     "validate()": FunctionFragment;
+    "wethAddress()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -50,6 +51,10 @@ interface SplitterInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "splitETH", values?: undefined): string;
   encodeFunctionData(functionFragment: "splitToken", values: [string]): string;
   encodeFunctionData(functionFragment: "validate", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "wethAddress",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(functionFragment: "accounts", data: BytesLike): Result;
   decodeFunctionResult(
@@ -64,6 +69,10 @@ interface SplitterInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "splitETH", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "splitToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "validate", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "wethAddress",
+    data: BytesLike
+  ): Result;
 
   events: {
     "TransferETH(address,uint256,uint32,bool)": EventFragment;
@@ -150,6 +159,10 @@ export class Splitter extends Contract {
     "validate()"(
       overrides?: CallOverrides
     ): Promise<[boolean] & { isValid: boolean }>;
+
+    wethAddress(overrides?: CallOverrides): Promise<[string]>;
+
+    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
@@ -208,6 +221,10 @@ export class Splitter extends Contract {
 
   "validate()"(overrides?: CallOverrides): Promise<boolean>;
 
+  wethAddress(overrides?: CallOverrides): Promise<string>;
+
+  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
     accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -261,6 +278,10 @@ export class Splitter extends Contract {
     validate(overrides?: CallOverrides): Promise<boolean>;
 
     "validate()"(overrides?: CallOverrides): Promise<boolean>;
+
+    wethAddress(overrides?: CallOverrides): Promise<string>;
+
+    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -336,6 +357,10 @@ export class Splitter extends Contract {
     validate(overrides?: CallOverrides): Promise<BigNumber>;
 
     "validate()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -400,5 +425,9 @@ export class Splitter extends Contract {
     validate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "validate()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

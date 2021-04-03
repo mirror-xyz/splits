@@ -3,8 +3,10 @@
 /* eslint-disable */
 export type { IERC20 } from "./IERC20";
 export type { ISplitter } from "./ISplitter";
+export type { IWETH } from "./IWETH";
 export type { Splitter } from "./Splitter";
 
 export { IERC20__factory } from "./factories/IERC20__factory";
 export { ISplitter__factory } from "./factories/ISplitter__factory";
+export { IWETH__factory } from "./factories/IWETH__factory";
 export { Splitter__factory } from "./factories/Splitter__factory";
