@@ -22,6 +22,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface SplitterProxyV2Interface extends ethers.utils.Interface {
   functions: {
+    "currentWindow()": FunctionFragment;
     "initialize(bytes32)": FunctionFragment;
     "initialized()": FunctionFragment;
     "merkleRoot()": FunctionFragment;
@@ -29,6 +30,10 @@ interface SplitterProxyV2Interface extends ethers.utils.Interface {
     "wethAddress()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "currentWindow",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "initialize",
     values: [BytesLike]
@@ -47,6 +52,10 @@ interface SplitterProxyV2Interface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "currentWindow",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "initialized",
@@ -76,6 +85,10 @@ export class SplitterProxyV2 extends Contract {
   interface: SplitterProxyV2Interface;
 
   functions: {
+    currentWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     initialize(
       merkleRoot_: BytesLike,
       overrides?: Overrides
@@ -102,6 +115,10 @@ export class SplitterProxyV2 extends Contract {
 
     "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
   };
+
+  currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   initialize(
     merkleRoot_: BytesLike,
@@ -130,6 +147,10 @@ export class SplitterProxyV2 extends Contract {
   "wethAddress()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     initialize(
       merkleRoot_: BytesLike,
       overrides?: CallOverrides
@@ -160,6 +181,10 @@ export class SplitterProxyV2 extends Contract {
   filters: {};
 
   estimateGas: {
+    currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     initialize(
       merkleRoot_: BytesLike,
       overrides?: Overrides
@@ -188,6 +213,10 @@ export class SplitterProxyV2 extends Contract {
   };
 
   populateTransaction: {
+    currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     initialize(
       merkleRoot_: BytesLike,
       overrides?: Overrides

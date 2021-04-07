@@ -29,13 +29,12 @@ interface IWETH {
  */
 contract SplitterV4 is ISplitter {
     // Inherited Storage.
-    address public splitter;
+    address internal _splitter;
     bytes32 public merkleRoot;
     address public wethAddress;
-    bool private initialized;
-
-    uint256 currentWindow;
-    uint256[] balanceForWindow;
+    bool public initialized;
+    uint256 public currentWindow;
+    uint256[] public balanceForWindow;
     mapping(bytes32 => bool) private claimed;
 
     // The TransferETH event is emitted after each eth transfer in the split is attempted.
@@ -64,12 +63,17 @@ contract SplitterV4 is ISplitter {
         bool success
     );
 
-    function incrementWindow() external {
-        balanceForWindow[currentWindow] =
-            // Current Balance, subtract previous balance to get the
-            // funds that were added for this window.
-            address(this).balance -
-            getBalanceForWindow(currentWindow - 1);
+    function incrementWindow() public {
+        if (currentWindow == 0) {
+            balanceForWindow.push(address(this).balance);
+        } else {
+            balanceForWindow.push(
+                // Current Balance, subtract previous balance to get the
+                // funds that were added for this window.
+                address(this).balance -
+                getBalanceForWindow(currentWindow - 1)
+            );
+        }
 
         currentWindow += 1;
     }
@@ -79,10 +83,10 @@ contract SplitterV4 is ISplitter {
         view
         returns (uint256)
     {
-        if (window == 0 && currentWindow == 0) {
-            // There has been no window yet.
-            return address(this).balance;
-        }
+        // if (window == 0 && currentWindow == 0) {
+        //     // There has been no window yet.
+        //     return address(this).balance;
+        // }
 
         return balanceForWindow[window];
     }
@@ -115,7 +119,7 @@ contract SplitterV4 is ISplitter {
         bytes32[] calldata merkleProof
     ) external {
         require(
-            currentWindow > window || (window == 0 && currentWindow == 0),
+            currentWindow > window,
             "cannot claim for a future window"
         );
         require(

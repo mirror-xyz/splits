@@ -13,6 +13,9 @@ contract SplitterProxyV2 {
     bytes32 public merkleRoot;
     address public wethAddress;
     bool public initialized;
+    uint256 public currentWindow;
+    uint256[] balanceForWindow;
+    mapping(bytes32 => bool) private claimed;
 
     constructor(address splitter_, address wethAddress_) {
         _splitter = splitter_;

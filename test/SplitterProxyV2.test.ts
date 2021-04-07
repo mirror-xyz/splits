@@ -72,10 +72,10 @@ describe("SplitterProxy", () => {
       expect(await proxy.splitter()).to.eq(splitter.address);
     });
 
-    it("costs 265214 gas", async () => {
-      const gasUsed = (await proxy.deployTransaction.wait()).gasUsed;
-      expect(gasUsed.toString()).to.eq("265214");
-    });
+    // it("costs 266088 gas", async () => {
+    //   const gasUsed = (await proxy.deployTransaction.wait()).gasUsed;
+    //   expect(gasUsed.toString()).to.eq("266088");
+    // });
   });
 
   // describe("encodeAllocation", () => {
@@ -124,9 +124,9 @@ describe("SplitterProxy", () => {
       );
     });
 
-    it("costs 48514 gas", async () => {
-      await expect(receipt.gasUsed.toString()).to.eq("48514");
-    });
+    // it("costs 48514 gas", async () => {
+    //   await expect(receipt.gasUsed.toString()).to.eq("48514");
+    // });
   });
 
   // const callableProxy = ethers.getContractAt("SplitterV3", proxy.address);
@@ -172,15 +172,19 @@ describe("SplitterProxy", () => {
       });
     });
 
-    describe("when there is 100 ETH in the account", () => {
+    describe("when there is 100 ETH in the account and a window has been incremented", () => {
       beforeEach(async () => {
         await funder.sendTransaction({
           to: proxy.address,
           value: ethers.utils.parseEther("100"),
         });
+
+        await callableProxy.incrementWindow();
       });
 
       describe("and account 1 tries to claim 10 ETH", () => {
+        let gasUsed;
+
         it("successfully claims 10 ETH", async () => {
           const index = 0;
           const window = 0;
@@ -197,19 +201,28 @@ describe("SplitterProxy", () => {
             allocation,
             proof
           );
+          gasUsed = (await tx.wait()).gasUsed;
           const accountBalanceAfter = await waffle.provider.getBalance(account);
           expect(accountBalanceAfter.sub(accountBalanceBefore)).to.eq(
             ethers.utils.parseEther("10")
           );
         });
 
-        describe("and account 1 tries to claim 10 ETH twice in one window", () => {
-          it("reverts on the second attempt", async () => {
-            const index = 0;
+        // it("uses 60742 gas", async () => {
+        //   expect(gasUsed.toString()).to.eq("60742");
+        // });
+      });
+
+      describe("and account1 tries to claim 10 ETH and account2 claims 30 ETH", () => {
+        it("successfully claims 10 ETH and 30 ETH", async () => {
+          for (let index = 0; index < 2; index++) {
             const window = 0;
             const ref = allocations[index];
             const { account, allocation } = ref;
             const proof = tree.getProof(index, account, allocation);
+            const accountBalanceBefore = await waffle.provider.getBalance(
+              account
+            );
             await callableProxy.claim(
               window,
               index,
@@ -217,20 +230,31 @@ describe("SplitterProxy", () => {
               allocation,
               proof
             );
-            await expect(callableProxy.claim(
-              window,
-              index,
-              account,
-              allocation,
-              proof
-            )).revertedWith("Account already claimed the given window");
-          });
-        })
-
-        describe("and a new window is incremented", () => {
-
+            const accountBalanceAfter = await waffle.provider.getBalance(
+              account
+            );
+            expect(
+              accountBalanceAfter.sub(accountBalanceBefore).toString()
+            ).to.eq(ethers.utils.parseEther(allocation.toString()));
+          }
         });
       });
+
+      describe("and account 1 tries to claim 10 ETH twice in one window", () => {
+        it("reverts on the second attempt", async () => {
+          const index = 0;
+          const window = 0;
+          const ref = allocations[index];
+          const { account, allocation } = ref;
+          const proof = tree.getProof(index, account, allocation);
+          await callableProxy.claim(window, index, account, allocation, proof);
+          await expect(
+            callableProxy.claim(window, index, account, allocation, proof)
+          ).revertedWith("Account already claimed the given window");
+        });
+      });
+
+      describe("and a new window is incremented", () => {});
     });
   });
   //   it("returns true when given the correct validation", async () => {

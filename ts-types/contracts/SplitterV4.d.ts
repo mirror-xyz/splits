@@ -23,12 +23,14 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface SplitterV4Interface extends ethers.utils.Interface {
   functions: {
     "amountFromPercent(uint256,uint32)": FunctionFragment;
+    "balanceForWindow(uint256)": FunctionFragment;
     "claim(uint256,uint256,address,uint256,bytes32[])": FunctionFragment;
+    "currentWindow()": FunctionFragment;
     "getClaimHash(uint256,uint256)": FunctionFragment;
     "incrementWindow()": FunctionFragment;
+    "initialized()": FunctionFragment;
     "isClaimed(uint256,uint256)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
-    "splitter()": FunctionFragment;
     "wethAddress()": FunctionFragment;
   };
 
@@ -37,8 +39,16 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "balanceForWindow",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "claim",
     values: [BigNumberish, BigNumberish, string, BigNumberish, BytesLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "currentWindow",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getClaimHash",
@@ -46,6 +56,10 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "incrementWindow",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialized",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -56,7 +70,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     functionFragment: "merkleRoot",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "splitter", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "wethAddress",
     values?: undefined
@@ -66,7 +79,15 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     functionFragment: "amountFromPercent",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "balanceForWindow",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "currentWindow",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getClaimHash",
     data: BytesLike
@@ -75,9 +96,12 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     functionFragment: "incrementWindow",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "initialized",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "isClaimed", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "splitter", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "wethAddress",
     data: BytesLike
@@ -118,6 +142,16 @@ export class SplitterV4 extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     claim(
       window: BigNumberish,
       index: BigNumberish,
@@ -136,6 +170,10 @@ export class SplitterV4 extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    currentWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getClaimHash(
       window: BigNumberish,
       index: BigNumberish,
@@ -151,6 +189,10 @@ export class SplitterV4 extends Contract {
     incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+    initialized(overrides?: CallOverrides): Promise<[boolean]>;
+
+    "initialized()"(overrides?: CallOverrides): Promise<[boolean]>;
 
     isClaimed(
       window: BigNumberish,
@@ -168,10 +210,6 @@ export class SplitterV4 extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
 
-    splitter(overrides?: CallOverrides): Promise<[string]>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<[string]>;
-
     wethAddress(overrides?: CallOverrides): Promise<[string]>;
 
     "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
@@ -186,6 +224,16 @@ export class SplitterV4 extends Contract {
   "amountFromPercent(uint256,uint32)"(
     amount: BigNumberish,
     percent: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  balanceForWindow(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "balanceForWindow(uint256)"(
+    arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -207,6 +255,10 @@ export class SplitterV4 extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   getClaimHash(
     window: BigNumberish,
     index: BigNumberish,
@@ -222,6 +274,10 @@ export class SplitterV4 extends Contract {
   incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
   "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+  initialized(overrides?: CallOverrides): Promise<boolean>;
+
+  "initialized()"(overrides?: CallOverrides): Promise<boolean>;
 
   isClaimed(
     window: BigNumberish,
@@ -239,10 +295,6 @@ export class SplitterV4 extends Contract {
 
   "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-  splitter(overrides?: CallOverrides): Promise<string>;
-
-  "splitter()"(overrides?: CallOverrides): Promise<string>;
-
   wethAddress(overrides?: CallOverrides): Promise<string>;
 
   "wethAddress()"(overrides?: CallOverrides): Promise<string>;
@@ -257,6 +309,16 @@ export class SplitterV4 extends Contract {
     "amountFromPercent(uint256,uint32)"(
       amount: BigNumberish,
       percent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -278,6 +340,10 @@ export class SplitterV4 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getClaimHash(
       window: BigNumberish,
       index: BigNumberish,
@@ -294,6 +360,10 @@ export class SplitterV4 extends Contract {
 
     "incrementWindow()"(overrides?: CallOverrides): Promise<void>;
 
+    initialized(overrides?: CallOverrides): Promise<boolean>;
+
+    "initialized()"(overrides?: CallOverrides): Promise<boolean>;
+
     isClaimed(
       window: BigNumberish,
       index: BigNumberish,
@@ -309,10 +379,6 @@ export class SplitterV4 extends Contract {
     merkleRoot(overrides?: CallOverrides): Promise<string>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
-
-    splitter(overrides?: CallOverrides): Promise<string>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<string>;
 
     wethAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -349,6 +415,16 @@ export class SplitterV4 extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     claim(
       window: BigNumberish,
       index: BigNumberish,
@@ -367,6 +443,10 @@ export class SplitterV4 extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getClaimHash(
       window: BigNumberish,
       index: BigNumberish,
@@ -383,6 +463,10 @@ export class SplitterV4 extends Contract {
 
     "incrementWindow()"(overrides?: Overrides): Promise<BigNumber>;
 
+    initialized(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "initialized()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     isClaimed(
       window: BigNumberish,
       index: BigNumberish,
@@ -398,10 +482,6 @@ export class SplitterV4 extends Contract {
     merkleRoot(overrides?: CallOverrides): Promise<BigNumber>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    splitter(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -421,6 +501,16 @@ export class SplitterV4 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     claim(
       window: BigNumberish,
       index: BigNumberish,
@@ -439,6 +529,10 @@ export class SplitterV4 extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getClaimHash(
       window: BigNumberish,
       index: BigNumberish,
@@ -455,6 +549,10 @@ export class SplitterV4 extends Contract {
 
     "incrementWindow()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
+    initialized(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "initialized()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     isClaimed(
       window: BigNumberish,
       index: BigNumberish,
@@ -470,10 +568,6 @@ export class SplitterV4 extends Contract {
     merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    splitter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
