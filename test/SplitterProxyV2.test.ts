@@ -131,7 +131,7 @@ describe("SplitterProxy", () => {
 
   // const callableProxy = ethers.getContractAt("SplitterV3", proxy.address);
 
-  describe("when initialized with a root", () => {
+  describe("when initialized with a root that allocates account1 10%, account2 30%, and account3 60%", () => {
     let allocations,
       tree,
       splitter,
@@ -161,16 +161,16 @@ describe("SplitterProxy", () => {
       ).deployed();
     });
 
-    describe("getClaimHash", () => {
-      it("returns a hash for a given index and window", async () => {
-        const window = 0;
-        const index = 1;
-        const result = await callableProxy.getClaimHash(window, index);
-        expect(result).to.eq(
-          "0xa6eef7e35abe7026729641147f7915573c7e97b47efa546f5f6e3230263bcb49"
-        );
-      });
-    });
+    // describe("getClaimHash", () => {
+    //   it("returns a hash for a given index and window", async () => {
+    //     const window = 0;
+    //     const index = 1;
+    //     const result = await callableProxy.getClaimHash(window, index);
+    //     expect(result).to.eq(
+    //       "0xa6eef7e35abe7026729641147f7915573c7e97b47efa546f5f6e3230263bcb49"
+    //     );
+    //   });
+    // });
 
     describe("when there is 100 ETH in the account and a window has been incremented", () => {
       beforeEach(async () => {
@@ -208,9 +208,9 @@ describe("SplitterProxy", () => {
           );
         });
 
-        // it("uses 60742 gas", async () => {
-        //   expect(gasUsed.toString()).to.eq("60742");
-        // });
+        it("costs 60776 gas", async () => {
+          expect(gasUsed.toString()).to.eq("60776");
+        });
       });
 
       describe("and account1 tries to claim 10 ETH and account2 claims 30 ETH", () => {
@@ -255,6 +255,64 @@ describe("SplitterProxy", () => {
       });
 
       describe("and a new window is incremented", () => {});
+    });
+
+    describe("when there is 200 ETH in the account across 2 windows", () => {
+      beforeEach(async () => {
+        // First Window
+        await funder.sendTransaction({
+          to: proxy.address,
+          value: ethers.utils.parseEther("100"),
+        });
+        await callableProxy.incrementWindow();
+        // Second Window
+        await funder.sendTransaction({
+          to: proxy.address,
+          value: ethers.utils.parseEther("100"),
+        });
+        await callableProxy.incrementWindow();
+      });
+
+      describe("and account 1 tries to claim 10 ETH twice in one window", () => {
+        it("reverts on the second attempt", async () => {
+          const index = 0;
+          const window = 0;
+          const ref = allocations[index];
+          const { account, allocation } = ref;
+          const proof = tree.getProof(index, account, allocation);
+          await callableProxy.claim(window, index, account, allocation, proof);
+          await expect(
+            callableProxy.claim(window, index, account, allocation, proof)
+          ).revertedWith("Account already claimed the given window");
+        });
+      });
+
+      describe("and account 1 tries to claim 10 ETH twice across both windows", () => {
+        it("successfully claims 10 ETH on each window", async () => {
+          for (let window = 0; window < 2; window++) {
+            const index = 0;
+            const ref = allocations[index];
+            const { account, allocation } = ref;
+            const proof = tree.getProof(index, account, allocation);
+            const accountBalanceBefore = await waffle.provider.getBalance(
+              account
+            );
+            const tx = await callableProxy.claim(
+              window,
+              index,
+              account,
+              allocation,
+              proof
+            );
+            const accountBalanceAfter = await waffle.provider.getBalance(
+              account
+            );
+            expect(accountBalanceAfter.sub(accountBalanceBefore)).to.eq(
+              ethers.utils.parseEther("10")
+            );
+          }
+        });
+      });
     });
   });
   //   it("returns true when given the correct validation", async () => {
