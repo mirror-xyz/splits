@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "test": "hardhat test",
-    "fix:flatten": "sed -i '' '/\/\/SPDX/,+1 d' flattened/MirrorWriteToken.sol",
+    "fix:flatten": "sed -i '' '///SPDX/,+1 d' flattened/MirrorWriteToken.sol",
     "deploy:default": "hardhat run scripts/deploy.ts",
     "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.ts"
   },
@@ -16,6 +16,7 @@
     "@openzeppelin/contracts": "^3.3.0",
     "@typechain/ethers-v5": "^5.0.0",
     "@types/mocha": "^8.2.0",
+    "commander": "^7.2.0",
     "hardhat": "^2.0.7",
     "hardhat-typechain": "^0.3.4",
     "ts-generator": "^0.1.1",

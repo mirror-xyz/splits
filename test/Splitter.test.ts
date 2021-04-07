@@ -4,6 +4,7 @@ import { ethers, waffle } from "hardhat";
 const deploySplitter = async (fakeWETHAddress: string) => {
   const Splitter = await ethers.getContractFactory("Splitter");
   const splitter = await Splitter.deploy(fakeWETHAddress);
+
   await splitter.deployed();
   return splitter;
 };
@@ -188,6 +189,10 @@ describe("Splitter", () => {
 
       beforeEach(async () => {
         splitter = await deploySplitter(fakeWETH.address);
+
+        console.log({
+            tx: (await splitter.deployTransaction.wait()).gasUsed.toString()
+        })
 
         const percentages = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 86];
         const accounts = [
