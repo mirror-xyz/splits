@@ -24,12 +24,13 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   functions: {
     "amountFromPercent(uint256,uint32)": FunctionFragment;
     "balanceForWindow(uint256)": FunctionFragment;
-    "claim(uint256,uint256,address,uint256,bytes32[])": FunctionFragment;
+    "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
+    "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "currentWindow()": FunctionFragment;
-    "getClaimHash(uint256,uint256)": FunctionFragment;
+    "getClaimHash(uint256,address)": FunctionFragment;
     "incrementWindow()": FunctionFragment;
     "initialized()": FunctionFragment;
-    "isClaimed(uint256,uint256)": FunctionFragment;
+    "isClaimed(uint256,address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
     "wethAddress()": FunctionFragment;
   };
@@ -44,7 +45,11 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "claim",
-    values: [BigNumberish, BigNumberish, string, BigNumberish, BytesLike[]]
+    values: [BigNumberish, string, BigNumberish, BytesLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claimForAllWindows",
+    values: [string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
     functionFragment: "currentWindow",
@@ -52,7 +57,7 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getClaimHash",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "incrementWindow",
@@ -64,7 +69,7 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "isClaimed",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "merkleRoot",
@@ -84,6 +89,10 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimForAllWindows",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "currentWindow",
     data: BytesLike
@@ -154,16 +163,28 @@ export class SplitterV4 extends Contract {
 
     claim(
       window: BigNumberish,
-      index: BigNumberish,
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "claim(uint256,uint256,address,uint256,bytes32[])"(
+    "claim(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -176,13 +197,13 @@ export class SplitterV4 extends Contract {
 
     getClaimHash(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    "getClaimHash(uint256,uint256)"(
+    "getClaimHash(uint256,address)"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -196,13 +217,13 @@ export class SplitterV4 extends Contract {
 
     isClaimed(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isClaimed(uint256,uint256)"(
+    "isClaimed(uint256,address)"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -239,16 +260,28 @@ export class SplitterV4 extends Contract {
 
   claim(
     window: BigNumberish,
-    index: BigNumberish,
     account: string,
     percentageAllocation: BigNumberish,
     merkleProof: BytesLike[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "claim(uint256,uint256,address,uint256,bytes32[])"(
+  "claim(uint256,address,uint256,bytes32[])"(
     window: BigNumberish,
-    index: BigNumberish,
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  claimForAllWindows(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "claimForAllWindows(address,uint256,bytes32[])"(
     account: string,
     percentageAllocation: BigNumberish,
     merkleProof: BytesLike[],
@@ -261,13 +294,13 @@ export class SplitterV4 extends Contract {
 
   getClaimHash(
     window: BigNumberish,
-    index: BigNumberish,
+    account: string,
     overrides?: CallOverrides
   ): Promise<string>;
 
-  "getClaimHash(uint256,uint256)"(
+  "getClaimHash(uint256,address)"(
     window: BigNumberish,
-    index: BigNumberish,
+    account: string,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -281,13 +314,13 @@ export class SplitterV4 extends Contract {
 
   isClaimed(
     window: BigNumberish,
-    index: BigNumberish,
+    account: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isClaimed(uint256,uint256)"(
+  "isClaimed(uint256,address)"(
     window: BigNumberish,
-    index: BigNumberish,
+    account: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -324,16 +357,28 @@ export class SplitterV4 extends Contract {
 
     claim(
       window: BigNumberish,
-      index: BigNumberish,
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claim(uint256,uint256,address,uint256,bytes32[])"(
+    "claim(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -346,13 +391,13 @@ export class SplitterV4 extends Contract {
 
     getClaimHash(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "getClaimHash(uint256,uint256)"(
+    "getClaimHash(uint256,address)"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -366,13 +411,13 @@ export class SplitterV4 extends Contract {
 
     isClaimed(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isClaimed(uint256,uint256)"(
+    "isClaimed(uint256,address)"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -427,16 +472,28 @@ export class SplitterV4 extends Contract {
 
     claim(
       window: BigNumberish,
-      index: BigNumberish,
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "claim(uint256,uint256,address,uint256,bytes32[])"(
+    "claim(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -449,13 +506,13 @@ export class SplitterV4 extends Contract {
 
     getClaimHash(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getClaimHash(uint256,uint256)"(
+    "getClaimHash(uint256,address)"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -469,13 +526,13 @@ export class SplitterV4 extends Contract {
 
     isClaimed(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isClaimed(uint256,uint256)"(
+    "isClaimed(uint256,address)"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -513,16 +570,28 @@ export class SplitterV4 extends Contract {
 
     claim(
       window: BigNumberish,
-      index: BigNumberish,
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "claim(uint256,uint256,address,uint256,bytes32[])"(
+    "claim(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -535,13 +604,13 @@ export class SplitterV4 extends Contract {
 
     getClaimHash(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getClaimHash(uint256,uint256)"(
+    "getClaimHash(uint256,address)"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -555,13 +624,13 @@ export class SplitterV4 extends Contract {
 
     isClaimed(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isClaimed(uint256,uint256)"(
+    "isClaimed(uint256,address)"(
       window: BigNumberish,
-      index: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -70,76 +70,75 @@ contract SplitterV4 is ISplitter {
             balanceForWindow.push(
                 // Current Balance, subtract previous balance to get the
                 // funds that were added for this window.
-                address(this).balance -
-                getBalanceForWindow(currentWindow - 1)
+                address(this).balance - balanceForWindow[currentWindow - 1]
             );
         }
 
         currentWindow += 1;
     }
 
-    function getBalanceForWindow(uint256 window)
-        private
-        view
-        returns (uint256)
-    {
-        // if (window == 0 && currentWindow == 0) {
-        //     // There has been no window yet.
-        //     return address(this).balance;
-        // }
-
-        return balanceForWindow[window];
-    }
-
-    function isClaimed(uint256 window, uint256 index)
+    function isClaimed(uint256 window, address account)
         public
         view
         returns (bool)
     {
-        return claimed[getClaimHash(window, index)];
+        return claimed[getClaimHash(window, account)];
     }
 
-    function _setClaimed(uint256 window, uint256 index) private {
-        claimed[getClaimHash(window, index)] = true;
+    function _setClaimed(uint256 window, address account) private {
+        claimed[getClaimHash(window, account)] = true;
     }
 
-    function getClaimHash(uint256 window, uint256 index)
+    function getClaimHash(uint256 window, address account)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(window, index));
+        return keccak256(abi.encodePacked(window, account));
     }
 
-    function claim(
-        uint256 window,
-        uint256 index,
+    function claimForAllWindows(
         address account,
         uint256 percentageAllocation,
         bytes32[] calldata merkleProof
     ) external {
+        // Make sure that the user has this allocation granted.
+        bytes32 node =
+            keccak256(abi.encodePacked(account, percentageAllocation));
+        require(verifyProof(merkleProof, merkleRoot, node), "Invalid proof");
+
+        uint256 amount = 0;
+        for (uint256 i = 0; i < currentWindow; i++) {
+            if (!isClaimed(i, account)) {
+                amount += (balanceForWindow[i] * percentageAllocation) / 100;
+            }
+        }
+
+        require(transferETHOrWETH(account, amount), "Transfer failed");
+    }
+
+    function claim(
+        uint256 window,
+        address account,
+        uint256 percentageAllocation,
+        bytes32[] calldata merkleProof
+    ) external {
+        require(currentWindow > window, "cannot claim for a future window");
         require(
-            currentWindow > window,
-            "cannot claim for a future window"
-        );
-        require(
-            !isClaimed(window, index),
+            !isClaimed(window, account),
             "Account already claimed the given window"
         );
 
-        _setClaimed(window, index);
+        _setClaimed(window, account);
 
-        // // Verify the merkle proof.
         bytes32 node =
-            keccak256(abi.encodePacked(index, account, percentageAllocation));
+            keccak256(abi.encodePacked(account, percentageAllocation));
         require(verifyProof(merkleProof, merkleRoot, node), "Invalid proof");
 
         uint256 amount =
-            (getBalanceForWindow(window) * percentageAllocation) / 100;
+            (balanceForWindow[window] * percentageAllocation) / 100;
 
         require(transferETHOrWETH(account, amount), "Transfer failed");
-
-        // emit Claimed(index, account, amount);
     }
 
     function amountFromPercent(uint256 amount, uint32 percent)
