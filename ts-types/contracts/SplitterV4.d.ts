@@ -24,7 +24,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   functions: {
     "PERCENTAGE_SCALE()": FunctionFragment;
     "amountFromPercent(uint256,uint32)": FunctionFragment;
-    "balanceForWindow(uint256)": FunctionFragment;
     "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
     "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "currentWindow()": FunctionFragment;
@@ -33,7 +32,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     "isClaimed(uint256,address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
     "scaleAmountByPercentage(uint256,uint256)": FunctionFragment;
-    "wethAddress()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -43,10 +41,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "amountFromPercent",
     values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "balanceForWindow",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "claim",
@@ -80,10 +74,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     functionFragment: "scaleAmountByPercentage",
     values: [BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "wethAddress",
-    values?: undefined
-  ): string;
 
   decodeFunctionResult(
     functionFragment: "PERCENTAGE_SCALE",
@@ -91,10 +81,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "amountFromPercent",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "balanceForWindow",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
@@ -118,10 +104,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "scaleAmountByPercentage",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "wethAddress",
     data: BytesLike
   ): Result;
 
@@ -161,16 +143,6 @@ export class SplitterV4 extends Contract {
     "amountFromPercent(uint256,uint32)"(
       amount: BigNumberish,
       percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    balanceForWindow(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "balanceForWindow(uint256)"(
-      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -251,10 +223,6 @@ export class SplitterV4 extends Contract {
       scaledPercent: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { scaledAmount: BigNumber }>;
-
-    wethAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
@@ -270,16 +238,6 @@ export class SplitterV4 extends Contract {
   "amountFromPercent(uint256,uint32)"(
     amount: BigNumberish,
     percent: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  balanceForWindow(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  "balanceForWindow(uint256)"(
-    arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -361,10 +319,6 @@ export class SplitterV4 extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  wethAddress(overrides?: CallOverrides): Promise<string>;
-
-  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
-
   callStatic: {
     PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -379,16 +333,6 @@ export class SplitterV4 extends Contract {
     "amountFromPercent(uint256,uint32)"(
       amount: BigNumberish,
       percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    balanceForWindow(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "balanceForWindow(uint256)"(
-      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -469,10 +413,6 @@ export class SplitterV4 extends Contract {
       scaledPercent: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    wethAddress(overrides?: CallOverrides): Promise<string>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -506,16 +446,6 @@ export class SplitterV4 extends Contract {
     "amountFromPercent(uint256,uint32)"(
       amount: BigNumberish,
       percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    balanceForWindow(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "balanceForWindow(uint256)"(
-      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -596,10 +526,6 @@ export class SplitterV4 extends Contract {
       scaledPercent: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -618,16 +544,6 @@ export class SplitterV4 extends Contract {
     "amountFromPercent(uint256,uint32)"(
       amount: BigNumberish,
       percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    balanceForWindow(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "balanceForWindow(uint256)"(
-      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -708,9 +624,5 @@ export class SplitterV4 extends Contract {
       scaledPercent: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

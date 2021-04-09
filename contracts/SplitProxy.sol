@@ -15,11 +15,11 @@ interface ISplitFactory {
  */
 contract SplitProxy {
     // Inherited Storage.
-    address internal _splitter;
     bytes32 public merkleRoot;
-    address public wethAddress;
     uint256 public currentWindow;
-    uint256[] balanceForWindow;
+    address private wethAddress;
+    address private _splitter;
+    uint256[] private balanceForWindow;
     mapping(bytes32 => bool) private claimed;
 
     constructor() {

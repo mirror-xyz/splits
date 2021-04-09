@@ -23,11 +23,11 @@ contract SplitterV4 {
     uint256 public constant PERCENTAGE_SCALE = 100;
 
     // Inherited Storage.
-    address internal _splitter;
     bytes32 public merkleRoot;
-    address public wethAddress;
     uint256 public currentWindow;
-    uint256[] public balanceForWindow;
+    address private wethAddress;
+    address private _splitter;
+    uint256[] private balanceForWindow;
     mapping(bytes32 => bool) private claimed;
 
     // The TransferETH event is emitted after each eth transfer in the split is attempted.

@@ -130,14 +130,14 @@ describe("SplitterProxy via Factory", () => {
       expect(await proxyFactory.merkleRoot()).to.eq(NULL_BYTES);
     });
 
-    it("costs 199924 gas to deploy the proxy", async () => {
+    it("costs 182676 gas to deploy the proxy", async () => {
       const gasUsed = (await deployTx.wait()).gasUsed;
-      expect(gasUsed.toString()).to.eq("199924");
+      expect(gasUsed.toString()).to.eq("182676");
     });
     
-    it("costs 765832 gas to deploy the splitter", async () => {
+    it("costs 728329 gas to deploy the splitter", async () => {
       const gasUsed = (await splitter.deployTransaction.wait()).gasUsed;
-      expect(gasUsed.toString()).to.eq("765832");
+      expect(gasUsed.toString()).to.eq("728329");
     });
 
     describe("when initialized with a root that allocates account1 10%, account2 30%, and account3 60%", () => {
@@ -178,8 +178,8 @@ describe("SplitterProxy via Factory", () => {
             ).to.eq(ethers.utils.parseEther("10"));
           });
 
-          it("costs 59332 gas", async () => {
-            expect(gasUsed.toString()).to.eq("59332");
+          it("costs 59322 gas", async () => {
+            expect(gasUsed.toString()).to.eq("59322");
           });
         });
 
@@ -294,9 +294,9 @@ describe("SplitterProxy via Factory", () => {
             ).to.eq(ethers.utils.parseEther("60"));
           });
 
-          it("costs 44003 gas", async () => {
+          it("costs 43993 gas", async () => {
             const receipt = await tx.wait();
-            expect(receipt.gasUsed).to.eq("44003");
+            expect(receipt.gasUsed).to.eq("43993");
           });
         });
 

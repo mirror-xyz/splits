@@ -24,7 +24,6 @@ interface SplitProxyInterface extends ethers.utils.Interface {
     "currentWindow()": FunctionFragment;
     "merkleRoot()": FunctionFragment;
     "splitter()": FunctionFragment;
-    "wethAddress()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -36,10 +35,6 @@ interface SplitProxyInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "splitter", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "wethAddress",
-    values?: undefined
-  ): string;
 
   decodeFunctionResult(
     functionFragment: "currentWindow",
@@ -47,10 +42,6 @@ interface SplitProxyInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "splitter", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "wethAddress",
-    data: BytesLike
-  ): Result;
 
   events: {};
 }
@@ -80,10 +71,6 @@ export class SplitProxy extends Contract {
     splitter(overrides?: CallOverrides): Promise<[string]>;
 
     "splitter()"(overrides?: CallOverrides): Promise<[string]>;
-
-    wethAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
@@ -98,10 +85,6 @@ export class SplitProxy extends Contract {
 
   "splitter()"(overrides?: CallOverrides): Promise<string>;
 
-  wethAddress(overrides?: CallOverrides): Promise<string>;
-
-  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
-
   callStatic: {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -114,10 +97,6 @@ export class SplitProxy extends Contract {
     splitter(overrides?: CallOverrides): Promise<string>;
 
     "splitter()"(overrides?: CallOverrides): Promise<string>;
-
-    wethAddress(overrides?: CallOverrides): Promise<string>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
@@ -134,10 +113,6 @@ export class SplitProxy extends Contract {
     splitter(overrides?: CallOverrides): Promise<BigNumber>;
 
     "splitter()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -152,9 +127,5 @@ export class SplitProxy extends Contract {
     splitter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "splitter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
