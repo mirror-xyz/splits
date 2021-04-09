@@ -22,6 +22,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface SplitterV4Interface extends ethers.utils.Interface {
   functions: {
+    "PERCENTAGE_SCALE()": FunctionFragment;
     "amountFromPercent(uint256,uint32)": FunctionFragment;
     "balanceForWindow(uint256)": FunctionFragment;
     "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
@@ -29,12 +30,16 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     "currentWindow()": FunctionFragment;
     "getClaimHash(uint256,address)": FunctionFragment;
     "incrementWindow()": FunctionFragment;
-    "initialized()": FunctionFragment;
     "isClaimed(uint256,address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
+    "scaleAmountByPercentage(uint256,uint256)": FunctionFragment;
     "wethAddress()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "PERCENTAGE_SCALE",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "amountFromPercent",
     values: [BigNumberish, BigNumberish]
@@ -64,10 +69,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "initialized",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "isClaimed",
     values: [BigNumberish, string]
   ): string;
@@ -76,10 +77,18 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "scaleAmountByPercentage",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "wethAddress",
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "PERCENTAGE_SCALE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "amountFromPercent",
     data: BytesLike
@@ -105,12 +114,12 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     functionFragment: "incrementWindow",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "initialized",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "isClaimed", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "scaleAmountByPercentage",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "wethAddress",
     data: BytesLike
@@ -139,6 +148,10 @@ export class SplitterV4 extends Contract {
   interface: SplitterV4Interface;
 
   functions: {
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     amountFromPercent(
       amount: BigNumberish,
       percent: BigNumberish,
@@ -164,7 +177,7 @@ export class SplitterV4 extends Contract {
     claim(
       window: BigNumberish,
       account: string,
-      percentageAllocation: BigNumberish,
+      scaledPercentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -172,7 +185,7 @@ export class SplitterV4 extends Contract {
     "claim(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
-      percentageAllocation: BigNumberish,
+      scaledPercentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -211,10 +224,6 @@ export class SplitterV4 extends Contract {
 
     "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
 
-    initialized(overrides?: CallOverrides): Promise<[boolean]>;
-
-    "initialized()"(overrides?: CallOverrides): Promise<[boolean]>;
-
     isClaimed(
       window: BigNumberish,
       account: string,
@@ -231,10 +240,26 @@ export class SplitterV4 extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
 
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { scaledAmount: BigNumber }>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { scaledAmount: BigNumber }>;
+
     wethAddress(overrides?: CallOverrides): Promise<[string]>;
 
     "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
   };
+
+  PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   amountFromPercent(
     amount: BigNumberish,
@@ -261,7 +286,7 @@ export class SplitterV4 extends Contract {
   claim(
     window: BigNumberish,
     account: string,
-    percentageAllocation: BigNumberish,
+    scaledPercentageAllocation: BigNumberish,
     merkleProof: BytesLike[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -269,7 +294,7 @@ export class SplitterV4 extends Contract {
   "claim(uint256,address,uint256,bytes32[])"(
     window: BigNumberish,
     account: string,
-    percentageAllocation: BigNumberish,
+    scaledPercentageAllocation: BigNumberish,
     merkleProof: BytesLike[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -308,10 +333,6 @@ export class SplitterV4 extends Contract {
 
   "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
 
-  initialized(overrides?: CallOverrides): Promise<boolean>;
-
-  "initialized()"(overrides?: CallOverrides): Promise<boolean>;
-
   isClaimed(
     window: BigNumberish,
     account: string,
@@ -328,11 +349,27 @@ export class SplitterV4 extends Contract {
 
   "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
+  scaleAmountByPercentage(
+    amount: BigNumberish,
+    scaledPercent: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "scaleAmountByPercentage(uint256,uint256)"(
+    amount: BigNumberish,
+    scaledPercent: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   wethAddress(overrides?: CallOverrides): Promise<string>;
 
   "wethAddress()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     amountFromPercent(
       amount: BigNumberish,
       percent: BigNumberish,
@@ -358,7 +395,7 @@ export class SplitterV4 extends Contract {
     claim(
       window: BigNumberish,
       account: string,
-      percentageAllocation: BigNumberish,
+      scaledPercentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -366,7 +403,7 @@ export class SplitterV4 extends Contract {
     "claim(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
-      percentageAllocation: BigNumberish,
+      scaledPercentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -405,10 +442,6 @@ export class SplitterV4 extends Contract {
 
     "incrementWindow()"(overrides?: CallOverrides): Promise<void>;
 
-    initialized(overrides?: CallOverrides): Promise<boolean>;
-
-    "initialized()"(overrides?: CallOverrides): Promise<boolean>;
-
     isClaimed(
       window: BigNumberish,
       account: string,
@@ -424,6 +457,18 @@ export class SplitterV4 extends Contract {
     merkleRoot(overrides?: CallOverrides): Promise<string>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
+
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     wethAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -448,6 +493,10 @@ export class SplitterV4 extends Contract {
   };
 
   estimateGas: {
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     amountFromPercent(
       amount: BigNumberish,
       percent: BigNumberish,
@@ -473,7 +522,7 @@ export class SplitterV4 extends Contract {
     claim(
       window: BigNumberish,
       account: string,
-      percentageAllocation: BigNumberish,
+      scaledPercentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -481,7 +530,7 @@ export class SplitterV4 extends Contract {
     "claim(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
-      percentageAllocation: BigNumberish,
+      scaledPercentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -520,10 +569,6 @@ export class SplitterV4 extends Contract {
 
     "incrementWindow()"(overrides?: Overrides): Promise<BigNumber>;
 
-    initialized(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "initialized()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     isClaimed(
       window: BigNumberish,
       account: string,
@@ -540,12 +585,30 @@ export class SplitterV4 extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "PERCENTAGE_SCALE()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     amountFromPercent(
       amount: BigNumberish,
       percent: BigNumberish,
@@ -571,7 +634,7 @@ export class SplitterV4 extends Contract {
     claim(
       window: BigNumberish,
       account: string,
-      percentageAllocation: BigNumberish,
+      scaledPercentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -579,7 +642,7 @@ export class SplitterV4 extends Contract {
     "claim(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
-      percentageAllocation: BigNumberish,
+      scaledPercentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -618,10 +681,6 @@ export class SplitterV4 extends Contract {
 
     "incrementWindow()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
-    initialized(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "initialized()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     isClaimed(
       window: BigNumberish,
       account: string,
@@ -637,6 +696,18 @@ export class SplitterV4 extends Contract {
     merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

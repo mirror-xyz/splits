@@ -13,7 +13,6 @@ import {
 import {
   Contract,
   ContractTransaction,
-  Overrides,
   CallOverrides,
 } from "@ethersproject/contracts";
 import { BytesLike } from "@ethersproject/bytes";
@@ -23,8 +22,6 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface SplitterProxyV2Interface extends ethers.utils.Interface {
   functions: {
     "currentWindow()": FunctionFragment;
-    "initialize(bytes32)": FunctionFragment;
-    "initialized()": FunctionFragment;
     "merkleRoot()": FunctionFragment;
     "splitter()": FunctionFragment;
     "wethAddress()": FunctionFragment;
@@ -32,14 +29,6 @@ interface SplitterProxyV2Interface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "currentWindow",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "initialize",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "initialized",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -54,11 +43,6 @@ interface SplitterProxyV2Interface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "currentWindow",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "initialized",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
@@ -89,20 +73,6 @@ export class SplitterProxyV2 extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    initialize(
-      merkleRoot_: BytesLike,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "initialize(bytes32)"(
-      merkleRoot_: BytesLike,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    initialized(overrides?: CallOverrides): Promise<[boolean]>;
-
-    "initialized()"(overrides?: CallOverrides): Promise<[boolean]>;
-
     merkleRoot(overrides?: CallOverrides): Promise<[string]>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
@@ -120,20 +90,6 @@ export class SplitterProxyV2 extends Contract {
 
   "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  initialize(
-    merkleRoot_: BytesLike,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "initialize(bytes32)"(
-    merkleRoot_: BytesLike,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  initialized(overrides?: CallOverrides): Promise<boolean>;
-
-  "initialized()"(overrides?: CallOverrides): Promise<boolean>;
-
   merkleRoot(overrides?: CallOverrides): Promise<string>;
 
   "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
@@ -150,20 +106,6 @@ export class SplitterProxyV2 extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    initialize(
-      merkleRoot_: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "initialize(bytes32)"(
-      merkleRoot_: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    initialized(overrides?: CallOverrides): Promise<boolean>;
-
-    "initialized()"(overrides?: CallOverrides): Promise<boolean>;
 
     merkleRoot(overrides?: CallOverrides): Promise<string>;
 
@@ -185,20 +127,6 @@ export class SplitterProxyV2 extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    initialize(
-      merkleRoot_: BytesLike,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "initialize(bytes32)"(
-      merkleRoot_: BytesLike,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    initialized(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "initialized()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     merkleRoot(overrides?: CallOverrides): Promise<BigNumber>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -216,20 +144,6 @@ export class SplitterProxyV2 extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    initialize(
-      merkleRoot_: BytesLike,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "initialize(bytes32)"(
-      merkleRoot_: BytesLike,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    initialized(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "initialized()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

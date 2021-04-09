@@ -1,11 +1,5 @@
-//SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.3;
-
-interface ISplitter {
-    // function validate() external view returns (bool isValid);
-    // function splitETH() external returns (bool success);
-    // function splitToken(address token) external returns (bool success);
-}
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
@@ -22,17 +16,16 @@ interface IWETH {
 }
 
 /**
- * @title Splitter
+ * @title SplitterV4
  * @author MirrorXYZ
- *
- *  A contract that can split eth and tokens to a given allocation based on percentages.
  */
-contract SplitterV4 is ISplitter {
+contract SplitterV4 {
+    uint256 public constant PERCENTAGE_SCALE = 100;
+
     // Inherited Storage.
     address internal _splitter;
     bytes32 public merkleRoot;
     address public wethAddress;
-    bool public initialized;
     uint256 public currentWindow;
     uint256[] public balanceForWindow;
     mapping(bytes32 => bool) private claimed;
@@ -110,17 +103,37 @@ contract SplitterV4 is ISplitter {
         uint256 amount = 0;
         for (uint256 i = 0; i < currentWindow; i++) {
             if (!isClaimed(i, account)) {
-                amount += (balanceForWindow[i] * percentageAllocation) / 100;
+                amount += scaleAmountByPercentage(
+                    balanceForWindow[i],
+                    percentageAllocation
+                );
             }
         }
 
         require(transferETHOrWETH(account, amount), "Transfer failed");
     }
 
+    function scaleAmountByPercentage(uint256 amount, uint256 scaledPercent)
+        public
+        pure
+        returns (uint256 scaledAmount)
+    {
+        /*
+            Example:
+                If there is 100 ETH in the account, and someone has 
+                an allocation of 2%, we call this with 100 as the amount, and 200
+                as the scaled percent.
+
+                To find out the amount we use, for example: (100 * 200) / (100 * 100)
+                which returns 2 -- i.e. 2% of the 100 ETH balance.
+         */
+        scaledAmount = (amount * scaledPercent) / (100 * PERCENTAGE_SCALE);
+    }
+
     function claim(
         uint256 window,
         address account,
-        uint256 percentageAllocation,
+        uint256 scaledPercentageAllocation,
         bytes32[] calldata merkleProof
     ) external {
         require(currentWindow > window, "cannot claim for a future window");
@@ -132,11 +145,14 @@ contract SplitterV4 is ISplitter {
         _setClaimed(window, account);
 
         bytes32 node =
-            keccak256(abi.encodePacked(account, percentageAllocation));
+            keccak256(abi.encodePacked(account, scaledPercentageAllocation));
         require(verifyProof(merkleProof, merkleRoot, node), "Invalid proof");
 
         uint256 amount =
-            (balanceForWindow[window] * percentageAllocation) / 100;
+            scaleAmountByPercentage(
+                balanceForWindow[window],
+                scaledPercentageAllocation
+            );
 
         require(transferETHOrWETH(account, amount), "Transfer failed");
     }
@@ -161,8 +177,8 @@ contract SplitterV4 is ISplitter {
             // If the transfer fails, wrap and send as WETH, so that
             // the auction is not impeded and the recipient still
             // can claim ETH via the WETH contract (similar to escrow).
-            // IWETH(wethAddress).deposit{value: value}();
-            // IWETH(wethAddress).transfer(to, value);
+            IWETH(wethAddress).deposit{value: value}();
+            IWETH(wethAddress).transfer(to, value);
             // At this point, the recipient can unwrap WETH.
         }
     }
