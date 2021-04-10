@@ -23,20 +23,6 @@ const deployProxyFactory = async (
   return await proxyFactory.deployed();
 };
 
-const deployProxy = async (
-  splitterAddress: string,
-  fakeWETHAddress: string,
-  merkleRoot: string
-) => {
-  const SplitterProxy = await ethers.getContractFactory("SplitProxy");
-  const proxy = await SplitterProxy.deploy(
-    splitterAddress,
-    fakeWETHAddress,
-    merkleRoot
-  );
-  return await proxy.deployed();
-};
-
 const PERCENTAGE_SCALE = 100;
 const NULL_BYTES =
   "0x0000000000000000000000000000000000000000000000000000000000000000";

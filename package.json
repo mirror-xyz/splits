@@ -9,7 +9,8 @@
     "test": "hardhat test",
     "fix:flatten": "sed -i '' '///SPDX/,+1 d' flattened/MirrorWriteToken.sol",
     "deploy:default": "hardhat run scripts/deploy.ts",
-    "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.ts"
+    "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.ts",
+    "deploy:mainnet": "hardhat run --network mainnet scripts/deploy.ts"
   },
   "dependencies": {
     "@nomiclabs/hardhat-solhint": "^2.0.0",
