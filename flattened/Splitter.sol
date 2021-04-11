@@ -1,3 +1,5 @@
+// File contracts/Splitter.sol
+
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.3;
 
@@ -16,10 +18,10 @@ interface IWETH {
 }
 
 /**
- * @title SplitterV4
+ * @title Splitter
  * @author MirrorXYZ
  */
-contract SplitterV4 {
+contract Splitter {
     uint256 public constant PERCENTAGE_SCALE = 10e5;
 
     // Inherited Storage.

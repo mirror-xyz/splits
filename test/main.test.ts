@@ -6,7 +6,7 @@ import AllocationTree from "../merkle-tree/balance-tree";
 let proxyFactory;
 
 const deploySplitter = async () => {
-  const Splitter = await ethers.getContractFactory("SplitterV4");
+  const Splitter = await ethers.getContractFactory("Splitter");
   const splitter = await Splitter.deploy();
   return await splitter.deployed();
 };
@@ -100,7 +100,7 @@ describe("SplitterProxy via Factory", () => {
       ).deployed();
 
       callableProxy = await (
-        await ethers.getContractAt("SplitterV4", proxy.address)
+        await ethers.getContractAt("Splitter", proxy.address)
       ).deployed();
     });
 

@@ -1,9 +1,7 @@
-// Sources flattened with hardhat v2.0.7 https://hardhat.org
-
-// File contracts/SplitProxy.sol
-
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.3;
+
+// File contracts/SplitProxy.sol
 
 interface ISplitFactory {
     function splitter() external returns (address);
@@ -59,11 +57,7 @@ contract SplitProxy {
     receive() external payable {}
 }
 
-
 // File contracts/SplitFactory.sol
-
-// SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.3;
 
 /**
  * @title SplitFactory

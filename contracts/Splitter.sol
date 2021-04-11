@@ -1,13 +1,5 @@
-//SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.3;
-
-interface ISplitter {
-    function validate() external view returns (bool isValid);
-
-    function splitETH() external returns (bool success);
-
-    function splitToken(address token) external returns (bool success);
-}
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
@@ -26,20 +18,17 @@ interface IWETH {
 /**
  * @title Splitter
  * @author MirrorXYZ
- *
- *  A contract that can split eth and tokens to a given allocation based on percentages.
  */
-contract Splitter is ISplitter {
-    // The address of the WETH contract, so that ETH can be transferred via
-    // WETH if native ETH transfers fail.
-    address public immutable wethAddress;
+contract Splitter {
+    uint256 public constant PERCENTAGE_SCALE = 10e5;
 
-    // An allocation comprises of an account and a percentage of the total
-    // balance that that account should receive once the split is executed.
-    uint32[] public percentages;
-    address[] public accounts;
-    // True if initialized.
-    bool private _initialized;
+    // Inherited Storage.
+    bytes32 public merkleRoot;
+    uint256 public currentWindow;
+    address private wethAddress;
+    address private _splitter;
+    uint256[] private balanceForWindow;
+    mapping(bytes32 => bool) private claimed;
 
     // The TransferETH event is emitted after each eth transfer in the split is attempted.
     event TransferETH(
@@ -47,125 +36,144 @@ contract Splitter is ISplitter {
         address account,
         // The amount for transfer that was attempted.
         uint256 amount,
-        // The percent of the total balance that this amount represented.
-        uint32 percent,
         // Whether or not the transfer succeeded.
         bool success
     );
 
-    // The TransferToken event is emitted after each ERC20 transfer in the split is attempted.
-    event TransferToken(
-        // The address of the ERC20 token to which the transfer was attempted.
-        address token,
-        // The account to which the transfer was attempted.
+    // Emits when a window is incremented.
+    event WindowIncremented(uint256 currentWindow, uint256 fundsAvailable);
+
+    function claimForAllWindows(
         address account,
-        // The amount for transfer that was attempted.
-        uint256 amount,
-        // The percent of the total balance that this amount represented.
-        uint32 percent,
-        // Whether or not the transfer succeeded.
-        bool success
-    );
-
-    constructor(address wethAddress_) {
-        wethAddress = wethAddress_;
-    }
-
-    /**
-     * Allows the instantiation of an array of allocations for splitting.
-     *
-     * NOTE: This does not validate the allocation on-chain, and therefore that
-     * ought to be done before deploying the Splitter.
-     *
-     * Once the Splitter is deployed, `validate()` can be called for free
-     * to confirm that make sure that the split is valid before funds are
-     * transferred into the splitter.
-     */
-    function initialize(
-        address[] calldata accounts_,
-        uint32[] calldata percentages_
+        uint256 percentageAllocation,
+        bytes32[] calldata merkleProof
     ) external {
-        // Basic validation that the Splitter hasn't been initialized.
-        require(!_initialized, "Splitter already initialized");
-        // Initialize storage.
-        accounts = accounts_;
-        percentages = percentages_;
-    }
+        // Make sure that the user has this allocation granted.
+        require(
+            verifyProof(
+                merkleProof,
+                merkleRoot,
+                getNode(account, percentageAllocation)
+            ),
+            "Invalid proof"
+        );
 
-    function validate() external view override returns (bool isValid) {
-        uint256 totalAllocation = 0;
+        uint256 amount = 0;
+        for (uint256 i = 0; i < currentWindow; i++) {
+            if (!isClaimed(i, account)) {
+                setClaimed(i, account);
 
-        for (uint256 i = 0; i < accounts.length; i++) {
-            totalAllocation += percentages[i];
-        }
-
-        return (totalAllocation == 100);
-    }
-
-    function splitETH() external override returns (bool success) {
-        uint256 startingBalance = address(this).balance;
-
-        // Expect success in all things; especially transfers via Splitter.
-        success = true;
-        for (uint256 i = 0; i < accounts.length; i++) {
-            bool didSucceed =
-                transferETHOrWETH(
-                    // To the allocation's account address.
-                    accounts[i],
-                    // For an amount equal to the allocation's percent of the starting balance.
-                    amountFromPercent(startingBalance, percentages[i])
+                amount += scaleAmountByPercentage(
+                    balanceForWindow[i],
+                    percentageAllocation
                 );
-
-            // If the operation did not succeed, we should return false from this function.
-            if (!didSucceed) {
-                success = false;
             }
-
-            emit TransferETH(
-                accounts[i],
-                amountFromPercent(startingBalance, percentages[i]),
-                percentages[i],
-                didSucceed
-            );
         }
+
+        transferETHOrWETH(account, amount);
     }
 
-    function splitToken(address token)
-        external
-        override
-        returns (bool success)
+    function getNode(address account, uint256 percentageAllocation)
+        private
+        pure
+        returns (bytes32)
     {
-        uint256 startingBalance = IERC20(token).balanceOf(address(this));
+        return keccak256(abi.encodePacked(account, percentageAllocation));
+    }
 
-        // Expect success in all things; especially transfers via Splitter.
-        success = true;
-        for (uint256 i = 0; i < accounts.length; i++) {
-            bool didSucceed =
-                attemptTokenTransfer(
-                    token,
-                    // To the allocation's account address.
-                    accounts[i],
-                    // For an amount equal to the allocation's percent of the starting balance.
-                    amountFromPercent(startingBalance, percentages[i])
-                );
+    function scaleAmountByPercentage(uint256 amount, uint256 scaledPercent)
+        public
+        pure
+        returns (uint256 scaledAmount)
+    {
+        /*
+            Example:
+                If there is 100 ETH in the account, and someone has 
+                an allocation of 2%, we call this with 100 as the amount, and 200
+                as the scaled percent.
 
-            // If the operation did not succeed, we should return false from this function.
-            if (!didSucceed) {
-                success = false;
-            }
+                To find out the amount we use, for example: (100 * 200) / (100 * 100)
+                which returns 2 -- i.e. 2% of the 100 ETH balance.
+         */
+        scaledAmount = (amount * scaledPercent) / (100 * PERCENTAGE_SCALE);
+    }
 
-            emit TransferToken(
-                token,
-                accounts[i],
-                amountFromPercent(startingBalance, percentages[i]),
-                percentages[i],
-                didSucceed
+    function claim(
+        uint256 window,
+        address account,
+        uint256 scaledPercentageAllocation,
+        bytes32[] calldata merkleProof
+    ) external {
+        require(currentWindow > window, "cannot claim for a future window");
+        require(
+            !isClaimed(window, account),
+            "Account already claimed the given window"
+        );
+
+        setClaimed(window, account);
+
+        require(
+            verifyProof(
+                merkleProof,
+                merkleRoot,
+                getNode(account, scaledPercentageAllocation)
+            ),
+            "Invalid proof"
+        );
+
+        uint256 amount =
+            scaleAmountByPercentage(
+                balanceForWindow[window],
+                scaledPercentageAllocation
             );
+
+        transferETHOrWETH(account, amount);
+    }
+
+    function incrementWindow() public {
+        uint256 fundsAvailable;
+
+        if (currentWindow == 0) {
+            fundsAvailable = address(this).balance;
+        } else {
+            // Current Balance, subtract previous balance to get the
+            // funds that were added for this window.
+            fundsAvailable =
+                address(this).balance -
+                balanceForWindow[currentWindow - 1];
         }
+
+        require(fundsAvailable > 0, "No additional funds for window");
+
+        balanceForWindow.push(fundsAvailable);
+        currentWindow += 1;
+        emit WindowIncremented(currentWindow, fundsAvailable);
+    }
+
+    function isClaimed(uint256 window, address account)
+        public
+        view
+        returns (bool)
+    {
+        return claimed[getClaimHash(window, account)];
+    }
+
+    //======== Private Functions ========
+
+    function setClaimed(uint256 window, address account) private {
+        claimed[getClaimHash(window, account)] = true;
+    }
+
+    function getClaimHash(uint256 window, address account)
+        private
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(window, account));
     }
 
     function amountFromPercent(uint256 amount, uint32 percent)
-        public
+        private
         pure
         returns (uint256)
     {
@@ -188,6 +196,8 @@ contract Splitter is ISplitter {
             IWETH(wethAddress).transfer(to, value);
             // At this point, the recipient can unwrap WETH.
         }
+
+        emit TransferETH(to, value, didSucceed);
     }
 
     function attemptETHTransfer(address to, uint256 value)
@@ -201,19 +211,31 @@ contract Splitter is ISplitter {
         return success;
     }
 
-    function attemptTokenTransfer(
-        address token,
-        address to,
-        uint256 value
-    ) private returns (bool) {
-        (bool success, bytes memory data) =
-            token.call(
-                abi.encodeWithSelector(IERC20.transfer.selector, to, value)
-            );
-        return success && (data.length == 0 || abi.decode(data, (bool)));
-    }
+    // From https://github.com/protofire/zeppelin-solidity/blob/master/contracts/MerkleProof.sol
+    function verifyProof(
+        bytes32[] memory proof,
+        bytes32 root,
+        bytes32 leaf
+    ) private pure returns (bool) {
+        bytes32 computedHash = leaf;
 
-    receive() external payable {
-        // This is expected.
+        for (uint256 i = 0; i < proof.length; i++) {
+            bytes32 proofElement = proof[i];
+
+            if (computedHash <= proofElement) {
+                // Hash(current computed hash + current element of the proof)
+                computedHash = keccak256(
+                    abi.encodePacked(computedHash, proofElement)
+                );
+            } else {
+                // Hash(current element of the proof + current computed hash)
+                computedHash = keccak256(
+                    abi.encodePacked(proofElement, computedHash)
+                );
+            }
+        }
+
+        // Check if the computed hash (root) is equal to the provided root
+        return computedHash == root;
     }
 }

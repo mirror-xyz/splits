@@ -22,65 +22,80 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface SplitterInterface extends ethers.utils.Interface {
   functions: {
-    "accounts(uint256)": FunctionFragment;
-    "amountFromPercent(uint256,uint32)": FunctionFragment;
-    "initialize(address[],uint32[])": FunctionFragment;
-    "percentages(uint256)": FunctionFragment;
-    "splitETH()": FunctionFragment;
-    "splitToken(address)": FunctionFragment;
-    "validate()": FunctionFragment;
-    "wethAddress()": FunctionFragment;
+    "PERCENTAGE_SCALE()": FunctionFragment;
+    "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
+    "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
+    "currentWindow()": FunctionFragment;
+    "incrementWindow()": FunctionFragment;
+    "isClaimed(uint256,address)": FunctionFragment;
+    "merkleRoot()": FunctionFragment;
+    "scaleAmountByPercentage(uint256,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "accounts",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "amountFromPercent",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "initialize",
-    values: [string[], BigNumberish[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "percentages",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "splitETH", values?: undefined): string;
-  encodeFunctionData(functionFragment: "splitToken", values: [string]): string;
-  encodeFunctionData(functionFragment: "validate", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "wethAddress",
+    functionFragment: "PERCENTAGE_SCALE",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "claim",
+    values: [BigNumberish, string, BigNumberish, BytesLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claimForAllWindows",
+    values: [string, BigNumberish, BytesLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "currentWindow",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "incrementWindow",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isClaimed",
+    values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "merkleRoot",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "scaleAmountByPercentage",
+    values: [BigNumberish, BigNumberish]
+  ): string;
 
-  decodeFunctionResult(functionFragment: "accounts", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "amountFromPercent",
+    functionFragment: "PERCENTAGE_SCALE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "percentages",
+    functionFragment: "claimForAllWindows",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "splitETH", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "splitToken", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "validate", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "wethAddress",
+    functionFragment: "currentWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "incrementWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "isClaimed", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "scaleAmountByPercentage",
     data: BytesLike
   ): Result;
 
   events: {
-    "TransferETH(address,uint256,uint32,bool)": EventFragment;
-    "TransferToken(address,address,uint256,uint32,bool)": EventFragment;
+    "TransferETH(address,uint256,bool)": EventFragment;
+    "WindowIncremented(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "TransferETH"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TransferToken"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WindowIncremented"): EventFragment;
 }
 
 export class Splitter extends Contract {
@@ -97,337 +112,368 @@ export class Splitter extends Contract {
   interface: SplitterInterface;
 
   functions: {
-    accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "accounts(uint256)"(
-      arg0: BigNumberish,
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    claim(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "claim(uint256,address,uint256,bytes32[])"(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    currentWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+    isClaimed(
+      window: BigNumberish,
+      account: string,
       overrides?: CallOverrides
-    ): Promise<[string]>;
+    ): Promise<[boolean]>;
 
-    amountFromPercent(
+    "isClaimed(uint256,address)"(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    merkleRoot(overrides?: CallOverrides): Promise<[string]>;
+
+    "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
+
+    scaleAmountByPercentage(
       amount: BigNumberish,
-      percent: BigNumberish,
+      scaledPercent: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { scaledAmount: BigNumber }>;
 
-    "amountFromPercent(uint256,uint32)"(
+    "scaleAmountByPercentage(uint256,uint256)"(
       amount: BigNumberish,
-      percent: BigNumberish,
+      scaledPercent: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    initialize(
-      accounts_: string[],
-      percentages_: BigNumberish[],
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "initialize(address[],uint32[])"(
-      accounts_: string[],
-      percentages_: BigNumberish[],
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    percentages(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[number]>;
-
-    "percentages(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[number]>;
-
-    splitETH(overrides?: Overrides): Promise<ContractTransaction>;
-
-    "splitETH()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-    splitToken(
-      token: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "splitToken(address)"(
-      token: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    validate(
-      overrides?: CallOverrides
-    ): Promise<[boolean] & { isValid: boolean }>;
-
-    "validate()"(
-      overrides?: CallOverrides
-    ): Promise<[boolean] & { isValid: boolean }>;
-
-    wethAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    ): Promise<[BigNumber] & { scaledAmount: BigNumber }>;
   };
 
-  accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+  PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "accounts(uint256)"(
-    arg0: BigNumberish,
+  "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  claim(
+    window: BigNumberish,
+    account: string,
+    scaledPercentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "claim(uint256,address,uint256,bytes32[])"(
+    window: BigNumberish,
+    account: string,
+    scaledPercentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  claimForAllWindows(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "claimForAllWindows(address,uint256,bytes32[])"(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+  isClaimed(
+    window: BigNumberish,
+    account: string,
     overrides?: CallOverrides
-  ): Promise<string>;
+  ): Promise<boolean>;
 
-  amountFromPercent(
+  "isClaimed(uint256,address)"(
+    window: BigNumberish,
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  merkleRoot(overrides?: CallOverrides): Promise<string>;
+
+  "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
+
+  scaleAmountByPercentage(
     amount: BigNumberish,
-    percent: BigNumberish,
+    scaledPercent: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "amountFromPercent(uint256,uint32)"(
+  "scaleAmountByPercentage(uint256,uint256)"(
     amount: BigNumberish,
-    percent: BigNumberish,
+    scaledPercent: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
-
-  initialize(
-    accounts_: string[],
-    percentages_: BigNumberish[],
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "initialize(address[],uint32[])"(
-    accounts_: string[],
-    percentages_: BigNumberish[],
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  percentages(arg0: BigNumberish, overrides?: CallOverrides): Promise<number>;
-
-  "percentages(uint256)"(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<number>;
-
-  splitETH(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "splitETH()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-  splitToken(
-    token: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "splitToken(address)"(
-    token: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  validate(overrides?: CallOverrides): Promise<boolean>;
-
-  "validate()"(overrides?: CallOverrides): Promise<boolean>;
-
-  wethAddress(overrides?: CallOverrides): Promise<string>;
-
-  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "accounts(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    amountFromPercent(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "amountFromPercent(uint256,uint32)"(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    initialize(
-      accounts_: string[],
-      percentages_: BigNumberish[],
+    claim(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address[],uint32[])"(
-      accounts_: string[],
-      percentages_: BigNumberish[],
+    "claim(uint256,address,uint256,bytes32[])"(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    percentages(arg0: BigNumberish, overrides?: CallOverrides): Promise<number>;
-
-    "percentages(uint256)"(
-      arg0: BigNumberish,
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
       overrides?: CallOverrides
-    ): Promise<number>;
+    ): Promise<void>;
 
-    splitETH(overrides?: CallOverrides): Promise<boolean>;
+    "claimForAllWindows(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    "splitETH()"(overrides?: CallOverrides): Promise<boolean>;
+    currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
-    splitToken(token: string, overrides?: CallOverrides): Promise<boolean>;
+    "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "splitToken(address)"(
-      token: string,
+    incrementWindow(overrides?: CallOverrides): Promise<void>;
+
+    "incrementWindow()"(overrides?: CallOverrides): Promise<void>;
+
+    isClaimed(
+      window: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    validate(overrides?: CallOverrides): Promise<boolean>;
+    "isClaimed(uint256,address)"(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
-    "validate()"(overrides?: CallOverrides): Promise<boolean>;
+    merkleRoot(overrides?: CallOverrides): Promise<string>;
 
-    wethAddress(overrides?: CallOverrides): Promise<string>;
+    "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {
-    TransferETH(
-      account: null,
-      amount: null,
-      percent: null,
-      success: null
-    ): EventFilter;
+    TransferETH(account: null, amount: null, success: null): EventFilter;
 
-    TransferToken(
-      token: null,
-      account: null,
-      amount: null,
-      percent: null,
-      success: null
-    ): EventFilter;
+    WindowIncremented(currentWindow: null, fundsAvailable: null): EventFilter;
   };
 
   estimateGas: {
-    accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "accounts(uint256)"(
-      arg0: BigNumberish,
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    claim(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "claim(uint256,address,uint256,bytes32[])"(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    incrementWindow(overrides?: Overrides): Promise<BigNumber>;
+
+    "incrementWindow()"(overrides?: Overrides): Promise<BigNumber>;
+
+    isClaimed(
+      window: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    amountFromPercent(
+    "isClaimed(uint256,address)"(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    merkleRoot(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    scaleAmountByPercentage(
       amount: BigNumberish,
-      percent: BigNumberish,
+      scaledPercent: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "amountFromPercent(uint256,uint32)"(
+    "scaleAmountByPercentage(uint256,uint256)"(
       amount: BigNumberish,
-      percent: BigNumberish,
+      scaledPercent: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    initialize(
-      accounts_: string[],
-      percentages_: BigNumberish[],
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "initialize(address[],uint32[])"(
-      accounts_: string[],
-      percentages_: BigNumberish[],
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    percentages(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "percentages(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    splitETH(overrides?: Overrides): Promise<BigNumber>;
-
-    "splitETH()"(overrides?: Overrides): Promise<BigNumber>;
-
-    splitToken(token: string, overrides?: Overrides): Promise<BigNumber>;
-
-    "splitToken(address)"(
-      token: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    validate(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "validate()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    accounts(
-      arg0: BigNumberish,
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "PERCENTAGE_SCALE()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "accounts(uint256)"(
-      arg0: BigNumberish,
+    claim(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "claim(uint256,address,uint256,bytes32[])"(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "incrementWindow()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    isClaimed(
+      window: BigNumberish,
+      account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    amountFromPercent(
+    "isClaimed(uint256,address)"(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "merkleRoot()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    scaleAmountByPercentage(
       amount: BigNumberish,
-      percent: BigNumberish,
+      scaledPercent: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "amountFromPercent(uint256,uint32)"(
+    "scaleAmountByPercentage(uint256,uint256)"(
       amount: BigNumberish,
-      percent: BigNumberish,
+      scaledPercent: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    initialize(
-      accounts_: string[],
-      percentages_: BigNumberish[],
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "initialize(address[],uint32[])"(
-      accounts_: string[],
-      percentages_: BigNumberish[],
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    percentages(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "percentages(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    splitETH(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    "splitETH()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    splitToken(
-      token: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "splitToken(address)"(
-      token: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    validate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "validate()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
