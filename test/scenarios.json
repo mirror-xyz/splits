@@ -1,8 +1,20 @@
 [
   {
+    "allocationPercentages": [100000000]
+  },
+  {
+    "allocationPercentages": [50000000, 50000000]
+  },
+  {
     "allocationPercentages": [10000000, 30000000, 60000000]
   },
   {
     "allocationPercentages": [23000000, 51000000, 26000000]
+  },
+  {
+    "allocationPercentages": [41312044, 5206076, 53481880]
+  },
+  {
+    "allocationPercentages": [25000000, 25000000, 25000000, 25000000]
   }
 ]
