@@ -29,6 +29,7 @@ contract Splitter {
     address private _splitter;
     uint256[] private balanceForWindow;
     mapping(bytes32 => bool) private claimed;
+    uint256 totalClaimed;
 
     // The TransferETH event is emitted after each eth transfer in the split is attempted.
     event TransferETH(
@@ -138,9 +139,7 @@ contract Splitter {
         } else {
             // Current Balance, subtract previous balance to get the
             // funds that were added for this window.
-            fundsAvailable =
-                address(this).balance -
-                balanceForWindow[currentWindow - 1];
+            fundsAvailable = address(this).balance - totalClaimed;
         }
 
         require(fundsAvailable > 0, "No additional funds for window");
@@ -197,6 +196,7 @@ contract Splitter {
             // At this point, the recipient can unwrap WETH.
         }
 
+        totalClaimed += value;
         emit TransferETH(to, value, didSucceed);
     }
 
