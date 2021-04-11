@@ -132,7 +132,7 @@ describe("SplitProxy via Factory", () => {
           expect(await proxyFactory.merkleRoot()).to.eq(NULL_BYTES);
         });
 
-        // NOTE: Gas cost is around 60973, but may vary slightly. 
+        // NOTE: Gas cost is around 60973, but may vary slightly.
         // Can check by uncommenting this and running the test.
         // it("costs 182664 gas to deploy the proxy", async () => {
         //   const gasUsed = (await deployTx.wait()).gasUsed;
@@ -159,7 +159,9 @@ describe("SplitProxy via Factory", () => {
             accountIndex < allocationPercentages.length;
             accountIndex++
           ) {
-            describe(`and account ${accountIndex + 1} tries to claim`, () => {
+            describe(`and account ${
+              accountIndex + 1
+            } tries to claim with the correct allocation`, () => {
               let gasUsed;
 
               it("successfully claims", async () => {
@@ -194,6 +196,27 @@ describe("SplitProxy via Factory", () => {
               // it("costs 60973 gas", async () => {
               //   expect(gasUsed.toString()).to.eq("60973");
               // });
+            });
+
+            describe(`and account ${
+              accountIndex + 1
+            } tries to claim with a higher allocation`, () => {
+              it("reverts with 'Invalid proof'", async () => {
+                const index = 0;
+                const window = 0;
+                const ref = allocations[index];
+                const { account, allocation } = ref;
+                const incorrectAllocation = allocation + 1;
+                const proof = tree.getProof(account, allocation);
+                await expect(
+                  callableProxy.claim(
+                    window,
+                    account,
+                    incorrectAllocation,
+                    proof
+                  )
+                ).revertedWith("Invalid proof");
+              });
             });
           }
 
@@ -311,7 +334,9 @@ describe("SplitProxy via Factory", () => {
               // });
             });
 
-            describe(`and account ${accountIndex} tries to claim twice across both windows`, () => {
+            describe(`and account ${
+              accountIndex + 1
+            } tries to claim twice across both windows`, () => {
               it("successfully claims on each window", async () => {
                 for (let window = 0; window < 2; window++) {
                   const ref = allocations[accountIndex];
