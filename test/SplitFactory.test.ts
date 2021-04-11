@@ -121,9 +121,9 @@ describe("SplitterProxy via Factory", () => {
       expect(gasUsed.toString()).to.eq("182676");
     });
 
-    it("costs 729440 gas to deploy the splitter", async () => {
+    it("costs 691565 gas to deploy the splitter", async () => {
       const gasUsed = (await splitter.deployTransaction.wait()).gasUsed;
-      expect(gasUsed.toString()).to.eq("729440");
+      expect(gasUsed.toString()).to.eq("691565");
     });
 
     describe("when initialized with a root that allocates account1 10%, account2 30%, and account3 60%", () => {
@@ -164,8 +164,8 @@ describe("SplitterProxy via Factory", () => {
             ).to.eq(ethers.utils.parseEther("10"));
           });
 
-          it("costs 60208 gas", async () => {
-            expect(gasUsed.toString()).to.eq("60208");
+          it("costs 61826 gas", async () => {
+            expect(gasUsed.toString()).to.eq("61826");
           });
         });
 
@@ -280,9 +280,9 @@ describe("SplitterProxy via Factory", () => {
             ).to.eq(ethers.utils.parseEther("60"));
           });
 
-          it("costs 44017 gas", async () => {
+          it("costs 88004 gas", async () => {
             const receipt = await tx.wait();
-            expect(receipt.gasUsed).to.eq("44017");
+            expect(receipt.gasUsed.toString()).to.eq("88004");
           });
         });
 

@@ -36,59 +36,12 @@ contract SplitterV4 {
         address account,
         // The amount for transfer that was attempted.
         uint256 amount,
-        // The percent of the total balance that this amount represented.
-        uint32 percent,
         // Whether or not the transfer succeeded.
         bool success
     );
 
-    // The TransferToken event is emitted after each ERC20 transfer in the split is attempted.
-    event TransferToken(
-        // The address of the ERC20 token to which the transfer was attempted.
-        address token,
-        // The account to which the transfer was attempted.
-        address account,
-        // The amount for transfer that was attempted.
-        uint256 amount,
-        // The percent of the total balance that this amount represented.
-        uint32 percent,
-        // Whether or not the transfer succeeded.
-        bool success
-    );
-
-    function incrementWindow() public {
-        if (currentWindow == 0) {
-            balanceForWindow.push(address(this).balance);
-        } else {
-            balanceForWindow.push(
-                // Current Balance, subtract previous balance to get the
-                // funds that were added for this window.
-                address(this).balance - balanceForWindow[currentWindow - 1]
-            );
-        }
-
-        currentWindow += 1;
-    }
-
-    function isClaimed(uint256 window, address account)
-        public
-        view
-        returns (bool)
-    {
-        return claimed[getClaimHash(window, account)];
-    }
-
-    function _setClaimed(uint256 window, address account) private {
-        claimed[getClaimHash(window, account)] = true;
-    }
-
-    function getClaimHash(uint256 window, address account)
-        public
-        pure
-        returns (bytes32)
-    {
-        return keccak256(abi.encodePacked(window, account));
-    }
+    // Emits when a window is incremented.
+    event WindowIncremented(uint256 currentWindow, uint256 fundsAvailable);
 
     function claimForAllWindows(
         address account,
@@ -96,13 +49,20 @@ contract SplitterV4 {
         bytes32[] calldata merkleProof
     ) external {
         // Make sure that the user has this allocation granted.
-        bytes32 node =
-            keccak256(abi.encodePacked(account, percentageAllocation));
-        require(verifyProof(merkleProof, merkleRoot, node), "Invalid proof");
+        require(
+            verifyProof(
+                merkleProof,
+                merkleRoot,
+                getNode(account, percentageAllocation)
+            ),
+            "Invalid proof"
+        );
 
         uint256 amount = 0;
         for (uint256 i = 0; i < currentWindow; i++) {
             if (!isClaimed(i, account)) {
+                setClaimed(i, account);
+
                 amount += scaleAmountByPercentage(
                     balanceForWindow[i],
                     percentageAllocation
@@ -110,7 +70,15 @@ contract SplitterV4 {
             }
         }
 
-        require(transferETHOrWETH(account, amount), "Transfer failed");
+        transferETHOrWETH(account, amount);
+    }
+
+    function getNode(address account, uint256 percentageAllocation)
+        private
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(account, percentageAllocation));
     }
 
     function scaleAmountByPercentage(uint256 amount, uint256 scaledPercent)
@@ -142,11 +110,16 @@ contract SplitterV4 {
             "Account already claimed the given window"
         );
 
-        _setClaimed(window, account);
+        setClaimed(window, account);
 
-        bytes32 node =
-            keccak256(abi.encodePacked(account, scaledPercentageAllocation));
-        require(verifyProof(merkleProof, merkleRoot, node), "Invalid proof");
+        require(
+            verifyProof(
+                merkleProof,
+                merkleRoot,
+                getNode(account, scaledPercentageAllocation)
+            ),
+            "Invalid proof"
+        );
 
         uint256 amount =
             scaleAmountByPercentage(
@@ -154,11 +127,53 @@ contract SplitterV4 {
                 scaledPercentageAllocation
             );
 
-        require(transferETHOrWETH(account, amount), "Transfer failed");
+        transferETHOrWETH(account, amount);
+    }
+
+    function incrementWindow() public {
+        uint256 fundsAvailable;
+
+        if (currentWindow == 0) {
+            fundsAvailable = address(this).balance;
+        } else {
+            // Current Balance, subtract previous balance to get the
+            // funds that were added for this window.
+            fundsAvailable =
+                address(this).balance -
+                balanceForWindow[currentWindow - 1];
+        }
+
+        require(fundsAvailable > 0, "No additional funds for window");
+
+        balanceForWindow.push(fundsAvailable);
+        currentWindow += 1;
+        emit WindowIncremented(currentWindow, fundsAvailable);
+    }
+
+    function isClaimed(uint256 window, address account)
+        public
+        view
+        returns (bool)
+    {
+        return claimed[getClaimHash(window, account)];
+    }
+
+    //======== Private Functions ========
+
+    function setClaimed(uint256 window, address account) private {
+        claimed[getClaimHash(window, account)] = true;
+    }
+
+    function getClaimHash(uint256 window, address account)
+        private
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(window, account));
     }
 
     function amountFromPercent(uint256 amount, uint32 percent)
-        public
+        private
         pure
         returns (uint256)
     {
@@ -181,6 +196,8 @@ contract SplitterV4 {
             IWETH(wethAddress).transfer(to, value);
             // At this point, the recipient can unwrap WETH.
         }
+
+        emit TransferETH(to, value, didSucceed);
     }
 
     function attemptETHTransfer(address to, uint256 value)
@@ -194,23 +211,12 @@ contract SplitterV4 {
         return success;
     }
 
-    function attemptTokenTransfer(
-        address token,
-        address to,
-        uint256 value
-    ) private returns (bool) {
-        (bool success, bytes memory data) =
-            token.call(
-                abi.encodeWithSelector(IERC20.transfer.selector, to, value)
-            );
-        return success && (data.length == 0 || abi.decode(data, (bool)));
-    }
-
+    // From https://github.com/protofire/zeppelin-solidity/blob/master/contracts/MerkleProof.sol
     function verifyProof(
         bytes32[] memory proof,
         bytes32 root,
         bytes32 leaf
-    ) internal pure returns (bool) {
+    ) private pure returns (bool) {
         bytes32 computedHash = leaf;
 
         for (uint256 i = 0; i < proof.length; i++) {

@@ -111,29 +111,15 @@ contract SplitterV4 {
                     balanceForWindow[i],
                     percentageAllocation
                 );
+
+                _setClaimed(i, account);
             }
         }
 
         require(transferETHOrWETH(account, amount), "Transfer failed");
     }
 
-    function scaleAmountByPercentage(uint256 amount, uint256 scaledPercent)
-        public
-        pure
-        returns (uint256 scaledAmount)
-    {
-        /*
-            Example:
-                If there is 100 ETH in the account, and someone has 
-                an allocation of 2%, we call this with 100 as the amount, and 200
-                as the scaled percent.
-
-                To find out the amount we use, for example: (100 * 200) / (100 * 100)
-                which returns 2 -- i.e. 2% of the 100 ETH balance.
-         */
-        scaledAmount = (amount * scaledPercent) / (100 * PERCENTAGE_SCALE);
-    }
-
+    
     function claim(
         uint256 window,
         address account,
@@ -161,14 +147,34 @@ contract SplitterV4 {
         require(transferETHOrWETH(account, amount), "Transfer failed");
     }
 
+    //======== Private Functions ========
+
     function amountFromPercent(uint256 amount, uint32 percent)
-        public
+        private
         pure
         returns (uint256)
     {
         // Solidity 0.8.0 lets us do this without SafeMath.
         return (amount * percent) / 100;
     }
+
+    function scaleAmountByPercentage(uint256 amount, uint256 scaledPercent)
+        private
+        pure
+        returns (uint256 scaledAmount)
+    {
+        /*
+            Example:
+                If there is 100 ETH in the account, and someone has 
+                an allocation of 2%, we call this with 100 as the amount, and 200
+                as the scaled percent.
+
+                To find out the amount we use, for example: (100 * 200) / (100 * 100)
+                which returns 2 -- i.e. 2% of the 100 ETH balance.
+         */
+        scaledAmount = (amount * scaledPercent) / (100 * PERCENTAGE_SCALE);
+    }
+
 
     // Will attempt to transfer ETH, but will transfer WETH instead if it fails.
     function transferETHOrWETH(address to, uint256 value)
@@ -214,7 +220,7 @@ contract SplitterV4 {
         bytes32[] memory proof,
         bytes32 root,
         bytes32 leaf
-    ) internal pure returns (bool) {
+    ) private pure returns (bool) {
         bytes32 computedHash = leaf;
 
         for (uint256 i = 0; i < proof.length; i++) {

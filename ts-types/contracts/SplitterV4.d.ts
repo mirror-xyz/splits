@@ -23,11 +23,9 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface SplitterV4Interface extends ethers.utils.Interface {
   functions: {
     "PERCENTAGE_SCALE()": FunctionFragment;
-    "amountFromPercent(uint256,uint32)": FunctionFragment;
     "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
     "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "currentWindow()": FunctionFragment;
-    "getClaimHash(uint256,address)": FunctionFragment;
     "incrementWindow()": FunctionFragment;
     "isClaimed(uint256,address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
@@ -37,10 +35,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "PERCENTAGE_SCALE",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "amountFromPercent",
-    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "claim",
@@ -53,10 +47,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "currentWindow",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getClaimHash",
-    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "incrementWindow",
@@ -79,10 +69,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
     functionFragment: "PERCENTAGE_SCALE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "amountFromPercent",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "claimForAllWindows",
@@ -90,10 +76,6 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "currentWindow",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getClaimHash",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -108,12 +90,12 @@ interface SplitterV4Interface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "TransferETH(address,uint256,uint32,bool)": EventFragment;
-    "TransferToken(address,address,uint256,uint32,bool)": EventFragment;
+    "TransferETH(address,uint256,bool)": EventFragment;
+    "WindowIncremented(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "TransferETH"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TransferToken"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WindowIncremented"): EventFragment;
 }
 
 export class SplitterV4 extends Contract {
@@ -133,18 +115,6 @@ export class SplitterV4 extends Contract {
     PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    amountFromPercent(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "amountFromPercent(uint256,uint32)"(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     claim(
       window: BigNumberish,
@@ -179,18 +149,6 @@ export class SplitterV4 extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    getClaimHash(
-      window: BigNumberish,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "getClaimHash(uint256,address)"(
-      window: BigNumberish,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
 
     incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -229,18 +187,6 @@ export class SplitterV4 extends Contract {
 
   "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  amountFromPercent(
-    amount: BigNumberish,
-    percent: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  "amountFromPercent(uint256,uint32)"(
-    amount: BigNumberish,
-    percent: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   claim(
     window: BigNumberish,
     account: string,
@@ -274,18 +220,6 @@ export class SplitterV4 extends Contract {
   currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
   "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getClaimHash(
-    window: BigNumberish,
-    account: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  "getClaimHash(uint256,address)"(
-    window: BigNumberish,
-    account: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -324,18 +258,6 @@ export class SplitterV4 extends Contract {
 
     "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    amountFromPercent(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "amountFromPercent(uint256,uint32)"(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     claim(
       window: BigNumberish,
       account: string,
@@ -369,18 +291,6 @@ export class SplitterV4 extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getClaimHash(
-      window: BigNumberish,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "getClaimHash(uint256,address)"(
-      window: BigNumberish,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     incrementWindow(overrides?: CallOverrides): Promise<void>;
 
@@ -416,38 +326,15 @@ export class SplitterV4 extends Contract {
   };
 
   filters: {
-    TransferETH(
-      account: null,
-      amount: null,
-      percent: null,
-      success: null
-    ): EventFilter;
+    TransferETH(account: null, amount: null, success: null): EventFilter;
 
-    TransferToken(
-      token: null,
-      account: null,
-      amount: null,
-      percent: null,
-      success: null
-    ): EventFilter;
+    WindowIncremented(currentWindow: null, fundsAvailable: null): EventFilter;
   };
 
   estimateGas: {
     PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
 
     "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    amountFromPercent(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "amountFromPercent(uint256,uint32)"(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     claim(
       window: BigNumberish,
@@ -482,18 +369,6 @@ export class SplitterV4 extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getClaimHash(
-      window: BigNumberish,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getClaimHash(uint256,address)"(
-      window: BigNumberish,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     incrementWindow(overrides?: Overrides): Promise<BigNumber>;
 
@@ -535,18 +410,6 @@ export class SplitterV4 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    amountFromPercent(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "amountFromPercent(uint256,uint32)"(
-      amount: BigNumberish,
-      percent: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     claim(
       window: BigNumberish,
       account: string,
@@ -580,18 +443,6 @@ export class SplitterV4 extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getClaimHash(
-      window: BigNumberish,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getClaimHash(uint256,address)"(
-      window: BigNumberish,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
 
