@@ -144,11 +144,10 @@ contract Splitter {
             // Current Balance, subtract previous balance to get the
             // funds that were added for this window.
             fundsAvailable = depositedInWindow;
+            depositedInWindow = 0;
         }
-        depositedInWindow = 0;
 
         require(fundsAvailable > 0, "No additional funds for window");
-
         balanceForWindow.push(fundsAvailable);
         currentWindow += 1;
         emit WindowIncremented(currentWindow, fundsAvailable);
