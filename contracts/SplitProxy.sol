@@ -21,6 +21,7 @@ contract SplitProxy {
     address private _splitter;
     uint256[] private balanceForWindow;
     mapping(bytes32 => bool) private claimed;
+    uint256 depositedInWindow;
 
     constructor() {
         _splitter = ISplitFactory(msg.sender).splitter();
@@ -52,5 +53,7 @@ contract SplitProxy {
     }
 
     // Plain ETH transfers.
-    receive() external payable {}
+    receive() external payable {
+        depositedInWindow += msg.value;
+    }
 }
