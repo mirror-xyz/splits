@@ -15,7 +15,7 @@ const config = {
 };
 
 const NETWORK_MAP = {
-  "0": "mainnet",
+  "1": "mainnet",
   "4": "rinkeby",
   "1337": "hardhat",
   "31337": "hardhat",
@@ -25,13 +25,15 @@ let isLocal = false;
 
 async function main() {
   const chainId = (await waffle.provider.getNetwork()).chainId;
+
+  console.log({chainId})
   const networkName = NETWORK_MAP[chainId];
 
   console.log(`Deploying to ${networkName}`);
 
   const { WETH_ADDRESS } = config[networkName];
 
-  const Splitter = await ethers.getContractFactory("SplitterV4");
+  const Splitter = await ethers.getContractFactory("Splitter");
   const splitter = await Splitter.deploy();
   await splitter.deployed();
 

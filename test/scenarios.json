@@ -1,20 +1,22 @@
 [
   {
-    "allocationPercentages": [100000000]
+    "allocationPercentages": [100000000],
+    "firstDepositFirstWindow": [100],
+    "secondDepositSecondWindow": [100]
   },
   {
-    "allocationPercentages": [50000000, 50000000]
+    "allocationPercentages": [50000000, 50000000],
+    "firstDepositFirstWindow": [50, 50],
+    "secondDepositSecondWindow": [50, 50]
   },
   {
-    "allocationPercentages": [10000000, 30000000, 60000000]
+    "allocationPercentages": [25000000, 25000000, 25000000, 25000000],
+    "firstDepositFirstWindow": [25, 25, 25, 25],
+    "secondDepositSecondWindow": [25, 25, 25, 25]
   },
   {
-    "allocationPercentages": [23000000, 51000000, 26000000]
-  },
-  {
-    "allocationPercentages": [41312044, 5206076, 53481880]
-  },
-  {
-    "allocationPercentages": [25000000, 25000000, 25000000, 25000000]
+    "allocationPercentages": [41312044, 5206076, 53481880],
+    "firstDepositFirstWindow": [41.312044, 5.206076, 53.48188],
+    "secondDepositSecondWindow": [41.312044, 5.206076, 53.48188]
   }
 ]

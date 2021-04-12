@@ -26,6 +26,10 @@ const config: HardhatUserConfig = {
       url: `http://eth-rinkeby.alchemyapi.io/v2/${alchemyAPIKey}`,
       accounts: [deployerPrivateKey],
     },
+    mainnet: {
+      url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyAPIKey}`,
+      accounts: [deployerPrivateKey],
+    },
   }
 };
 
