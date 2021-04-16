@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers, waffle } from "hardhat";
-import { convertCompilerOptionsFromJson } from "typescript";
 import AllocationTree from "../merkle-tree/balance-tree";
 
 import scenarios from "./scenarios.json";
@@ -102,12 +101,12 @@ describe("SplitProxy via Factory", () => {
         });
 
         describe("and one account claims on the first window", () => {
-          let amountClaimed;
+          let amountClaimed, allocation;
           beforeEach(async () => {
             // Setup.
             const window = 0;
             const account = account1.address;
-            const allocation = BigNumber.from("50000000");
+            allocation = BigNumber.from("50000000");
             const proof = tree.getProof(account, allocation);
             const accountBalanceBefore = await waffle.provider.getBalance(
               account
@@ -122,6 +121,27 @@ describe("SplitProxy via Factory", () => {
             );
 
             amountClaimed = accountBalanceAfter.sub(accountBalanceBefore);
+          });
+
+          it("it sets depositedInWindow to 0 ETH", async () => {
+            expect(await callableProxy.depositedInWindow()).to.eq(
+              ethers.utils.parseEther("0").toString()
+            );
+          });
+
+          it("it returns 1 ETH for balanceForWindow[0]", async () => {
+            expect(await callableProxy.balanceForWindow(0)).to.eq(
+              ethers.utils.parseEther("1").toString()
+            );
+          });
+
+          it("gets 0.5 ETH from scaleAmountByPercentage", async () => {
+            expect(
+              await callableProxy.scaleAmountByPercentage(
+                allocation,
+                ethers.utils.parseEther("1").toString()
+              )
+            ).to.eq(ethers.utils.parseEther("0.5").toString());
           });
 
           it("allows them to successfully claim 0.5 ETH", async () => {
@@ -350,16 +370,15 @@ describe("SplitProxy via Factory", () => {
             expect(await proxyFactory.merkleRoot()).to.eq(NULL_BYTES);
           });
 
-          // NOTE: Gas cost is around 60973, but may vary slightly.
-          // Can check by uncommenting this and running the test.
-          // it("costs 182664 gas to deploy the proxy", async () => {
-          //   const gasUsed = (await deployTx.wait()).gasUsed;
-          //   expect(gasUsed.toString()).to.eq("182664");
-          // });
+          // NOTE: Gas cost is around 202330, but may vary slightly.
+          it("costs 232215 gas to deploy the proxy", async () => {
+            const gasUsed = (await deployTx.wait()).gasUsed;
+            expect(gasUsed.toString()).to.eq("232215");
+          });
 
-          it("costs 672826 gas to deploy the splitter", async () => {
+          it("costs 702846 gas to deploy the splitter", async () => {
             const gasUsed = (await splitter.deployTransaction.wait()).gasUsed;
-            expect(gasUsed.toString()).to.eq("672826");
+            expect(gasUsed.toString()).to.eq("702846");
           });
 
           describe("when there is 100 ETH in the account and a window has been incremented", () => {
@@ -413,10 +432,9 @@ describe("SplitProxy via Factory", () => {
                   );
                 });
 
-                // NOTE: Gas cost is around 60973, but depends slightly on the size of the
-                // allocation. Can check by uncommenting this and running the test.
-                // it("costs 60973 gas", async () => {
-                //   expect(gasUsed.toString()).to.eq("60973");
+                // NOTE: Gas cost is around 60973, but depends slightly.
+                // it("costs 61885 gas", async () => {
+                //   expect(gasUsed.toString()).to.eq("61885");
                 // });
               });
 

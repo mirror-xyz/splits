@@ -21,13 +21,23 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface SplitProxyInterface extends ethers.utils.Interface {
   functions: {
+    "balanceForWindow(uint256)": FunctionFragment;
     "currentWindow()": FunctionFragment;
+    "depositedInWindow()": FunctionFragment;
     "merkleRoot()": FunctionFragment;
     "splitter()": FunctionFragment;
   };
 
   encodeFunctionData(
+    functionFragment: "balanceForWindow",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "currentWindow",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "depositedInWindow",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -37,7 +47,15 @@ interface SplitProxyInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "splitter", values?: undefined): string;
 
   decodeFunctionResult(
+    functionFragment: "balanceForWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "currentWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "depositedInWindow",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
@@ -60,9 +78,23 @@ export class SplitProxy extends Contract {
   interface: SplitProxyInterface;
 
   functions: {
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     currentWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    depositedInWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "depositedInWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     merkleRoot(overrides?: CallOverrides): Promise<[string]>;
 
@@ -73,9 +105,23 @@ export class SplitProxy extends Contract {
     "splitter()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
+  balanceForWindow(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "balanceForWindow(uint256)"(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
   "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   merkleRoot(overrides?: CallOverrides): Promise<string>;
 
@@ -86,9 +132,23 @@ export class SplitProxy extends Contract {
   "splitter()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     merkleRoot(overrides?: CallOverrides): Promise<string>;
 
@@ -102,9 +162,23 @@ export class SplitProxy extends Contract {
   filters: {};
 
   estimateGas: {
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     merkleRoot(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -116,9 +190,25 @@ export class SplitProxy extends Contract {
   };
 
   populateTransaction: {
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    depositedInWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "depositedInWindow()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

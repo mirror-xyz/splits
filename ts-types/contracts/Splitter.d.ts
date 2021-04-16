@@ -23,9 +23,11 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface SplitterInterface extends ethers.utils.Interface {
   functions: {
     "PERCENTAGE_SCALE()": FunctionFragment;
+    "balanceForWindow(uint256)": FunctionFragment;
     "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
     "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "currentWindow()": FunctionFragment;
+    "depositedInWindow()": FunctionFragment;
     "incrementWindow()": FunctionFragment;
     "isClaimed(uint256,address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
@@ -37,6 +39,10 @@ interface SplitterInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "balanceForWindow",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "claim",
     values: [BigNumberish, string, BigNumberish, BytesLike[]]
   ): string;
@@ -46,6 +52,10 @@ interface SplitterInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "currentWindow",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "depositedInWindow",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -69,6 +79,10 @@ interface SplitterInterface extends ethers.utils.Interface {
     functionFragment: "PERCENTAGE_SCALE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "balanceForWindow",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "claimForAllWindows",
@@ -76,6 +90,10 @@ interface SplitterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "currentWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "depositedInWindow",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -116,6 +134,16 @@ export class Splitter extends Contract {
 
     "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     claim(
       window: BigNumberish,
       account: string,
@@ -149,6 +177,10 @@ export class Splitter extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    depositedInWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "depositedInWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -187,6 +219,16 @@ export class Splitter extends Contract {
 
   "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  balanceForWindow(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "balanceForWindow(uint256)"(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   claim(
     window: BigNumberish,
     account: string,
@@ -220,6 +262,10 @@ export class Splitter extends Contract {
   currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
   "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -258,6 +304,16 @@ export class Splitter extends Contract {
 
     "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     claim(
       window: BigNumberish,
       account: string,
@@ -291,6 +347,10 @@ export class Splitter extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     incrementWindow(overrides?: CallOverrides): Promise<void>;
 
@@ -336,6 +396,16 @@ export class Splitter extends Contract {
 
     "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     claim(
       window: BigNumberish,
       account: string,
@@ -369,6 +439,10 @@ export class Splitter extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     incrementWindow(overrides?: Overrides): Promise<BigNumber>;
 
@@ -410,6 +484,16 @@ export class Splitter extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     claim(
       window: BigNumberish,
       account: string,
@@ -443,6 +527,12 @@ export class Splitter extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    depositedInWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "depositedInWindow()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
 
