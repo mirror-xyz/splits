@@ -21,7 +21,7 @@ contract SplitProxy {
     address private _splitter;
     uint256[] public balanceForWindow;
     mapping(bytes32 => bool) private claimed;
-    uint256 public depositedInWindow;
+    uint256 private depositedInWindow;
 
     constructor() {
         _splitter = ISplitFactory(msg.sender).splitter();
