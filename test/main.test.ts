@@ -101,7 +101,7 @@ describe("SplitProxy via Factory", () => {
         });
 
         describe("and one account claims on the first window", () => {
-          let amountClaimed, allocation;
+          let amountClaimed, allocation, claimTx;
           beforeEach(async () => {
             // Setup.
             const window = 0;
@@ -112,7 +112,7 @@ describe("SplitProxy via Factory", () => {
               account
             );
 
-            await callableProxy
+            claimTx = await callableProxy
               .connect(transactionHandler)
               .claim(window, account, allocation, proof);
 
@@ -142,6 +142,11 @@ describe("SplitProxy via Factory", () => {
             expect(amountClaimed.toString()).to.eq(
               ethers.utils.parseEther("0.5").toString()
             );
+          });
+
+          it("costs 60982 gas", async () => {
+            const { gasUsed } = await claimTx.wait();
+            expect(gasUsed.toString()).to.eq("60982");
           });
 
           describe("and another 1 ETH is added, and the window is incremented", () => {
@@ -370,9 +375,9 @@ describe("SplitProxy via Factory", () => {
             expect(gasUsed.toString()).to.eq("222384");
           });
 
-          it("costs 695064 gas to deploy the splitter", async () => {
+          it("costs 688385 gas to deploy the splitter", async () => {
             const gasUsed = (await splitter.deployTransaction.wait()).gasUsed;
-            expect(gasUsed.toString()).to.eq("695064");
+            expect(gasUsed.toString()).to.eq("688385");
           });
 
           describe("when there is 100 ETH in the account and a window has been incremented", () => {
@@ -427,8 +432,8 @@ describe("SplitProxy via Factory", () => {
                 });
 
                 // NOTE: Gas cost is around 60973, but depends slightly.
-                // it("costs 61885 gas", async () => {
-                //   expect(gasUsed.toString()).to.eq("61885");
+                // it("costs 60984 gas", async () => {
+                //   expect(gasUsed.toString()).to.eq("60984");
                 // });
               });
 

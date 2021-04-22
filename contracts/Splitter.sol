@@ -20,7 +20,7 @@ interface IWETH {
 /**
  * @title Splitter
  * @author MirrorXYZ
- * 
+ *
  * Building on the work from the Uniswap team at https://github.com/Uniswap/merkle-distributor
  */
 contract Splitter is SplitStorage {
@@ -117,13 +117,14 @@ contract Splitter is SplitStorage {
             "Invalid proof"
         );
 
-        uint256 amount =
+        transferETHOrWETH(
+            account,
+            // The absolute amount that's claimable.
             scaleAmountByPercentage(
                 balanceForWindow[window],
                 scaledPercentageAllocation
-            );
-
-        transferETHOrWETH(account, amount);
+            )
+        );
     }
 
     function incrementWindow() public {
