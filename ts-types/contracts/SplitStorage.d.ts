@@ -23,7 +23,6 @@ interface SplitStorageInterface extends ethers.utils.Interface {
   functions: {
     "balanceForWindow(uint256)": FunctionFragment;
     "currentWindow()": FunctionFragment;
-    "depositedInWindow()": FunctionFragment;
     "merkleRoot()": FunctionFragment;
   };
 
@@ -33,10 +32,6 @@ interface SplitStorageInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "currentWindow",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "depositedInWindow",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -50,10 +45,6 @@ interface SplitStorageInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "currentWindow",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "depositedInWindow",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
@@ -89,10 +80,6 @@ export class SplitStorage extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    depositedInWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "depositedInWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     merkleRoot(overrides?: CallOverrides): Promise<[string]>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
@@ -112,10 +99,6 @@ export class SplitStorage extends Contract {
 
   "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   merkleRoot(overrides?: CallOverrides): Promise<string>;
 
   "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
@@ -134,10 +117,6 @@ export class SplitStorage extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     merkleRoot(overrides?: CallOverrides): Promise<string>;
 
@@ -161,10 +140,6 @@ export class SplitStorage extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     merkleRoot(overrides?: CallOverrides): Promise<BigNumber>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -184,12 +159,6 @@ export class SplitStorage extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    depositedInWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "depositedInWindow()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

@@ -12,5 +12,5 @@ contract SplitStorage {
     address internal _splitter;
     uint256[] public balanceForWindow;
     mapping(bytes32 => bool) internal claimed;
-    uint256 public depositedInWindow;
+    uint256 internal depositedInWindow;
 }

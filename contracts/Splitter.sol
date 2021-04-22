@@ -136,7 +136,7 @@ contract Splitter is SplitStorage {
             // funds that were added for this window.
             fundsAvailable = depositedInWindow;
         }
-        
+
         depositedInWindow = 0;
         require(fundsAvailable > 0, "No additional funds for window");
         balanceForWindow.push(fundsAvailable);

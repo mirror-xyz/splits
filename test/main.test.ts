@@ -123,12 +123,6 @@ describe("SplitProxy via Factory", () => {
             amountClaimed = accountBalanceAfter.sub(accountBalanceBefore);
           });
 
-          it("it sets depositedInWindow to 0 ETH", async () => {
-            expect(await callableProxy.depositedInWindow()).to.eq(
-              ethers.utils.parseEther("0").toString()
-            );
-          });
-
           it("it returns 1 ETH for balanceForWindow[0]", async () => {
             expect(await callableProxy.balanceForWindow(0)).to.eq(
               ethers.utils.parseEther("1").toString()
@@ -371,14 +365,14 @@ describe("SplitProxy via Factory", () => {
           });
 
           // NOTE: Gas cost is around 202330, but may vary slightly.
-          it("costs 232215 gas to deploy the proxy", async () => {
+          it("costs 222384 gas to deploy the proxy", async () => {
             const gasUsed = (await deployTx.wait()).gasUsed;
-            expect(gasUsed.toString()).to.eq("232215");
+            expect(gasUsed.toString()).to.eq("222384");
           });
 
-          it("costs 702846 gas to deploy the splitter", async () => {
+          it("costs 695064 gas to deploy the splitter", async () => {
             const gasUsed = (await splitter.deployTransaction.wait()).gasUsed;
-            expect(gasUsed.toString()).to.eq("702846");
+            expect(gasUsed.toString()).to.eq("695064");
           });
 
           describe("when there is 100 ETH in the account and a window has been incremented", () => {

@@ -27,7 +27,6 @@ interface SplitterInterface extends ethers.utils.Interface {
     "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
     "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "currentWindow()": FunctionFragment;
-    "depositedInWindow()": FunctionFragment;
     "incrementWindow()": FunctionFragment;
     "isClaimed(uint256,address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
@@ -52,10 +51,6 @@ interface SplitterInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "currentWindow",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "depositedInWindow",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -90,10 +85,6 @@ interface SplitterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "currentWindow",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "depositedInWindow",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -178,10 +169,6 @@ export class Splitter extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    depositedInWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "depositedInWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -263,10 +250,6 @@ export class Splitter extends Contract {
 
   "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
   "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -347,10 +330,6 @@ export class Splitter extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     incrementWindow(overrides?: CallOverrides): Promise<void>;
 
@@ -440,10 +419,6 @@ export class Splitter extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    depositedInWindow(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "depositedInWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     incrementWindow(overrides?: Overrides): Promise<BigNumber>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<BigNumber>;
@@ -527,12 +502,6 @@ export class Splitter extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    depositedInWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "depositedInWindow()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
 
