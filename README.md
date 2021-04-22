@@ -1,15 +1,5 @@
-# Mirror $WRITE Token
+# Splits
 
-> Mirror is the next big change in the long history of symbolic communication. Through a decentralized, user-owned, crypto-based network, Mirror’s publishing platform revolutionizes the way we express, share and monetize our thoughts.
+Allows deployment of a minimal proxy contract that specifies a Merkle root describing an allocation across a number of different addreses. Once ETH has been deposited, `incrementWindow` can be called, and members of the split can claim their allocation.
 
-
-## Summary
-
-Includes contracts pertaining to Mirror onboarding.
-
-## Contract Deployment Addresses and Verified Source Code
-
-
-* [Write Token ERC20 Contract](https://etherscan.io/address/0x622236bb180256b6ae1a935dae08dc0356141632#code)
-
-* [Mirror ENS Registrar](https://etherscan.io/address/0x0b53D523912593C18dD7C22AFd2c448BB48e1bf8#code)
+![](https://images.mirror-media.xyz/publication-images/cc7e264b-8a9a-4a2b-924a-2b38135410c3.jpeg?height=1218&width=1630)
