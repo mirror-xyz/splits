@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.3;
+pragma solidity 0.8.4;
+
+import {SplitStorage} from "./SplitStorage.sol";
 
 interface ISplitFactory {
     function splitter() external returns (address);
@@ -13,16 +15,7 @@ interface ISplitFactory {
  * @title SplitProxy
  * @author MirrorXYZ
  */
-contract SplitProxy {
-    // Inherited Storage.
-    bytes32 public merkleRoot;
-    uint256 public currentWindow;
-    address private wethAddress;
-    address private _splitter;
-    uint256[] public balanceForWindow;
-    mapping(bytes32 => bool) private claimed;
-    uint256 public depositedInWindow;
-
+contract SplitProxy is SplitStorage {
     constructor() {
         _splitter = ISplitFactory(msg.sender).splitter();
         wethAddress = ISplitFactory(msg.sender).wethAddress();

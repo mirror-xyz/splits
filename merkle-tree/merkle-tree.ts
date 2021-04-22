@@ -1,3 +1,5 @@
+// From https://github.com/Uniswap/merkle-distributor
+
 import { bufferToHex, keccak256 } from 'ethereumjs-util'
 
 export default class MerkleTree {

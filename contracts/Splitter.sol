@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.3;
+pragma solidity 0.8.4;
+
+import {SplitStorage} from "./SplitStorage.sol";
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
@@ -18,18 +20,11 @@ interface IWETH {
 /**
  * @title Splitter
  * @author MirrorXYZ
+ * 
+ * Building on the work from the Uniswap team at https://github.com/Uniswap/merkle-distributor
  */
-contract Splitter {
+contract Splitter is SplitStorage {
     uint256 public constant PERCENTAGE_SCALE = 10e5;
-
-    // Inherited Storage.
-    bytes32 public merkleRoot;
-    uint256 public currentWindow;
-    address private wethAddress;
-    address private _splitter;
-    uint256[] public balanceForWindow;
-    mapping(bytes32 => bool) private claimed;
-    uint256 public depositedInWindow;
 
     // The TransferETH event is emitted after each eth transfer in the split is attempted.
     event TransferETH(
