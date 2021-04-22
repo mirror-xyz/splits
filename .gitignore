@@ -8,3 +8,4 @@ build/
 .env
 *.DS_Store
 env*
+.vscode
