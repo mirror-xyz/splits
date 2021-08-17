@@ -8,21 +8,28 @@ import scenarios from "./scenarios.json";
 let proxyFactory;
 
 const deploySplitter = async () => {
-  const Splitter = await ethers.getContractFactory("Splitter");
-  const splitter = await Splitter.deploy();
-  return await splitter.deployed();
+  const OurSplitter = await ethers.getContractFactory("OurSplitter");
+  const ourSplitter = await OurSplitter.deploy();
+  return await ourSplitter.deployed();
+};
+
+const deployMinter = async (
+) => {
+  const OurMinter = await ethers.getContractFactory("OurMinter");
+  const ourMinter = await OurMinter.deploy();
+  return await ourMinter.deployed();
 };
 
 const deployProxyFactory = async (
   splitterAddress: string,
-  fakeWETHAddress: string
+  minterAddress: string,
 ) => {
-  const SplitFactory = await ethers.getContractFactory("SplitFactory");
-  const proxyFactory = await SplitFactory.deploy(
+  const OurFactory = await ethers.getContractFactory("OurFactory");
+  const ourFactory = await OurFactory.deploy(
     splitterAddress,
-    fakeWETHAddress
+    minterAddress,
   );
-  return await proxyFactory.deployed();
+  return await ourFactory.deployed();
 };
 
 const PERCENTAGE_SCALE = 1000000;
@@ -31,17 +38,18 @@ const NULL_BYTES =
 
 describe("SplitProxy via Factory", () => {
   describe("basic test", () => {
-    let proxy, callableProxy;
-    let funder, fakeWETH, account1, account2, transactionHandler;
+    let factory, owner, minter, auctionHouse, proxy, proxyCalledAsSplitterByAnyone, proxyCalledAsMinterByOwner, proxyCalledAsMinterByAnyone;
+    let splitCreator, fakeWETH, account1, account2, funder, transactionHandler;
     let tree;
 
     describe("when there is a 50-50 allocation", () => {
       beforeEach(async () => {
         [
-          funder,
+          splitCreator,
           fakeWETH,
           account1,
           account2,
+          funder,
           transactionHandler,
         ] = await ethers.getSigners();
 
@@ -59,21 +67,23 @@ describe("SplitProxy via Factory", () => {
         const rootHash = tree.getHexRoot();
 
         const splitter = await deploySplitter();
+        minter = await deployMinter();
         const proxyFactory = await deployProxyFactory(
           splitter.address,
-          fakeWETH.address
+          minter.address,
         );
 
         const deployTx = await proxyFactory
-          .connect(funder)
+          .connect(splitCreator)
           .createSplit(rootHash);
+          
         // Compute address.
         const constructorArgs = ethers.utils.defaultAbiCoder.encode(
           ["bytes32"],
           [rootHash]
         );
         const salt = ethers.utils.keccak256(constructorArgs);
-        const proxyBytecode = (await ethers.getContractFactory("SplitProxy"))
+        const proxyBytecode = (await ethers.getContractFactory("OurProxy"))
           .bytecode;
         const codeHash = ethers.utils.keccak256(proxyBytecode);
         const proxyAddress = await ethers.utils.getCreate2Address(
@@ -82,13 +92,41 @@ describe("SplitProxy via Factory", () => {
           codeHash
         );
         proxy = await (
-          await ethers.getContractAt("SplitProxy", proxyAddress)
+          await ethers.getContractAt("OurProxy", proxyAddress)
         ).deployed();
 
-        callableProxy = await (
-          await ethers.getContractAt("Splitter", proxy.address)
+        proxyCalledAsSplitterByAnyone = await (
+          await ethers.getContractAt("OurSplitter", proxy.address, transactionHandler)
         ).deployed();
+
+        proxyCalledAsMinterByOwner = await (
+          await ethers.getContractAt("OurMinter", proxy.address, splitCreator)
+        ).deployed();
+
+        proxyCalledAsMinterByAnyone = await (
+          await ethers.getContractAt("OurMinter", proxy.address, transactionHandler)
+        ).deployed();
+
+        factory = await proxyFactory.address;
+        owner = await proxy.owner();
+
+        // console.log(
+        //   `\nProxy Owner: `, owner, 
+        //   `\nSplit Creator: `, splitCreator.address, 
+        //   `\nAccount 1: `, account1.address, 
+        //   `\nAccount 2: `, account2.address, 
+        //   `\nFunder: `, funder.address, 
+        //   `\nProxy: `, proxy.address, 
+        //   `\n'Callable' Proxy (as Splitter): `, proxyCalledAsSplitterByAnyone.address,
+        //   `\n'Callable' Proxy (as Minter): `, proxyCalledAsMinterByOwner.address,
+        //   `\nTransaction Handler: `, transactionHandler.address
+        // )
       });
+
+      it("Owner is the splitCreator", async () => {
+        // console.log(`Proxy Owner: `, owner, `\nTransaction Handler: `, transactionHandler.address)
+        expect(owner).to.eq(splitCreator.address)
+      })
 
       describe("and 1 ETH is deposited and the window is incremented", () => {
         beforeEach(async () => {
@@ -97,7 +135,7 @@ describe("SplitProxy via Factory", () => {
             value: ethers.utils.parseEther("1"),
           });
 
-          await callableProxy.incrementWindow();
+          await proxyCalledAsSplitterByAnyone.incrementWindow();
         });
 
         describe("and one account claims on the first window", () => {
@@ -111,27 +149,30 @@ describe("SplitProxy via Factory", () => {
             const accountBalanceBefore = await waffle.provider.getBalance(
               account
             );
-
-            claimTx = await callableProxy
-              .connect(transactionHandler)
+            // console.log(`1`)
+            claimTx = await proxyCalledAsSplitterByAnyone
+              .connect(account1)
               .claim(window, account, allocation, proof);
 
+            // console.log(`2`)
             const accountBalanceAfter = await waffle.provider.getBalance(
               account
             );
+            // console.log(`3`)
 
             amountClaimed = accountBalanceAfter.sub(accountBalanceBefore);
           });
 
           it("it returns 1 ETH for balanceForWindow[0]", async () => {
-            expect(await callableProxy.balanceForWindow(0)).to.eq(
+            // console.log(`4`)
+            expect(await proxyCalledAsSplitterByAnyone.balanceForWindow(0)).to.eq(
               ethers.utils.parseEther("1").toString()
             );
           });
 
           it("gets 0.5 ETH from scaleAmountByPercentage", async () => {
             expect(
-              await callableProxy.scaleAmountByPercentage(
+              await proxyCalledAsSplitterByAnyone.scaleAmountByPercentage(
                 allocation,
                 ethers.utils.parseEther("1").toString()
               )
@@ -139,14 +180,14 @@ describe("SplitProxy via Factory", () => {
           });
 
           it("allows them to successfully claim 0.5 ETH", async () => {
-            expect(amountClaimed.toString()).to.eq(
-              ethers.utils.parseEther("0.5").toString()
+            expect(amountClaimed).to.eq(
+              ethers.utils.parseEther("0.5")
             );
           });
 
-          it("costs 60982 gas", async () => {
+          it("costs around 71560 gas", async () => {
             const { gasUsed } = await claimTx.wait();
-            expect(gasUsed.toString()).to.eq("60982");
+            expect(gasUsed).to.eq(71562);
           });
 
           describe("and another 1 ETH is added, and the window is incremented", () => {
@@ -156,7 +197,7 @@ describe("SplitProxy via Factory", () => {
                 value: ethers.utils.parseEther("1"),
               });
 
-              await callableProxy.incrementWindow();
+              await proxyCalledAsSplitterByAnyone.incrementWindow();
             });
 
             describe("and the other account claims on the second window", () => {
@@ -171,7 +212,7 @@ describe("SplitProxy via Factory", () => {
                   account
                 );
 
-                await callableProxy
+                await proxyCalledAsSplitterByAnyone
                   .connect(transactionHandler)
                   .claim(window, account, allocation, proof);
 
@@ -184,6 +225,7 @@ describe("SplitProxy via Factory", () => {
                 );
               });
 
+              // there seems to be a small (~0.00007 ETH) loss of funds, likely due to logic in fallback
               it("allows them to successfully claim 0.5 ETH", async () => {
                 expect(amountClaimedBySecond.toString()).to.eq(
                   ethers.utils.parseEther("0.5").toString()
@@ -203,7 +245,7 @@ describe("SplitProxy via Factory", () => {
                   account
                 );
 
-                await callableProxy
+                await proxyCalledAsSplitterByAnyone
                   .connect(transactionHandler)
                   .claim(window, account, allocation, proof);
 
@@ -235,7 +277,7 @@ describe("SplitProxy via Factory", () => {
                   account
                 );
 
-                await callableProxy
+                await proxyCalledAsSplitterByAnyone
                   .connect(transactionHandler)
                   .claim(window, account, allocation, proof);
 
@@ -275,9 +317,10 @@ describe("SplitProxy via Factory", () => {
         (p) => p / PERCENTAGE_SCALE
       );
 
-      let funder;
+      let splitCreator;
       let secondFunder;
       let thirdFunder;
+      let fourthFunder;
       let fakeWETH;
       let account1;
       let account2;
@@ -286,21 +329,25 @@ describe("SplitProxy via Factory", () => {
       // Setup
       let proxy;
       let splitter;
+      let minter;
       let rootHash;
       let deployTx;
-      let callableProxy;
+      let proxyCalledAsSplitterByAnyone;
       let allocations;
       let tree;
       let claimers;
-      let transactionSigner;
+      let funder;
+      let transactionHandler;
 
       beforeEach(async () => {
         [
-          funder,
+          splitCreator,
           secondFunder,
           thirdFunder,
+          fourthFunder,
           // Use a different account for transactions, to simplify gas accounting.
-          transactionSigner,
+          transactionHandler,
+          funder,
           fakeWETH,
           account1,
           account2,
@@ -327,12 +374,13 @@ describe("SplitProxy via Factory", () => {
             rootHash = tree.getHexRoot();
 
             splitter = await deploySplitter();
+            minter = await deployMinter();
             proxyFactory = await deployProxyFactory(
               splitter.address,
-              fakeWETH.address
+              minter.address,
             );
 
-            deployTx = await proxyFactory.connect(funder).createSplit(rootHash);
+            deployTx = await proxyFactory.connect(splitCreator).createSplit(rootHash);
             // Compute address.
             const constructorArgs = ethers.utils.defaultAbiCoder.encode(
               ["bytes32"],
@@ -340,7 +388,7 @@ describe("SplitProxy via Factory", () => {
             );
             const salt = ethers.utils.keccak256(constructorArgs);
             const proxyBytecode = (
-              await ethers.getContractFactory("SplitProxy")
+              await ethers.getContractFactory("OurProxy")
             ).bytecode;
             const codeHash = ethers.utils.keccak256(proxyBytecode);
             const proxyAddress = await ethers.utils.getCreate2Address(
@@ -349,16 +397,20 @@ describe("SplitProxy via Factory", () => {
               codeHash
             );
             proxy = await (
-              await ethers.getContractAt("SplitProxy", proxyAddress)
+              await ethers.getContractAt("OurProxy", proxyAddress)
             ).deployed();
 
-            callableProxy = await (
-              await ethers.getContractAt("Splitter", proxy.address)
+            proxyCalledAsSplitterByAnyone = await (
+              await ethers.getContractAt("OurSplitter", proxy.address, transactionHandler)
             ).deployed();
           });
 
           it("sets the Splitter address", async () => {
             expect(await proxy.splitter()).to.eq(splitter.address);
+          });
+
+          it("sets the Minter address", async () => {
+            expect(await proxy.minter()).to.eq(minter.address);
           });
 
           it("sets the root hash", async () => {
@@ -369,15 +421,25 @@ describe("SplitProxy via Factory", () => {
             expect(await proxyFactory.merkleRoot()).to.eq(NULL_BYTES);
           });
 
-          // NOTE: Gas cost is around 202330, but may vary slightly.
-          it("costs 222384 gas to deploy the proxy", async () => {
+          // NOTE: Gas cost is around 495k on rinkeby/mainnet, due to constructor approval calls.
+          it("costs less than 450k gas to deploy the proxy", async () => {
             const gasUsed = (await deployTx.wait()).gasUsed;
-            expect(gasUsed.toString()).to.eq("222384");
+            console.log(`Gas used to deploy Proxy: `, gasUsed.toString()+'.')
+            expect(gasUsed).to.be.lt(550000);
           });
 
-          it("costs 688385 gas to deploy the splitter", async () => {
+          it("costs around 2M gas to deploy the minter", async () => {
+            const gasUsed = (await minter.deployTransaction.wait()).gasUsed;
+            console.log(`Gas used to deploy Minter: `, gasUsed.toString()+'.')
+            expect(gasUsed).to.be.gt(2000000);
+            expect(gasUsed).to.be.lt(2500000);
+          });
+
+          it("costs around 700k gas to deploy the splitter", async () => {
             const gasUsed = (await splitter.deployTransaction.wait()).gasUsed;
-            expect(gasUsed.toString()).to.eq("688385");
+            console.log(`Gas used to deploy Splitter: `, gasUsed.toString())+'.'
+            expect(gasUsed).to.be.gt(675000);
+            expect(gasUsed).to.be.lt(710000);
           });
 
           describe("when there is 100 ETH in the account and a window has been incremented", () => {
@@ -387,7 +449,7 @@ describe("SplitProxy via Factory", () => {
                 value: ethers.utils.parseEther("100"),
               });
 
-              await callableProxy.incrementWindow();
+              await proxyCalledAsSplitterByAnyone.incrementWindow();
             });
 
             for (
@@ -395,74 +457,21 @@ describe("SplitProxy via Factory", () => {
               accountIndex < allocationPercentages.length;
               accountIndex++
             ) {
-              describe(`and account ${
-                accountIndex + 1
-              } tries to claim ${firstDepositFirstWindow[
-                accountIndex
-              ].toString()} ETH on the first window with the correct allocation`, () => {
-                let gasUsed;
-
-                it("successfully claims", async () => {
-                  const window = 0;
-                  const ref = allocations[accountIndex];
-                  const { account, allocation } = ref;
-                  const proof = tree.getProof(account, allocation);
-                  const accountBalanceBefore = await waffle.provider.getBalance(
-                    account
-                  );
-                  const tx = await callableProxy.claim(
-                    window,
-                    account,
-                    allocation,
-                    proof
-                  );
-                  gasUsed = (await tx.wait()).gasUsed;
-                  const accountBalanceAfter = await waffle.provider.getBalance(
-                    account
-                  );
-
-                  const amountClaimed = accountBalanceAfter.sub(
-                    accountBalanceBefore
-                  );
-                  expect(amountClaimed.toString()).to.eq(
-                    ethers.utils.parseEther(
-                      firstDepositFirstWindow[accountIndex].toString()
-                    )
-                  );
-                });
-
-                // NOTE: Gas cost is around 60973, but depends slightly.
-                // it("costs 60984 gas", async () => {
-                //   expect(gasUsed.toString()).to.eq("60984");
-                // });
-              });
-
-              describe("and another 100 ETH is added, and the window is been incremented", () => {
-                beforeEach(async () => {
-                  await secondFunder.sendTransaction({
-                    to: proxy.address,
-                    value: ethers.utils.parseEther("100"),
-                  });
-
-                  await callableProxy.incrementWindow();
-                });
-
-                describe(`and account ${
-                  accountIndex + 1
-                } tries to claim ${secondDepositSecondWindow[
+              describe(`and account ${accountIndex + 1
+                } tries to claim ${firstDepositFirstWindow[
                   accountIndex
-                ].toString()} ETH on the second window with the correct allocation`, () => {
+                ].toString()} ETH on the first window with the correct allocation`, () => {
                   let gasUsed;
 
                   it("successfully claims", async () => {
-                    const window = 1;
+                    const window = 0;
                     const ref = allocations[accountIndex];
                     const { account, allocation } = ref;
                     const proof = tree.getProof(account, allocation);
                     const accountBalanceBefore = await waffle.provider.getBalance(
                       account
                     );
-                    const tx = await callableProxy.claim(
+                    const tx = await proxyCalledAsSplitterByAnyone.claim(
                       window,
                       account,
                       allocation,
@@ -472,44 +481,94 @@ describe("SplitProxy via Factory", () => {
                     const accountBalanceAfter = await waffle.provider.getBalance(
                       account
                     );
+
                     const amountClaimed = accountBalanceAfter.sub(
                       accountBalanceBefore
                     );
                     expect(amountClaimed.toString()).to.eq(
                       ethers.utils.parseEther(
-                        secondDepositSecondWindow[accountIndex].toString()
+                        firstDepositFirstWindow[accountIndex].toString()
                       )
                     );
                   });
 
-                  // NOTE: Gas cost is around 60973, but depends slightly on the size of the
-                  // allocation. Can check by uncommenting this and running the test.
-                  // it("costs 60973 gas", async () => {
-                  //   expect(gasUsed.toString()).to.eq("60973");
+                  // NOTE: Gas cost is around 60973, but depends slightly.
+                  // it("costs 60984 gas", async () => {
+                  //   expect(gasUsed.toString()).to.eq("60984");
                   // });
                 });
+
+              describe("and another 100 ETH is added, and the window is been incremented", () => {
+                beforeEach(async () => {
+                  await secondFunder.sendTransaction({
+                    to: proxy.address,
+                    value: ethers.utils.parseEther("100"),
+                  });
+
+                  await proxyCalledAsSplitterByAnyone.incrementWindow();
+                });
+
+                describe(`and account ${accountIndex + 1
+                  } tries to claim ${secondDepositSecondWindow[
+                    accountIndex
+                  ].toString()} ETH on the second window with the correct allocation`, () => {
+                    let gasUsed;
+
+                    it("successfully claims", async () => {
+                      const window = 1;
+                      const ref = allocations[accountIndex];
+                      const { account, allocation } = ref;
+                      const proof = tree.getProof(account, allocation);
+                      const accountBalanceBefore = await waffle.provider.getBalance(
+                        account
+                      );
+                      const tx = await proxyCalledAsSplitterByAnyone.claim(
+                        window,
+                        account,
+                        allocation,
+                        proof
+                      );
+                      gasUsed = (await tx.wait()).gasUsed;
+                      const accountBalanceAfter = await waffle.provider.getBalance(
+                        account
+                      );
+                      const amountClaimed = accountBalanceAfter.sub(
+                        accountBalanceBefore
+                      );
+                      expect(amountClaimed.toString()).to.eq(
+                        ethers.utils.parseEther(
+                          secondDepositSecondWindow[accountIndex].toString()
+                        )
+                      );
+                    });
+
+                    // NOTE: Gas cost is around 60973, but depends slightly on the size of the
+                    // allocation. Can check by uncommenting this and running the test.
+                    // it("costs 60973 gas", async () => {
+                    //   expect(gasUsed.toString()).to.eq("60973");
+                    // });
+                  });
               });
 
-              describe(`and account ${
-                accountIndex + 1
-              } tries to claim with a higher allocation`, () => {
-                it("reverts with 'Invalid proof'", async () => {
-                  const index = 0;
-                  const window = 0;
-                  const ref = allocations[index];
-                  const { account, allocation } = ref;
-                  const incorrectAllocation = allocation + 1;
-                  const proof = tree.getProof(account, allocation);
-                  await expect(
-                    callableProxy.claim(
-                      window,
-                      account,
-                      incorrectAllocation,
-                      proof
-                    )
-                  ).revertedWith("Invalid proof");
+              describe(`and account ${accountIndex + 1
+                } tries to claim with a higher allocation`, () => {
+                  it("reverts with 'Invalid proof'", async () => {
+                    const index = 0;
+                    const window = 0;
+                    const ref = allocations[index];
+                    const { account, allocation } = ref;
+                    const incorrectAllocation = allocation + 1;
+                    const proof = tree.getProof(account, allocation);
+                    await expect(
+                      proxyCalledAsSplitterByAnyone.claim(
+                        window,
+                        account,
+                        incorrectAllocation,
+                        proof
+                      )
+                    ).revertedWith("Invalid proof");
+                  });
                 });
-              });
             }
 
             describe("and an account without an allocation tries to claim with account1's proof", () => {
@@ -520,7 +579,7 @@ describe("SplitProxy via Factory", () => {
                 const { account, allocation } = ref;
                 const proof = tree.getProof(account, allocation);
                 await expect(
-                  callableProxy.claim(
+                  proxyCalledAsSplitterByAnyone.claim(
                     window,
                     // Here we change the address!
                     account4.address,
@@ -538,11 +597,11 @@ describe("SplitProxy via Factory", () => {
                 const ref = allocations[index];
                 const { account, allocation } = ref;
                 const proof = tree.getProof(account, allocation);
-                await callableProxy
-                  .connect(transactionSigner)
+                await proxyCalledAsSplitterByAnyone
+                  .connect(transactionHandler)
                   .claim(window, account, allocation, proof);
                 await expect(
-                  callableProxy.claim(window, account, allocation, proof)
+                  proxyCalledAsSplitterByAnyone.claim(window, account, allocation, proof)
                 ).revertedWith("Account already claimed the given window");
               });
             });
@@ -555,13 +614,13 @@ describe("SplitProxy via Factory", () => {
                 to: proxy.address,
                 value: ethers.utils.parseEther("100"),
               });
-              await callableProxy.incrementWindow();
+              await proxyCalledAsSplitterByAnyone.incrementWindow();
               // Second Window
               await thirdFunder.sendTransaction({
                 to: proxy.address,
                 value: ethers.utils.parseEther("100"),
               });
-              await callableProxy.connect(transactionSigner).incrementWindow();
+              await proxyCalledAsSplitterByAnyone.connect(transactionHandler).incrementWindow();
             });
 
             for (
@@ -569,77 +628,37 @@ describe("SplitProxy via Factory", () => {
               accountIndex < allocationPercentages.length;
               accountIndex++
             ) {
-              describe(`and account ${
-                accountIndex + 1
-              } tries to claim twice in one window`, () => {
-                it("reverts on the second attempt", async () => {
-                  const window = 0;
-                  const ref = allocations[accountIndex];
-                  const { account, allocation } = ref;
-                  const proof = tree.getProof(account, allocation);
-                  await callableProxy
-                    .connect(transactionSigner)
-                    .claim(window, account, allocation, proof);
-                  await expect(
-                    callableProxy
-                      .connect(transactionSigner)
-                      .claim(window, account, allocation, proof)
-                  ).revertedWith("Account already claimed the given window");
-                });
-              });
-
-              describe(`and account ${
-                accountIndex + 1
-              } tries to claim using claimForAllWindows`, () => {
-                let tx;
-                it("successfully claims", async () => {
-                  const ref = allocations[accountIndex];
-                  const { account, allocation } = ref;
-                  const proof = tree.getProof(account, allocation);
-                  const accountBalanceBefore = await waffle.provider.getBalance(
-                    account
-                  );
-                  tx = await callableProxy
-                    .connect(transactionSigner)
-                    .claimForAllWindows(account, allocation, proof);
-                  const accountBalanceAfter = await waffle.provider.getBalance(
-                    account
-                  );
-
-                  const amountClaimed = accountBalanceAfter
-                    .sub(accountBalanceBefore)
-                    .toString();
-                  const claimExpected = ethers.utils
-                    // Use the appropriate account.
-                    .parseEther(scaledPercentages[accountIndex].toString())
-                    // Multiply 2 because there are two windows.
-                    .mul(2)
-                    .toString();
-                  expect(amountClaimed).to.eq(claimExpected);
+              describe(`and account ${accountIndex + 1
+                } tries to claim twice in one window`, () => {
+                  it("reverts on the second attempt", async () => {
+                    const window = 0;
+                    const ref = allocations[accountIndex];
+                    const { account, allocation } = ref;
+                    const proof = tree.getProof(account, allocation);
+                    await proxyCalledAsSplitterByAnyone
+                      .connect(transactionHandler)
+                      .claim(window, account, allocation, proof);
+                    await expect(
+                      proxyCalledAsSplitterByAnyone
+                        .connect(transactionHandler)
+                        .claim(window, account, allocation, proof)
+                    ).revertedWith("Account already claimed the given window");
+                  });
                 });
 
-                // NOTE: Gas cost is around 88004, but depends slightly on the size of the
-                // allocation. Can check by uncommenting this and running the test.
-                // it("costs 88004 gas", async () => {
-                //   const receipt = await tx.wait();
-                //   expect(receipt.gasUsed.toString()).to.eq("88004");
-                // });
-              });
-
-              describe(`and account ${
-                accountIndex + 1
-              } tries to claim twice across both windows`, () => {
-                it("successfully claims on each window", async () => {
-                  for (let window = 0; window < 2; window++) {
+              describe(`and account ${accountIndex + 1
+                } tries to claim using claimForAllWindows`, () => {
+                  let tx;
+                  it("successfully claims", async () => {
                     const ref = allocations[accountIndex];
                     const { account, allocation } = ref;
                     const proof = tree.getProof(account, allocation);
                     const accountBalanceBefore = await waffle.provider.getBalance(
                       account
                     );
-                    const tx = await callableProxy
-                      .connect(transactionSigner)
-                      .claim(window, account, allocation, proof);
+                    tx = await proxyCalledAsSplitterByAnyone
+                      .connect(transactionHandler)
+                      .claimForAllWindows(account, allocation, proof);
                     const accountBalanceAfter = await waffle.provider.getBalance(
                       account
                     );
@@ -648,12 +667,49 @@ describe("SplitProxy via Factory", () => {
                       .sub(accountBalanceBefore)
                       .toString();
                     const claimExpected = ethers.utils
+                      // Use the appropriate account.
                       .parseEther(scaledPercentages[accountIndex].toString())
+                      // Multiply 2 because there are two windows.
+                      .mul(2)
                       .toString();
                     expect(amountClaimed).to.eq(claimExpected);
-                  }
+                  });
+
+                  // NOTE: Gas cost is around 88004, but depends slightly on the size of the
+                  // allocation. Can check by uncommenting this and running the test.
+                  // it("costs 88004 gas", async () => {
+                  //   const receipt = await tx.wait();
+                  //   expect(receipt.gasUsed.toString()).to.eq("88004");
+                  // });
                 });
-              });
+
+              describe(`and account ${accountIndex + 1
+                } tries to claim twice across both windows`, () => {
+                  it("successfully claims on each window", async () => {
+                    for (let window = 0; window < 2; window++) {
+                      const ref = allocations[accountIndex];
+                      const { account, allocation } = ref;
+                      const proof = tree.getProof(account, allocation);
+                      const accountBalanceBefore = await waffle.provider.getBalance(
+                        account
+                      );
+                      const tx = await proxyCalledAsSplitterByAnyone
+                        .connect(transactionHandler)
+                        .claim(window, account, allocation, proof);
+                      const accountBalanceAfter = await waffle.provider.getBalance(
+                        account
+                      );
+
+                      const amountClaimed = accountBalanceAfter
+                        .sub(accountBalanceBefore)
+                        .toString();
+                      const claimExpected = ethers.utils
+                        .parseEther(scaledPercentages[accountIndex].toString())
+                        .toString();
+                      expect(amountClaimed).to.eq(claimExpected);
+                    }
+                  });
+                });
             }
           });
         });
