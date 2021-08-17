@@ -9,13 +9,26 @@ const { alchemyAPIKey, deployerPrivateKey } = require('./env.json');
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   solidity: {
-    version: '0.8.4',
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 2000
+    compilers: [
+      {
+        version: '0.8.4',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 2000
+          }
+        }
+      },
+      {
+        version: "0.6.8",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 2000
+          }
+        }
       }
-    }
+    ]
   },
   typechain: {
     outDir: 'ts-types/contracts',
