@@ -1,6 +1,8 @@
 {
   "Contracts": {
-    "Splitter": "0xFBd6213A899f3B0e1EEc969fF1263c8fA31858B8",
-    "SplitFactory": "0xe915c0F129F940846c660c9E6F3f824294dC9a2d"
+    "OurSplitter": "0x390BEC6364F97d3fef4C51A1526eaA62c8fBE3fE",
+    "OurMinter": "0x25Eb0C14142391DF138891F611C1E611b7B071BD",
+    "OurFactory": "0x2085e655Fe586b02250019Db51D5E858e463Dc2C",
+    "OurProxyExample": "0xe00b2f4b684888cf5dd5af2d84213f14e4550a60"
   }
 }
