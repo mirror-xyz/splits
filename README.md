@@ -59,3 +59,5 @@ https://dashboard.tenderly.co/tx/rinkeby/0x385d3231135799c4be7364ef50eb4e08dd610
   - 0.5 eth test fails but larger denominations do not
 - gas cost for creation of the OurProxy is around 2.5x the cost of the original SplitProxy.
   - this can be reduced further if you remove the setApproval calls in constructor, or some of the access
+
+# Critiques, ideas, and any other feedback are greatly appreciated. Open an issue, or email me: nickadamson@pm.me
