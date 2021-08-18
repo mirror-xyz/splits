@@ -30,6 +30,8 @@ Or whatever else you can think of, it just needs to be implemented in OurMinter.
 
 https://www.ourz.network/nft/3689
 
+& another: https://www.ourz.network/nft/3699
+
 ### The transaction that created the Split
 
 https://rinkeby.etherscan.io/tx/0x71115ed05464a126d992fe51f4c55c93c410269317b2752161e11b2e29303ef8

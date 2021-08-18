@@ -1,5 +1,5 @@
 {
-  "ETHERSCAN_API": "/([A-Z0-9]){34}/",
-  "alchemyAPIkey": "https://eth-rinkeby.alchemyapi.io/v2/abc123",
-  "deployerPrivateKey": "/([\\D]){64}/"
+  "ETHERSCAN_API": "",
+  "alchemyAPIkey": "https://eth-rinkeby.alchemyapi.io/v2/",
+  "deployerPrivateKey": ""
 }
