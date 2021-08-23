@@ -11,7 +11,7 @@ import { OurProxy } from "./OurProxy.sol";
  */
 contract OurFactory {
   //======== Events =========
-  event ProxyCreation(address ourProxy);
+  event ProxyCreated(address ourProxy, address proxyManager);
 
   //======== Immutable storage =========
   address public immutable splitter;
@@ -32,6 +32,6 @@ contract OurFactory {
     merkleRoot = merkleRoot_;
     ourProxy = address(new OurProxy{ salt: keccak256(abi.encode(merkleRoot_)) }());
     delete merkleRoot;
-    emit ProxyCreation(ourProxy);
+    emit ProxyCreated(ourProxy, msg.sender);
   }
 }

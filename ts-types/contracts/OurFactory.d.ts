@@ -48,10 +48,10 @@ interface OurFactoryInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "splitter", data: BytesLike): Result;
 
   events: {
-    "ProxyCreation(address)": EventFragment;
+    "ProxyCreated(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "ProxyCreation"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ProxyCreated"): EventFragment;
 }
 
 export class OurFactory extends Contract {
@@ -138,7 +138,7 @@ export class OurFactory extends Contract {
   };
 
   filters: {
-    ProxyCreation(ourProxy: null): EventFilter;
+    ProxyCreated(ourProxy: null, proxyManager: null): EventFilter;
   };
 
   estimateGas: {
