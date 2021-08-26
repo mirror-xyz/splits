@@ -10,8 +10,8 @@ import { OurProxy } from "./OurProxy.sol";
  * @notice Modified: store OurMinter.sol address, add events, remove WETHaddress in favor of constant
  */
 contract OurFactory {
-  //======== Events =========
-  event ProxyCreated(address ourProxy, address proxyManager);
+  //======== Graph Protocol =========
+  event ProxyCreated(address ourProxy, address proxyManager, string splitRecipients);
 
   //======== Immutable storage =========
   address public immutable splitter;
@@ -19,6 +19,7 @@ contract OurFactory {
 
   //======== Mutable storage =========
   /// @dev Gets set within the block, and then deleted.
+  address public splitOwner;
   bytes32 public merkleRoot;
 
   //======== Constructor =========
@@ -28,10 +29,15 @@ contract OurFactory {
   }
 
   //======== Deploy function =========
-  function createSplit(bytes32 merkleRoot_) external returns (address ourProxy) {
+  function createSplit(bytes32 merkleRoot_, string memory splitRecipients_)
+    external
+    returns (address ourProxy)
+  {
+    splitOwner = msg.sender;
     merkleRoot = merkleRoot_;
     ourProxy = address(new OurProxy{ salt: keccak256(abi.encode(merkleRoot_)) }());
     delete merkleRoot;
-    emit ProxyCreated(ourProxy, msg.sender);
+    delete splitOwner;
+    emit ProxyCreated(ourProxy, msg.sender, splitRecipients_);
   }
 }

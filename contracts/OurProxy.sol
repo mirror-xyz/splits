@@ -6,9 +6,8 @@ import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Rec
 
 interface IOurFactory {
   function splitter() external returns (address);
-
   function minter() external returns (address);
-
+  function splitOwner() external returns (address);
   function merkleRoot() external returns (bytes32);
 }
 
@@ -25,13 +24,11 @@ contract OurProxy is OurStorage, IERC721Receiver {
   constructor() {
     _splitter = IOurFactory(msg.sender).splitter();
     _minter = IOurFactory(msg.sender).minter();
-    merkleRoot = IOurFactory(msg.sender).merkleRoot();
 
-    /**
-     * @dev Using tx.origin instead of OurFactory to set owner saves gas and is safe in this context
-     * NOTE: Modification of OpenZeppelin Ownable.sol
-     */
-    _setOwner(tx.origin);
+    /// @notice tx.origin should not be used in the constructor as the deploy transaction can be front-run.
+    _owner = IOurFactory(msg.sender).splitOwner();
+
+    merkleRoot = IOurFactory(msg.sender).merkleRoot();
 
     address(_minter).delegatecall(
       abi.encodeWithSignature("setApprovalsForSplit(address)", owner())
