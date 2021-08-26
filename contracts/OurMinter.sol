@@ -31,12 +31,10 @@ contract OurMinter is OurStorage {
   address public constant _zoraMarket = 0x85e946e1Bd35EC91044Dc83A5DdAB2B6A262ffA6;
   address public constant _zoraAuctionHouse = 0xE7dd1252f50B3d845590Da0c5eADd985049a03ce;
   address public constant _mirrorAH = 0x2D5c022fd4F81323bbD1Cc0Ec6959EC8CC1C5A11;
-  address public constant _mirrorCrowdfundFactory =
-    0xeac226B370D77f436b5780b4DD4A49E59e8bEA37;
+  address public constant _mirrorCrowdfundFactory = 0xeac226B370D77f436b5780b4DD4A49E59e8bEA37;
   address public constant _mirrorEditions = 0xa8b8F7cC0C64c178ddCD904122844CBad0021647;
   address public constant _partyBidFactory = 0xB725682D5AdadF8dfD657f8e7728744C0835ECd9;
 
-  event NFTReceived(address proxyAddress, uint256 tokenId);
 
   /**======== IZora =========
    * @notice Various functions allowing a Split to interact with Zora Protocol
