@@ -43,6 +43,7 @@ https://rinkeby.etherscan.io/tx/0x385d3231135799c4be7364ef50eb4e08dd610e4df9e77a
 https://dashboard.tenderly.co/tx/rinkeby/0x385d3231135799c4be7364ef50eb4e08dd610e4df9e77a8e8d3b07f7a9e63382
 
 <br/>
+Subgraph: https://thegraph.com/legacy-explorer/subgraph/nickadamson/ourzrinkebyv1?query=Example%20query
 
 ## Changes:
 
