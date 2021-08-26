@@ -544,11 +544,7 @@ interface OurMinterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
 
-  events: {
-    "NFTReceived(address,uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "NFTReceived"): EventFragment;
+  events: {};
 }
 
 export class OurMinter extends Contract {
@@ -2524,9 +2520,7 @@ export class OurMinter extends Contract {
     ): Promise<void>;
   };
 
-  filters: {
-    NFTReceived(proxyAddress: null, tokenId: null): EventFilter;
-  };
+  filters: {};
 
   estimateGas: {
     _mirrorAH(overrides?: CallOverrides): Promise<BigNumber>;

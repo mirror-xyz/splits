@@ -45,6 +45,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "splitOwner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "splitter",
     outputs: [
       {
