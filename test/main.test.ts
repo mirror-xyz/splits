@@ -75,8 +75,8 @@ describe("SplitProxy via Factory", () => {
 
         const deployTx = await proxyFactory
           .connect(splitCreator)
-          .createSplit(rootHash);
-          
+          .createSplit(rootHash, JSON.stringify(allocations));
+
         // Compute address.
         const constructorArgs = ethers.utils.defaultAbiCoder.encode(
           ["bytes32"],
@@ -380,7 +380,7 @@ describe("SplitProxy via Factory", () => {
               minter.address,
             );
 
-            deployTx = await proxyFactory.connect(splitCreator).createSplit(rootHash);
+            deployTx = await proxyFactory.connect(splitCreator).createSplit(rootHash, JSON.stringify(allocations));
             // Compute address.
             const constructorArgs = ethers.utils.defaultAbiCoder.encode(
               ["bytes32"],
@@ -424,20 +424,20 @@ describe("SplitProxy via Factory", () => {
           // NOTE: Gas cost is around 495k on rinkeby/mainnet, due to constructor approval calls.
           it("costs less than 450k gas to deploy the proxy", async () => {
             const gasUsed = (await deployTx.wait()).gasUsed;
-            console.log(`Gas used to deploy Proxy: `, gasUsed.toString()+'.')
+            console.log(`Gas used to deploy Proxy: `, gasUsed.toString() + '.')
             expect(gasUsed).to.be.lt(550000);
           });
 
           it("costs around 2M gas to deploy the minter", async () => {
             const gasUsed = (await minter.deployTransaction.wait()).gasUsed;
-            console.log(`Gas used to deploy Minter: `, gasUsed.toString()+'.')
+            console.log(`Gas used to deploy Minter: `, gasUsed.toString() + '.')
             expect(gasUsed).to.be.gt(2000000);
             expect(gasUsed).to.be.lt(2500000);
           });
 
           it("costs around 700k gas to deploy the splitter", async () => {
             const gasUsed = (await splitter.deployTransaction.wait()).gasUsed;
-            console.log(`Gas used to deploy Splitter: `, gasUsed.toString())+'.'
+            console.log(`Gas used to deploy Splitter: `, gasUsed.toString()) + '.'
             expect(gasUsed).to.be.gt(675000);
             expect(gasUsed).to.be.lt(710000);
           });
