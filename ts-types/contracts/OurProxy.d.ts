@@ -97,9 +97,13 @@ interface OurProxyInterface extends ethers.utils.Interface {
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
+    "ethReceived(address,address,uint256)": EventFragment;
+    "tokenReceived(address,address,uint256,bytes)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ethReceived"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "tokenReceived"): EventFragment;
 }
 
 export class OurProxy extends Contract {
@@ -139,18 +143,18 @@ export class OurProxy extends Contract {
     "minter()"(overrides?: CallOverrides): Promise<[string]>;
 
     onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      data_: BytesLike,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
     "onERC721Received(address,address,uint256,bytes)"(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      data_: BytesLike,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -204,18 +208,18 @@ export class OurProxy extends Contract {
   "minter()"(overrides?: CallOverrides): Promise<string>;
 
   onERC721Received(
-    arg0: string,
-    arg1: string,
-    arg2: BigNumberish,
-    arg3: BytesLike,
+    operator_: string,
+    from_: string,
+    tokenId_: BigNumberish,
+    data_: BytesLike,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   "onERC721Received(address,address,uint256,bytes)"(
-    arg0: string,
-    arg1: string,
-    arg2: BigNumberish,
-    arg3: BytesLike,
+    operator_: string,
+    from_: string,
+    tokenId_: BigNumberish,
+    data_: BytesLike,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -269,18 +273,18 @@ export class OurProxy extends Contract {
     "minter()"(overrides?: CallOverrides): Promise<string>;
 
     onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      data_: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
 
     "onERC721Received(address,address,uint256,bytes)"(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      data_: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -316,6 +320,15 @@ export class OurProxy extends Contract {
       oldOwner: string | null,
       newOwner: string | null
     ): EventFilter;
+
+    ethReceived(origin: null, sender: null, value: null): EventFilter;
+
+    tokenReceived(
+      operator: null,
+      from: null,
+      tokenId: null,
+      data: null
+    ): EventFilter;
   };
 
   estimateGas: {
@@ -342,18 +355,18 @@ export class OurProxy extends Contract {
     "minter()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      data_: BytesLike,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
     "onERC721Received(address,address,uint256,bytes)"(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      data_: BytesLike,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -408,18 +421,18 @@ export class OurProxy extends Contract {
     "minter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      data_: BytesLike,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     "onERC721Received(address,address,uint256,bytes)"(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      data_: BytesLike,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

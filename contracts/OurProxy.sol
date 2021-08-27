@@ -70,16 +70,19 @@ contract OurProxy is OurStorage, IERC721Receiver {
   }
 
   //======== IERC721Receiver =========
+  event tokenReceived(address operator, address from, uint256 tokenId, bytes data);
+
   /**
    * @notice OpenZeppelin IERC721Receiver.sol
    * @dev Allows contract to receive ERC-721s
    */
   function onERC721Received(
-    address,
-    address,
-    uint256,
-    bytes calldata
+    address operator_,
+    address from_,
+    uint256 tokenId_,
+    bytes calldata data_
   ) external override returns (bytes4) {
+    emit tokenReceived(operator_, from_, tokenId_, data_);
     return this.onERC721Received.selector;
   }
 
@@ -134,7 +137,9 @@ contract OurProxy is OurStorage, IERC721Receiver {
   }
 
   // Plain ETH transfers.
+  event ethReceived(address origin, address sender, uint value);
   receive() external payable {
+    emit ethReceived(tx.origin, msg.sender, msg.value);
     depositedInWindow += msg.value;
   }
 }
