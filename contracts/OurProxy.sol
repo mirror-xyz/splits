@@ -2,7 +2,6 @@
 pragma solidity 0.8.4;
 
 import { OurStorage } from "./OurStorage.sol";
-import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 interface IOurFactory {
   function splitter() external returns (address);
@@ -15,9 +14,9 @@ interface IOurFactory {
  * @title OurProxy (originally SplitProxy)
  * @author MirrorXYZ https://github.com/mirror-xyz/splits - modified by Nick Adamson for Ourz
  *
- * @notice Modified: added OpenZeppelin's Ownable (modified) & IERC721Receiver (inherited)
+ * @notice Modified: added OpenZeppelin's Ownable (modified)
  */
-contract OurProxy is OurStorage, IERC721Receiver {
+contract OurProxy is OurStorage {
   /// OZ Ownable.sol
   address private _owner;
 
@@ -67,23 +66,6 @@ contract OurProxy is OurStorage, IERC721Receiver {
   /// @dev Returns the address of the current owner.
   function owner() public view returns (address) {
     return _owner;
-  }
-
-  //======== IERC721Receiver =========
-  event TokenReceived(address operator, address from, uint256 tokenId, bytes data);
-
-  /**
-   * @notice OpenZeppelin IERC721Receiver.sol
-   * @dev Allows contract to receive ERC-721s
-   */
-  function onERC721Received(
-    address operator_,
-    address from_,
-    uint256 tokenId_,
-    bytes calldata data_
-  ) external override returns (bytes4) {
-    emit TokenReceived(operator_, from_, tokenId_, data_);
-    return this.onERC721Received.selector;
   }
 
   //======== /OZ =========
