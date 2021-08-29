@@ -11,7 +11,7 @@ import { OurProxy } from "./OurProxy.sol";
  */
 contract OurFactory {
   //======== Graph Protocol =========
-  event ProxyCreated(address ourProxy, address proxyManager, string splitRecipients);
+  event ProxyCreated(address ourProxy, address proxyOwner, string splitRecipients);
 
   //======== Immutable storage =========
   address public immutable splitter;

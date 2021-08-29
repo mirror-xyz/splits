@@ -137,9 +137,9 @@ contract OurProxy is OurStorage, IERC721Receiver {
   }
 
   // Plain ETH transfers.
-  event ETHReceived(address origin, address sender, uint value);
+  event ETHReceived(uint256 value);
   receive() external payable {
-    emit ETHReceived(tx.origin, msg.sender, msg.value);
+    emit ETHReceived(msg.value);
     depositedInWindow += msg.value;
   }
 }
