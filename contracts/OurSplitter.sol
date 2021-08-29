@@ -37,6 +37,31 @@ contract OurSplitter is OurStorage {
   // Emits when a window is incremented.
   event WindowIncremented(uint256 currentWindow, uint256 fundsAvailable);
 
+  function incrementWindowThenClaimForAll(
+    address account,
+    uint256 percentageAllocation,
+    bytes32[] calldata merkleProof
+  ) external {
+    // Make sure that the user has this allocation granted.
+    require(
+      verifyProof(merkleProof, merkleRoot, getNode(account, percentageAllocation)),
+      "Invalid proof"
+    );
+
+    incrementWindow();
+
+    uint256 amount = 0;
+    for (uint256 i = 0; i < currentWindow; i++) {
+      if (!isClaimed(i, account)) {
+        setClaimed(i, account);
+
+        amount += scaleAmountByPercentage(balanceForWindow[i], percentageAllocation);
+      }
+    }
+
+    transferETHOrWETH(account, amount);
+  }
+
   function claimForAllWindows(
     address account,
     uint256 percentageAllocation,
