@@ -18,24 +18,37 @@ interface IOurFactory {
 contract OurProxy is OurStorage {
   constructor() {
     _pylon = IOurFactory(msg.sender).pylon();
-    _splitter = IOurFactory(msg.sender).splitter();
-    _minter = IOurFactory(msg.sender).minter();
-
     merkleRoot = IOurFactory(msg.sender).merkleRoot();
-
-    address(_minter).delegatecall(
-      abi.encodeWithSignature("setApprovalsForSplit(address)", owner())
-    );
   }
 
-  function minter() public view returns (address) {
-    return _minter;
-  }
-
-  function splitter() public view returns (address) {
-    return _splitter;
-  }
-
+  event ETHReceived(address indexed sender, uint256 value);
   
+  function pylon() public view returns (address) {
+    return _pylon;
+  }
 
+  fallback() external payable {
+    address _impl = pylon();
+    assembly {
+      let ptr := mload(0x40)
+      calldatacopy(ptr, 0, calldatasize())
+      let result := delegatecall(gas(), _impl, ptr, calldatasize(), 0, 0)
+      let size := returndatasize()
+      returndatacopy(ptr, 0, size)
+
+      switch result
+      case 0 {
+        revert(ptr, size)
+      }
+      default {
+        return(ptr, size)
+      }
+    }
+  }
+  
+  // Plain ETH transfers.
+  receive() external payable {
+    emit ETHReceived(msg.sender, msg.value);
+    depositedInWindow += msg.value;
+  }
 }

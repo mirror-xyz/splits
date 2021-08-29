@@ -14,30 +14,33 @@ contract OurFactory {
   event ProxyCreated(address ourProxy, address proxyOwner, string splitRecipients);
 
   //======== Immutable storage =========
-  address public immutable splitter;
-  address public immutable minter;
+  address public immutable pylon;
 
   //======== Mutable storage =========
   /// @dev Gets set within the block, and then deleted.
-  address public splitOwner;
   bytes32 public merkleRoot;
 
   //======== Constructor =========
-  constructor(address splitter_, address minter_) {
-    splitter = splitter_;
-    minter = minter_;
+  constructor(address pylon_) {
+    pylon = pylon_;
   }
 
   //======== Deploy function =========
-  function createSplit(bytes32 merkleRoot_, string memory splitRecipients_)
+  function createSplit(bytes32 merkleRoot_, bytes memory initializer, string memory splitRecipients_)
     external
     returns (address ourProxy)
   {
-    splitOwner = msg.sender;
     merkleRoot = merkleRoot_;
     ourProxy = address(new OurProxy{ salt: keccak256(abi.encode(merkleRoot_)) }());
+
+    // call setup() to set owners
+    assembly {
+        if eq(call(gas(), ourProxy, 0, add(initializer, 0x20), mload(initializer), 0, 0), 0) {
+            revert(0, 0)
+        }
+    }
+
     delete merkleRoot;
-    delete splitOwner;
     emit ProxyCreated(ourProxy, msg.sender, splitRecipients_);
   }
 }
