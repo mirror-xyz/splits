@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.4;
 
-contract OurInterface {
+contract OurIntrospector {
   //======== ERC721 =========
   // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.3.0/contracts/token/ERC721/IERC721Receiver.sol
   event TokenReceived(address operator, address from, uint256 tokenId);
