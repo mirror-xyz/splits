@@ -96,7 +96,7 @@ interface OurProxyInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "ETHReceived(address,address,uint256)": EventFragment;
+    "ETHReceived(uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "TokenReceived(address,address,uint256,bytes)": EventFragment;
   };
@@ -316,7 +316,7 @@ export class OurProxy extends Contract {
   };
 
   filters: {
-    ETHReceived(origin: null, sender: null, value: null): EventFilter;
+    ETHReceived(value: null): EventFilter;
 
     OwnershipTransferred(
       oldOwner: string | null,
