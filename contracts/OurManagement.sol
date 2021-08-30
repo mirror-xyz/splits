@@ -49,7 +49,7 @@ contract OurManagement {
   /// @param owner Owner address to be removed.
   function removeOwner(
       address prevOwner,
-      address owner,
+      address owner
   ) public {
       // Validate owner address and check that it corresponds to owner index.
       require(owner != address(0) && owner != SENTINEL_OWNERS, "GS203");
