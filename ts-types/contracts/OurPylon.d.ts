@@ -25,11 +25,11 @@ interface OurPylonInterface extends ethers.utils.Interface {
   functions: {
     "PERCENTAGE_SCALE()": FunctionFragment;
     "_mirrorAH()": FunctionFragment;
-    "_mirrorCrowdfundFactory()": FunctionFragment;
+    "_mirrorCrowdfund()": FunctionFragment;
     "_mirrorEditions()": FunctionFragment;
-    "_partyBidFactory()": FunctionFragment;
-    "_wethAddress()": FunctionFragment;
-    "_zoraAuctionHouse()": FunctionFragment;
+    "_partyBid()": FunctionFragment;
+    "_weth()": FunctionFragment;
+    "_zoraAH()": FunctionFragment;
     "_zoraMarket()": FunctionFragment;
     "_zoraMedia()": FunctionFragment;
     "acceptZoraMarketBid(uint256,tuple)": FunctionFragment;
@@ -37,8 +37,9 @@ interface OurPylonInterface extends ethers.utils.Interface {
     "balanceForWindow(uint256)": FunctionFragment;
     "buyMirrorEdition(uint256)": FunctionFragment;
     "cancelZoraAuction(uint256)": FunctionFragment;
-    "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
-    "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
+    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])": FunctionFragment;
+    "claimETH(uint256,address,uint256,bytes32[])": FunctionFragment;
+    "claimETHForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "createMirrorAuction(uint256,uint256,uint256,address,address)": FunctionFragment;
     "createMirrorBid(uint256)": FunctionFragment;
     "createMirrorCrowdfund(string,string,address,address,uint256,uint256)": FunctionFragment;
@@ -50,7 +51,6 @@ interface OurPylonInterface extends ethers.utils.Interface {
     "endZoraAuction(uint256)": FunctionFragment;
     "getOwners()": FunctionFragment;
     "incrementWindow()": FunctionFragment;
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])": FunctionFragment;
     "isClaimed(uint256,address)": FunctionFragment;
     "isOwner(address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
@@ -77,14 +77,13 @@ interface OurPylonInterface extends ethers.utils.Interface {
     "unsafeCreateZoraAuction(uint256,address,uint256,uint256,address,uint8,address)": FunctionFragment;
     "untrustedBurn721(address,uint256)": FunctionFragment;
     "untrustedCloseCrowdFunding(address)": FunctionFragment;
-    "untrustedRescueERC20(address,address,uint256)": FunctionFragment;
     "untrustedSafeTransfer721(address,address,uint256)": FunctionFragment;
     "untrustedSetApproval721(address,address,bool)": FunctionFragment;
     "updateMirrorMinBid(uint256)": FunctionFragment;
     "updateZoraMediaMetadataURI(uint256,string)": FunctionFragment;
     "updateZoraMediaTokenURI(uint256,string)": FunctionFragment;
     "updateZoraMediaURIs(uint256,string,string)": FunctionFragment;
-    "wethAddress()": FunctionFragment;
+    "weth()": FunctionFragment;
     "withdrawEditionFunds(uint256)": FunctionFragment;
   };
 
@@ -94,25 +93,16 @@ interface OurPylonInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "_mirrorAH", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "_mirrorCrowdfundFactory",
+    functionFragment: "_mirrorCrowdfund",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "_mirrorEditions",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "_partyBidFactory",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "_wethAddress",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "_zoraAuctionHouse",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "_partyBid", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_weth", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_zoraAH", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "_zoraMarket",
     values?: undefined
@@ -148,11 +138,15 @@ interface OurPylonInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "claim",
+    functionFragment: "claimERC20ForAllSplits",
+    values: [string, string[], BigNumberish[], BytesLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claimETH",
     values: [BigNumberish, string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "claimForAllWindows",
+    functionFragment: "claimETHForAllWindows",
     values: [string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
@@ -203,10 +197,6 @@ interface OurPylonInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "incrementWindow",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "incrementWindowThenClaimForAll",
-    values: [string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
     functionFragment: "isClaimed",
@@ -372,10 +362,6 @@ interface OurPylonInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "untrustedRescueERC20",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "untrustedSafeTransfer721",
     values: [string, string, BigNumberish]
   ): string;
@@ -399,10 +385,7 @@ interface OurPylonInterface extends ethers.utils.Interface {
     functionFragment: "updateZoraMediaURIs",
     values: [BigNumberish, string, string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "wethAddress",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "weth", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdrawEditionFunds",
     values: [BigNumberish]
@@ -414,25 +397,16 @@ interface OurPylonInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "_mirrorAH", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "_mirrorCrowdfundFactory",
+    functionFragment: "_mirrorCrowdfund",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "_mirrorEditions",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "_partyBidFactory",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "_wethAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "_zoraAuctionHouse",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "_partyBid", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_weth", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_zoraAH", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "_zoraMarket",
     data: BytesLike
@@ -455,9 +429,13 @@ interface OurPylonInterface extends ethers.utils.Interface {
     functionFragment: "cancelZoraAuction",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "claimForAllWindows",
+    functionFragment: "claimERC20ForAllSplits",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "claimETH", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimETHForAllWindows",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -499,10 +477,6 @@ interface OurPylonInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "getOwners", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "incrementWindow",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "incrementWindowThenClaimForAll",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "isClaimed", data: BytesLike): Result;
@@ -592,10 +566,6 @@ interface OurPylonInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "untrustedRescueERC20",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "untrustedSafeTransfer721",
     data: BytesLike
   ): Result;
@@ -619,10 +589,7 @@ interface OurPylonInterface extends ethers.utils.Interface {
     functionFragment: "updateZoraMediaURIs",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "wethAddress",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "weth", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "withdrawEditionFunds",
     data: BytesLike
@@ -633,6 +600,8 @@ interface OurPylonInterface extends ethers.utils.Interface {
     "Batch1155Received(address,address,uint256[],uint256[])": EventFragment;
     "ERC1155Received(address,address,uint256,uint256)": EventFragment;
     "ERC777Received(address,address,address,uint256)": EventFragment;
+    "ETHReceived(address,uint256)": EventFragment;
+    "MassTransferERC20(address,uint256,bool)": EventFragment;
     "ProxySetup(address,address[])": EventFragment;
     "RemovedOwner(address)": EventFragment;
     "TokenReceived(address,address,uint256)": EventFragment;
@@ -644,6 +613,8 @@ interface OurPylonInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Batch1155Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC1155Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC777Received"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ETHReceived"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MassTransferERC20"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProxySetup"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemovedOwner"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TokenReceived"): EventFragment;
@@ -673,25 +644,25 @@ export class OurPylon extends Contract {
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<[string]>;
 
-    _mirrorCrowdfundFactory(overrides?: CallOverrides): Promise<[string]>;
+    _mirrorCrowdfund(overrides?: CallOverrides): Promise<[string]>;
 
-    "_mirrorCrowdfundFactory()"(overrides?: CallOverrides): Promise<[string]>;
+    "_mirrorCrowdfund()"(overrides?: CallOverrides): Promise<[string]>;
 
     _mirrorEditions(overrides?: CallOverrides): Promise<[string]>;
 
     "_mirrorEditions()"(overrides?: CallOverrides): Promise<[string]>;
 
-    _partyBidFactory(overrides?: CallOverrides): Promise<[string]>;
+    _partyBid(overrides?: CallOverrides): Promise<[string]>;
 
-    "_partyBidFactory()"(overrides?: CallOverrides): Promise<[string]>;
+    "_partyBid()"(overrides?: CallOverrides): Promise<[string]>;
 
-    _wethAddress(overrides?: CallOverrides): Promise<[string]>;
+    _weth(overrides?: CallOverrides): Promise<[string]>;
 
-    "_wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "_weth()"(overrides?: CallOverrides): Promise<[string]>;
 
-    _zoraAuctionHouse(overrides?: CallOverrides): Promise<[string]>;
+    _zoraAH(overrides?: CallOverrides): Promise<[string]>;
 
-    "_zoraAuctionHouse()"(overrides?: CallOverrides): Promise<[string]>;
+    "_zoraAH()"(overrides?: CallOverrides): Promise<[string]>;
 
     _zoraMarket(overrides?: CallOverrides): Promise<[string]>;
 
@@ -765,7 +736,23 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    claim(
+    claimERC20ForAllSplits(
+      tokenAddress: string,
+      accounts: string[],
+      allocations: BigNumberish[],
+      merkleProofZero: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+      tokenAddress: string,
+      accounts: string[],
+      allocations: BigNumberish[],
+      merkleProofZero: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    claimETH(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -773,7 +760,7 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "claim(uint256,address,uint256,bytes32[])"(
+    "claimETH(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -781,14 +768,14 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    claimForAllWindows(
+    claimETHForAllWindows(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "claimForAllWindows(address,uint256,bytes32[])"(
+    "claimETHForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -922,20 +909,6 @@ export class OurPylon extends Contract {
     incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-    incrementWindowThenClaimForAll(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
 
     isClaimed(
       window: BigNumberish,
@@ -1366,20 +1339,6 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    untrustedRescueERC20(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "untrustedRescueERC20(address,address,uint256)"(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
     untrustedSafeTransfer721(
       tokenContract_: string,
       newOwner_: string,
@@ -1456,9 +1415,9 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    wethAddress(overrides?: CallOverrides): Promise<[string]>;
+    weth(overrides?: CallOverrides): Promise<[string]>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "weth()"(overrides?: CallOverrides): Promise<[string]>;
 
     withdrawEditionFunds(
       editionId: BigNumberish,
@@ -1479,25 +1438,25 @@ export class OurPylon extends Contract {
 
   "_mirrorAH()"(overrides?: CallOverrides): Promise<string>;
 
-  _mirrorCrowdfundFactory(overrides?: CallOverrides): Promise<string>;
+  _mirrorCrowdfund(overrides?: CallOverrides): Promise<string>;
 
-  "_mirrorCrowdfundFactory()"(overrides?: CallOverrides): Promise<string>;
+  "_mirrorCrowdfund()"(overrides?: CallOverrides): Promise<string>;
 
   _mirrorEditions(overrides?: CallOverrides): Promise<string>;
 
   "_mirrorEditions()"(overrides?: CallOverrides): Promise<string>;
 
-  _partyBidFactory(overrides?: CallOverrides): Promise<string>;
+  _partyBid(overrides?: CallOverrides): Promise<string>;
 
-  "_partyBidFactory()"(overrides?: CallOverrides): Promise<string>;
+  "_partyBid()"(overrides?: CallOverrides): Promise<string>;
 
-  _wethAddress(overrides?: CallOverrides): Promise<string>;
+  _weth(overrides?: CallOverrides): Promise<string>;
 
-  "_wethAddress()"(overrides?: CallOverrides): Promise<string>;
+  "_weth()"(overrides?: CallOverrides): Promise<string>;
 
-  _zoraAuctionHouse(overrides?: CallOverrides): Promise<string>;
+  _zoraAH(overrides?: CallOverrides): Promise<string>;
 
-  "_zoraAuctionHouse()"(overrides?: CallOverrides): Promise<string>;
+  "_zoraAH()"(overrides?: CallOverrides): Promise<string>;
 
   _zoraMarket(overrides?: CallOverrides): Promise<string>;
 
@@ -1568,7 +1527,23 @@ export class OurPylon extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  claim(
+  claimERC20ForAllSplits(
+    tokenAddress: string,
+    accounts: string[],
+    allocations: BigNumberish[],
+    merkleProofZero: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+    tokenAddress: string,
+    accounts: string[],
+    allocations: BigNumberish[],
+    merkleProofZero: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  claimETH(
     window: BigNumberish,
     account: string,
     scaledPercentageAllocation: BigNumberish,
@@ -1576,7 +1551,7 @@ export class OurPylon extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "claim(uint256,address,uint256,bytes32[])"(
+  "claimETH(uint256,address,uint256,bytes32[])"(
     window: BigNumberish,
     account: string,
     scaledPercentageAllocation: BigNumberish,
@@ -1584,14 +1559,14 @@ export class OurPylon extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  claimForAllWindows(
+  claimETHForAllWindows(
     account: string,
     percentageAllocation: BigNumberish,
     merkleProof: BytesLike[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "claimForAllWindows(address,uint256,bytes32[])"(
+  "claimETHForAllWindows(address,uint256,bytes32[])"(
     account: string,
     percentageAllocation: BigNumberish,
     merkleProof: BytesLike[],
@@ -1725,20 +1700,6 @@ export class OurPylon extends Contract {
   incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
   "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-  incrementWindowThenClaimForAll(
-    account: string,
-    percentageAllocation: BigNumberish,
-    merkleProof: BytesLike[],
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-    account: string,
-    percentageAllocation: BigNumberish,
-    merkleProof: BytesLike[],
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
 
   isClaimed(
     window: BigNumberish,
@@ -2166,20 +2127,6 @@ export class OurPylon extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  untrustedRescueERC20(
-    tokenContract_: string,
-    spender_: string,
-    amount_: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "untrustedRescueERC20(address,address,uint256)"(
-    tokenContract_: string,
-    spender_: string,
-    amount_: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   untrustedSafeTransfer721(
     tokenContract_: string,
     newOwner_: string,
@@ -2256,9 +2203,9 @@ export class OurPylon extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  wethAddress(overrides?: CallOverrides): Promise<string>;
+  weth(overrides?: CallOverrides): Promise<string>;
 
-  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+  "weth()"(overrides?: CallOverrides): Promise<string>;
 
   withdrawEditionFunds(
     editionId: BigNumberish,
@@ -2279,25 +2226,25 @@ export class OurPylon extends Contract {
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<string>;
 
-    _mirrorCrowdfundFactory(overrides?: CallOverrides): Promise<string>;
+    _mirrorCrowdfund(overrides?: CallOverrides): Promise<string>;
 
-    "_mirrorCrowdfundFactory()"(overrides?: CallOverrides): Promise<string>;
+    "_mirrorCrowdfund()"(overrides?: CallOverrides): Promise<string>;
 
     _mirrorEditions(overrides?: CallOverrides): Promise<string>;
 
     "_mirrorEditions()"(overrides?: CallOverrides): Promise<string>;
 
-    _partyBidFactory(overrides?: CallOverrides): Promise<string>;
+    _partyBid(overrides?: CallOverrides): Promise<string>;
 
-    "_partyBidFactory()"(overrides?: CallOverrides): Promise<string>;
+    "_partyBid()"(overrides?: CallOverrides): Promise<string>;
 
-    _wethAddress(overrides?: CallOverrides): Promise<string>;
+    _weth(overrides?: CallOverrides): Promise<string>;
 
-    "_wethAddress()"(overrides?: CallOverrides): Promise<string>;
+    "_weth()"(overrides?: CallOverrides): Promise<string>;
 
-    _zoraAuctionHouse(overrides?: CallOverrides): Promise<string>;
+    _zoraAH(overrides?: CallOverrides): Promise<string>;
 
-    "_zoraAuctionHouse()"(overrides?: CallOverrides): Promise<string>;
+    "_zoraAH()"(overrides?: CallOverrides): Promise<string>;
 
     _zoraMarket(overrides?: CallOverrides): Promise<string>;
 
@@ -2368,7 +2315,23 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    claim(
+    claimERC20ForAllSplits(
+      tokenAddress: string,
+      accounts: string[],
+      allocations: BigNumberish[],
+      merkleProofZero: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+      tokenAddress: string,
+      accounts: string[],
+      allocations: BigNumberish[],
+      merkleProofZero: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    claimETH(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -2376,7 +2339,7 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claim(uint256,address,uint256,bytes32[])"(
+    "claimETH(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -2384,14 +2347,14 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    claimForAllWindows(
+    claimETHForAllWindows(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claimForAllWindows(address,uint256,bytes32[])"(
+    "claimETHForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -2525,20 +2488,6 @@ export class OurPylon extends Contract {
     incrementWindow(overrides?: CallOverrides): Promise<void>;
 
     "incrementWindow()"(overrides?: CallOverrides): Promise<void>;
-
-    incrementWindowThenClaimForAll(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     isClaimed(
       window: BigNumberish,
@@ -2966,20 +2915,6 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    untrustedRescueERC20(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "untrustedRescueERC20(address,address,uint256)"(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     untrustedSafeTransfer721(
       tokenContract_: string,
       newOwner_: string,
@@ -3056,9 +2991,9 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    wethAddress(overrides?: CallOverrides): Promise<string>;
+    weth(overrides?: CallOverrides): Promise<string>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+    "weth()"(overrides?: CallOverrides): Promise<string>;
 
     withdrawEditionFunds(
       editionId: BigNumberish,
@@ -3095,6 +3030,10 @@ export class OurPylon extends Contract {
       amount: null
     ): EventFilter;
 
+    ETHReceived(sender: string | null, value: null): EventFilter;
+
+    MassTransferERC20(token: null, amount: null, success: null): EventFilter;
+
     ProxySetup(initiator: string | null, owners: null): EventFilter;
 
     RemovedOwner(owner: null): EventFilter;
@@ -3115,25 +3054,25 @@ export class OurPylon extends Contract {
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _mirrorCrowdfundFactory(overrides?: CallOverrides): Promise<BigNumber>;
+    _mirrorCrowdfund(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_mirrorCrowdfundFactory()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "_mirrorCrowdfund()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     _mirrorEditions(overrides?: CallOverrides): Promise<BigNumber>;
 
     "_mirrorEditions()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _partyBidFactory(overrides?: CallOverrides): Promise<BigNumber>;
+    _partyBid(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_partyBidFactory()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "_partyBid()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    _weth(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "_weth()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _zoraAuctionHouse(overrides?: CallOverrides): Promise<BigNumber>;
+    _zoraAH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_zoraAuctionHouse()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "_zoraAH()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     _zoraMarket(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -3204,7 +3143,23 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    claim(
+    claimERC20ForAllSplits(
+      tokenAddress: string,
+      accounts: string[],
+      allocations: BigNumberish[],
+      merkleProofZero: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+      tokenAddress: string,
+      accounts: string[],
+      allocations: BigNumberish[],
+      merkleProofZero: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    claimETH(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -3212,7 +3167,7 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "claim(uint256,address,uint256,bytes32[])"(
+    "claimETH(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -3220,14 +3175,14 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    claimForAllWindows(
+    claimETHForAllWindows(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "claimForAllWindows(address,uint256,bytes32[])"(
+    "claimETHForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -3361,20 +3316,6 @@ export class OurPylon extends Contract {
     incrementWindow(overrides?: Overrides): Promise<BigNumber>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<BigNumber>;
-
-    incrementWindowThenClaimForAll(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<BigNumber>;
 
     isClaimed(
       window: BigNumberish,
@@ -3802,20 +3743,6 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    untrustedRescueERC20(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "untrustedRescueERC20(address,address,uint256)"(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
     untrustedSafeTransfer721(
       tokenContract_: string,
       newOwner_: string,
@@ -3892,9 +3819,9 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    weth(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "weth()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdrawEditionFunds(
       editionId: BigNumberish,
@@ -3918,11 +3845,9 @@ export class OurPylon extends Contract {
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    _mirrorCrowdfundFactory(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    _mirrorCrowdfund(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_mirrorCrowdfundFactory()"(
+    "_mirrorCrowdfund()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -3932,21 +3857,17 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    _partyBidFactory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    _partyBid(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_partyBidFactory()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "_partyBid()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    _wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    _weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "_weth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    _zoraAuctionHouse(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    _zoraAH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_zoraAuctionHouse()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "_zoraAH()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     _zoraMarket(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -4020,7 +3941,23 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    claim(
+    claimERC20ForAllSplits(
+      tokenAddress: string,
+      accounts: string[],
+      allocations: BigNumberish[],
+      merkleProofZero: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+      tokenAddress: string,
+      accounts: string[],
+      allocations: BigNumberish[],
+      merkleProofZero: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    claimETH(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -4028,7 +3965,7 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "claim(uint256,address,uint256,bytes32[])"(
+    "claimETH(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -4036,14 +3973,14 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    claimForAllWindows(
+    claimETHForAllWindows(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "claimForAllWindows(address,uint256,bytes32[])"(
+    "claimETHForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -4177,20 +4114,6 @@ export class OurPylon extends Contract {
     incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    incrementWindowThenClaimForAll(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
 
     isClaimed(
       window: BigNumberish,
@@ -4624,20 +4547,6 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    untrustedRescueERC20(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "untrustedRescueERC20(address,address,uint256)"(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
     untrustedSafeTransfer721(
       tokenContract_: string,
       newOwner_: string,
@@ -4714,9 +4623,9 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "weth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdrawEditionFunds(
       editionId: BigNumberish,

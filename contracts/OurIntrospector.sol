@@ -6,6 +6,15 @@ import "./interfaces/ERC721TokenReceiver.sol";
 import "./interfaces/ERC777TokensRecipient.sol";
 import "./interfaces/IERC165.sol";
 
+/**
+ * @title OurIntrospector
+ * @author Nick Adamson - nickadamson@pm.me
+ * 
+ * Building on the work from:
+ * @author Mirror       @title Splits   https://github.com/mirror-xyz/splits
+ * @author Gnosis       @title Safe     https://github.com/gnosis/safe-contracts
+ * & of course, @author OpenZeppelin
+ */
 contract OurIntrospector is
     ERC1155TokenReceiver,
     ERC777TokensRecipient,

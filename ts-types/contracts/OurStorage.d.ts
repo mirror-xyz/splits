@@ -24,7 +24,7 @@ interface OurStorageInterface extends ethers.utils.Interface {
     "balanceForWindow(uint256)": FunctionFragment;
     "currentWindow()": FunctionFragment;
     "merkleRoot()": FunctionFragment;
-    "wethAddress()": FunctionFragment;
+    "weth()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -39,10 +39,7 @@ interface OurStorageInterface extends ethers.utils.Interface {
     functionFragment: "merkleRoot",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "wethAddress",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "weth", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "balanceForWindow",
@@ -53,10 +50,7 @@ interface OurStorageInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "wethAddress",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "weth", data: BytesLike): Result;
 
   events: {};
 }
@@ -93,9 +87,9 @@ export class OurStorage extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
 
-    wethAddress(overrides?: CallOverrides): Promise<[string]>;
+    weth(overrides?: CallOverrides): Promise<[string]>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "weth()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   balanceForWindow(
@@ -116,9 +110,9 @@ export class OurStorage extends Contract {
 
   "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-  wethAddress(overrides?: CallOverrides): Promise<string>;
+  weth(overrides?: CallOverrides): Promise<string>;
 
-  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+  "weth()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     balanceForWindow(
@@ -139,9 +133,9 @@ export class OurStorage extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-    wethAddress(overrides?: CallOverrides): Promise<string>;
+    weth(overrides?: CallOverrides): Promise<string>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+    "weth()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
@@ -165,9 +159,9 @@ export class OurStorage extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    weth(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "weth()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -189,8 +183,8 @@ export class OurStorage extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "weth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

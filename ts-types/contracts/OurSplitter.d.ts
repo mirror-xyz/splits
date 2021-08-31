@@ -24,15 +24,14 @@ interface OurSplitterInterface extends ethers.utils.Interface {
   functions: {
     "PERCENTAGE_SCALE()": FunctionFragment;
     "balanceForWindow(uint256)": FunctionFragment;
-    "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
-    "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
+    "claimETH(uint256,address,uint256,bytes32[])": FunctionFragment;
+    "claimETHForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "currentWindow()": FunctionFragment;
     "incrementWindow()": FunctionFragment;
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])": FunctionFragment;
     "isClaimed(uint256,address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
     "scaleAmountByPercentage(uint256,uint256)": FunctionFragment;
-    "wethAddress()": FunctionFragment;
+    "weth()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -44,11 +43,11 @@ interface OurSplitterInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "claim",
+    functionFragment: "claimETH",
     values: [BigNumberish, string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "claimForAllWindows",
+    functionFragment: "claimETHForAllWindows",
     values: [string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
@@ -58,10 +57,6 @@ interface OurSplitterInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "incrementWindow",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "incrementWindowThenClaimForAll",
-    values: [string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
     functionFragment: "isClaimed",
@@ -75,10 +70,7 @@ interface OurSplitterInterface extends ethers.utils.Interface {
     functionFragment: "scaleAmountByPercentage",
     values: [BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "wethAddress",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "weth", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "PERCENTAGE_SCALE",
@@ -88,9 +80,9 @@ interface OurSplitterInterface extends ethers.utils.Interface {
     functionFragment: "balanceForWindow",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "claimETH", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "claimForAllWindows",
+    functionFragment: "claimETHForAllWindows",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -101,26 +93,23 @@ interface OurSplitterInterface extends ethers.utils.Interface {
     functionFragment: "incrementWindow",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "incrementWindowThenClaimForAll",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "isClaimed", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "scaleAmountByPercentage",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "wethAddress",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "weth", data: BytesLike): Result;
 
   events: {
+    "ETHReceived(address,uint256)": EventFragment;
+    "MassTransferERC20(address,uint256,bool)": EventFragment;
     "TransferETH(address,uint256,bool)": EventFragment;
     "WindowIncremented(uint256,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "ETHReceived"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MassTransferERC20"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferETH"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "WindowIncremented"): EventFragment;
 }
@@ -153,7 +142,7 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    claim(
+    claimETH(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -161,7 +150,7 @@ export class OurSplitter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "claim(uint256,address,uint256,bytes32[])"(
+    "claimETH(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -169,14 +158,14 @@ export class OurSplitter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    claimForAllWindows(
+    claimETHForAllWindows(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "claimForAllWindows(address,uint256,bytes32[])"(
+    "claimETHForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -190,20 +179,6 @@ export class OurSplitter extends Contract {
     incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-    incrementWindowThenClaimForAll(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
 
     isClaimed(
       window: BigNumberish,
@@ -233,9 +208,9 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { scaledAmount: BigNumber }>;
 
-    wethAddress(overrides?: CallOverrides): Promise<[string]>;
+    weth(overrides?: CallOverrides): Promise<[string]>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "weth()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
@@ -252,7 +227,7 @@ export class OurSplitter extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  claim(
+  claimETH(
     window: BigNumberish,
     account: string,
     scaledPercentageAllocation: BigNumberish,
@@ -260,7 +235,7 @@ export class OurSplitter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "claim(uint256,address,uint256,bytes32[])"(
+  "claimETH(uint256,address,uint256,bytes32[])"(
     window: BigNumberish,
     account: string,
     scaledPercentageAllocation: BigNumberish,
@@ -268,14 +243,14 @@ export class OurSplitter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  claimForAllWindows(
+  claimETHForAllWindows(
     account: string,
     percentageAllocation: BigNumberish,
     merkleProof: BytesLike[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "claimForAllWindows(address,uint256,bytes32[])"(
+  "claimETHForAllWindows(address,uint256,bytes32[])"(
     account: string,
     percentageAllocation: BigNumberish,
     merkleProof: BytesLike[],
@@ -289,20 +264,6 @@ export class OurSplitter extends Contract {
   incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
   "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-  incrementWindowThenClaimForAll(
-    account: string,
-    percentageAllocation: BigNumberish,
-    merkleProof: BytesLike[],
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-    account: string,
-    percentageAllocation: BigNumberish,
-    merkleProof: BytesLike[],
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
 
   isClaimed(
     window: BigNumberish,
@@ -332,9 +293,9 @@ export class OurSplitter extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  wethAddress(overrides?: CallOverrides): Promise<string>;
+  weth(overrides?: CallOverrides): Promise<string>;
 
-  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+  "weth()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
@@ -351,7 +312,7 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    claim(
+    claimETH(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -359,7 +320,7 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claim(uint256,address,uint256,bytes32[])"(
+    "claimETH(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -367,14 +328,14 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    claimForAllWindows(
+    claimETHForAllWindows(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claimForAllWindows(address,uint256,bytes32[])"(
+    "claimETHForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -388,20 +349,6 @@ export class OurSplitter extends Contract {
     incrementWindow(overrides?: CallOverrides): Promise<void>;
 
     "incrementWindow()"(overrides?: CallOverrides): Promise<void>;
-
-    incrementWindowThenClaimForAll(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     isClaimed(
       window: BigNumberish,
@@ -431,12 +378,16 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    wethAddress(overrides?: CallOverrides): Promise<string>;
+    weth(overrides?: CallOverrides): Promise<string>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+    "weth()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
+    ETHReceived(sender: string | null, value: null): EventFilter;
+
+    MassTransferERC20(token: null, amount: null, success: null): EventFilter;
+
     TransferETH(account: null, amount: null, success: null): EventFilter;
 
     WindowIncremented(currentWindow: null, fundsAvailable: null): EventFilter;
@@ -457,7 +408,7 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    claim(
+    claimETH(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -465,7 +416,7 @@ export class OurSplitter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "claim(uint256,address,uint256,bytes32[])"(
+    "claimETH(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -473,14 +424,14 @@ export class OurSplitter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    claimForAllWindows(
+    claimETHForAllWindows(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "claimForAllWindows(address,uint256,bytes32[])"(
+    "claimETHForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -494,20 +445,6 @@ export class OurSplitter extends Contract {
     incrementWindow(overrides?: Overrides): Promise<BigNumber>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<BigNumber>;
-
-    incrementWindowThenClaimForAll(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<BigNumber>;
 
     isClaimed(
       window: BigNumberish,
@@ -537,9 +474,9 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    weth(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "weth()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -559,7 +496,7 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    claim(
+    claimETH(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -567,7 +504,7 @@ export class OurSplitter extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "claim(uint256,address,uint256,bytes32[])"(
+    "claimETH(uint256,address,uint256,bytes32[])"(
       window: BigNumberish,
       account: string,
       scaledPercentageAllocation: BigNumberish,
@@ -575,14 +512,14 @@ export class OurSplitter extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    claimForAllWindows(
+    claimETHForAllWindows(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "claimForAllWindows(address,uint256,bytes32[])"(
+    "claimETHForAllWindows(address,uint256,bytes32[])"(
       account: string,
       percentageAllocation: BigNumberish,
       merkleProof: BytesLike[],
@@ -596,20 +533,6 @@ export class OurSplitter extends Contract {
     incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    incrementWindowThenClaimForAll(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
-      account: string,
-      percentageAllocation: BigNumberish,
-      merkleProof: BytesLike[],
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
 
     isClaimed(
       window: BigNumberish,
@@ -639,8 +562,8 @@ export class OurSplitter extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "weth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

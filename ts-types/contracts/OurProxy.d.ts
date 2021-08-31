@@ -25,7 +25,7 @@ interface OurProxyInterface extends ethers.utils.Interface {
     "currentWindow()": FunctionFragment;
     "merkleRoot()": FunctionFragment;
     "pylon()": FunctionFragment;
-    "wethAddress()": FunctionFragment;
+    "weth()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -41,10 +41,7 @@ interface OurProxyInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "pylon", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "wethAddress",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "weth", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "balanceForWindow",
@@ -56,16 +53,9 @@ interface OurProxyInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pylon", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "wethAddress",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "weth", data: BytesLike): Result;
 
-  events: {
-    "ETHReceived(address,uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "ETHReceived"): EventFragment;
+  events: {};
 }
 
 export class OurProxy extends Contract {
@@ -104,9 +94,9 @@ export class OurProxy extends Contract {
 
     "pylon()"(overrides?: CallOverrides): Promise<[string]>;
 
-    wethAddress(overrides?: CallOverrides): Promise<[string]>;
+    weth(overrides?: CallOverrides): Promise<[string]>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "weth()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   balanceForWindow(
@@ -131,9 +121,9 @@ export class OurProxy extends Contract {
 
   "pylon()"(overrides?: CallOverrides): Promise<string>;
 
-  wethAddress(overrides?: CallOverrides): Promise<string>;
+  weth(overrides?: CallOverrides): Promise<string>;
 
-  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+  "weth()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     balanceForWindow(
@@ -158,14 +148,12 @@ export class OurProxy extends Contract {
 
     "pylon()"(overrides?: CallOverrides): Promise<string>;
 
-    wethAddress(overrides?: CallOverrides): Promise<string>;
+    weth(overrides?: CallOverrides): Promise<string>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+    "weth()"(overrides?: CallOverrides): Promise<string>;
   };
 
-  filters: {
-    ETHReceived(sender: string | null, value: null): EventFilter;
-  };
+  filters: {};
 
   estimateGas: {
     balanceForWindow(
@@ -190,9 +178,9 @@ export class OurProxy extends Contract {
 
     "pylon()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    weth(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "weth()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -218,8 +206,8 @@ export class OurProxy extends Contract {
 
     "pylon()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "weth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

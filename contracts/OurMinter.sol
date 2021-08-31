@@ -4,45 +4,38 @@ pragma experimental ABIEncoderV2;
 
 /// @us The Future Is Ourz
 
-import {OurManagement} from "./OurManagement.sol";
-import {IZora} from "./interfaces/IZora.sol";
-import {IMirror} from "./interfaces/IMirror.sol";
-import {IPartyBid} from "./interfaces/IPartyBid.sol";
-import {IERC721} from "./interfaces/IERC721.sol";
-import {IERC20} from "./interfaces/IERC20.sol";
+import { OurManagement } from "./OurManagement.sol";
+import { IZora } from "./interfaces/IZora.sol";
+import { IMirror } from "./interfaces/IMirror.sol";
+import { IPartyBid } from "./interfaces/IPartyBid.sol";
+import { IERC721 } from "./interfaces/IERC721.sol";
+import { IERC20 } from "./interfaces/IERC20.sol";
 
-/** Use with CAUTION; the contracts are not audited.
+/**
  * @title OurMinter
- * @notice extension for MirrorXYZ's Splits Contracts
- * @author nickadamson@pm.me
- *
- * @notice ALL credit due to open-source contributions of @author (s) from:
- * Zora, MirrorXYZ, OpenZeppelin, Gnosis, & PartyDAO. Would not have been possible without them.
+ * @author Nick Adamson - nickadamson@pm.me
+ * 
+ * Building on the work from:
+ * @author Mirror       @title Splits   https://github.com/mirror-xyz/splits
+ * @author Gnosis       @title Safe     https://github.com/gnosis/safe-contracts
+ * & of course, @author OpenZeppelin
  *
  * @notice Some functions are marked as 'untrusted'Function. Use caution when interacting
  * with these, as any contracts you supply could be potentially unsafe.
- * 'Trusted' functions on the other hand -- implied by absence of 'untrusted' --
+ * 'Trusted' functions on the other hand -- implied by the absence of 'untrusted' --
  * are hardcoded to use the Zora Protocol/MirrorXYZ/PartyDAO addresses.
  * https://consensys.github.io/smart-contract-best-practices/recommendations/#mark-untrusted-contracts
  */
 contract OurMinter is OurManagement {
     /// @notice RINKEBY ADDRESSES
-    address public constant _zoraMedia =
-        0x7C2668BD0D3c050703CEcC956C11Bd520c26f7d4;
-    address public constant _zoraMarket =
-        0x85e946e1Bd35EC91044Dc83A5DdAB2B6A262ffA6;
-    address public constant _zoraAuctionHouse =
-        0xE7dd1252f50B3d845590Da0c5eADd985049a03ce;
-    address public constant _mirrorAH =
-        0x2D5c022fd4F81323bbD1Cc0Ec6959EC8CC1C5A11;
-    address public constant _mirrorCrowdfundFactory =
-        0xeac226B370D77f436b5780b4DD4A49E59e8bEA37;
-    address public constant _mirrorEditions =
-        0xa8b8F7cC0C64c178ddCD904122844CBad0021647;
-    address public constant _partyBidFactory =
-        0xB725682D5AdadF8dfD657f8e7728744C0835ECd9;
-    address public constant _wethAddress =
-        0xc778417E063141139Fce010982780140Aa0cD5Ab;
+    address public constant _zoraMedia = 0x7C2668BD0D3c050703CEcC956C11Bd520c26f7d4;
+    address public constant _zoraMarket = 0x85e946e1Bd35EC91044Dc83A5DdAB2B6A262ffA6;
+    address public constant _zoraAH = 0xE7dd1252f50B3d845590Da0c5eADd985049a03ce;
+    address public constant _mirrorAH = 0x2D5c022fd4F81323bbD1Cc0Ec6959EC8CC1C5A11;
+    address public constant _mirrorCrowdfund = 0xeac226B370D77f436b5780b4DD4A49E59e8bEA37;
+    address public constant _mirrorEditions = 0xa8b8F7cC0C64c178ddCD904122844CBad0021647;
+    address public constant _partyBid = 0xB725682D5AdadF8dfD657f8e7728744C0835ECd9;
+    address public constant _weth = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
 
     /**======== IZora =========
      * @notice Various functions allowing a Split to interact with Zora Protocol
@@ -55,10 +48,8 @@ contract OurMinter is OurManagement {
      * @notice Approve the splitOwner and Zora Auction House to manage Split's ERC-721s
      * @dev Called in Proxy's Constructor, hence internal
      */
-    function setApprovalsForSplit(address splitOwner) external {
-        // require(threshold == 0, "Setup has already been completed once.");
-        IERC721(_zoraMedia).setApprovalForAll(splitOwner, true);
-        IERC721(_zoraMedia).setApprovalForAll(_zoraAuctionHouse, true);
+    function setupApprovalForAH() internal {
+        IERC721(_zoraMedia).setApprovalForAll(_zoraAH, true);
     }
 
     /** QoL
@@ -74,7 +65,7 @@ contract OurMinter is OurManagement {
         IZora(_zoraMedia).mint(mediaData, bidShares);
         uint256 index = IERC721(_zoraMedia).totalSupply() - 1;
         uint256 tokenId_ = IERC721(_zoraMedia).tokenByIndex(index);
-        IZora(_zoraAuctionHouse).createAuction(
+        IZora(_zoraAH).createAuction(
             tokenId_,
             _zoraMedia,
             duration,
@@ -88,10 +79,10 @@ contract OurMinter is OurManagement {
     /** Media
      * @notice Mint new Zora NFT for Split Contract.
      */
-    function mintZora(
-        IZora.MediaData calldata mediaData,
-        IZora.BidShares calldata bidShares
-    ) external onlyOwners {
+    function mintZora(IZora.MediaData calldata mediaData, IZora.BidShares calldata bidShares)
+        external
+        onlyOwners
+    {
         IZora(_zoraMedia).mint(mediaData, bidShares);
     }
 
@@ -122,40 +113,28 @@ contract OurMinter is OurManagement {
     /** Media
      * @notice Update the token URI
      */
-    function updateZoraMediaTokenURI(uint256 tokenId, string calldata tokenURI)
-        external
-        onlyOwners
-    {
+    function updateZoraMediaTokenURI(uint256 tokenId, string calldata tokenURI) external onlyOwners {
         IZora(_zoraMedia).updateTokenURI(tokenId, tokenURI);
     }
 
     /** Media
      * @notice Update the token metadata uri
      */
-    function updateZoraMediaMetadataURI(
-        uint256 tokenId,
-        string calldata metadataURI
-    ) external {
+    function updateZoraMediaMetadataURI(uint256 tokenId, string calldata metadataURI) external {
         IZora(_zoraMedia).updateTokenMetadataURI(tokenId, metadataURI);
     }
 
     /** Market
      * @notice Update zora/core/market bidShares (NOT zora/auctionHouse)
      */
-    function setZoraMarketBidShares(
-        uint256 tokenId,
-        IZora.BidShares calldata bidShares
-    ) external {
+    function setZoraMarketBidShares(uint256 tokenId, IZora.BidShares calldata bidShares) external {
         IZora(_zoraMarket).setBidShares(tokenId, bidShares);
     }
 
     /** Market
      * @notice Update zora/core/market ask
      */
-    function setZoraMarketAsk(uint256 tokenId, IZora.Ask calldata ask)
-        external
-        onlyOwners
-    {
+    function setZoraMarketAsk(uint256 tokenId, IZora.Ask calldata ask) external onlyOwners {
         IZora(_zoraMarket).setAsk(tokenId, ask);
     }
 
@@ -180,20 +159,14 @@ contract OurMinter is OurManagement {
     /** Market
      * @notice Remove zora/core/market bid (NOT zora/auctionHouse)
      */
-    function removeZoraMarketBid(uint256 tokenId, address bidder)
-        external
-        onlyOwners
-    {
+    function removeZoraMarketBid(uint256 tokenId, address bidder) external onlyOwners {
         IZora(_zoraMarket).removeBid(tokenId, bidder);
     }
 
     /** Market
      * @notice Accept zora/core/market bid
      */
-    function acceptZoraMarketBid(
-        uint256 tokenId,
-        IZora.Bid calldata expectedBid
-    ) external onlyOwners {
+    function acceptZoraMarketBid(uint256 tokenId, IZora.Bid calldata expectedBid) external onlyOwners {
         IZora(_zoraMarket).acceptBid(tokenId, expectedBid);
     }
 
@@ -210,10 +183,8 @@ contract OurMinter is OurManagement {
         uint8 curatorFeePercentages,
         address auctionCurrency
     ) external onlyOwners {
-        require(
-            auctionCurrency == address(0) || auctionCurrency == _wethAddress
-        );
-        IZora(_zoraAuctionHouse).createAuction(
+        require(auctionCurrency == address(0) || auctionCurrency == _weth);
+        IZora(_zoraAH).createAuction(
             tokenId,
             tokenContract,
             duration,
@@ -238,7 +209,7 @@ contract OurMinter is OurManagement {
         uint8 curatorFeePercentages,
         address auctionCurrency
     ) external onlyOwners {
-        IZora(_zoraAuctionHouse).createAuction(
+        IZora(_zoraAH).createAuction(
             tokenId,
             tokenContract,
             duration,
@@ -252,48 +223,36 @@ contract OurMinter is OurManagement {
     /** AuctionHouse
      * @notice Approve Auction; aka Split Contract is now the Curator
      */
-    function setZoraAuctionApproval(uint256 auctionId, bool approved)
-        external
-        onlyOwners
-    {
-        IZora(_zoraAuctionHouse).setAuctionApproval(auctionId, approved);
+    function setZoraAuctionApproval(uint256 auctionId, bool approved) external onlyOwners {
+        IZora(_zoraAH).setAuctionApproval(auctionId, approved);
     }
 
     /** AuctionHouse
      * @notice Set Auction's reserve price
      */
-    function setZoraAuctionReservePrice(uint256 auctionId, uint256 reservePrice)
-        external
-        onlyOwners
-    {
-        IZora(_zoraAuctionHouse).setAuctionReservePrice(
-            auctionId,
-            reservePrice
-        );
+    function setZoraAuctionReservePrice(uint256 auctionId, uint256 reservePrice) external onlyOwners {
+        IZora(_zoraAH).setAuctionReservePrice(auctionId, reservePrice);
     }
 
     /** AuctionHouse
      * @notice Bid on an Auction
      */
-    function createZoraAuctionBid(uint256 auctionId, uint256 amount)
-        external
-        payable
-    {
-        IZora(_zoraAuctionHouse).createBid(auctionId, amount);
+    function createZoraAuctionBid(uint256 auctionId, uint256 amount) external payable {
+        IZora(_zoraAH).createBid(auctionId, amount);
     }
 
     /** AuctionHouse
      * @notice End an Auction
      */
     function endZoraAuction(uint256 auctionId) external onlyOwners {
-        IZora(_zoraAuctionHouse).endAuction(auctionId);
+        IZora(_zoraAH).endAuction(auctionId);
     }
 
     /** AuctionHouse
      * @notice Cancel an Auction before any bids have been placed
      */
     function cancelZoraAuction(uint256 auctionId) external onlyOwners {
-        IZora(_zoraAuctionHouse).cancelAuction(auctionId);
+        IZora(_zoraAH).cancelAuction(auctionId);
     }
 
     //======== /IZora =========
@@ -312,13 +271,7 @@ contract OurMinter is OurManagement {
         address creator,
         address payable creatorShareRecipient
     ) external onlyOwners {
-        IMirror(_mirrorAH).createAuction(
-            tokenId,
-            duration,
-            reservePrice,
-            creator,
-            creatorShareRecipient
-        );
+        IMirror(_mirrorAH).createAuction(tokenId, duration, reservePrice, creator, creatorShareRecipient);
     }
 
     /** ReserveAuctionV3
@@ -350,11 +303,7 @@ contract OurMinter is OurManagement {
         uint256 price,
         address payable fundingRecipient
     ) external onlyOwners {
-        IMirror(_mirrorEditions).createEdition(
-            quantity,
-            price,
-            fundingRecipient
-        );
+        IMirror(_mirrorEditions).createEdition(quantity, price, fundingRecipient);
     }
 
     /** Editions
@@ -382,7 +331,7 @@ contract OurMinter is OurManagement {
         uint256 fundingCap,
         uint256 operatorPercent
     ) external onlyOwners {
-        IMirror(_mirrorCrowdfundFactory).createCrowdfund(
+        IMirror(_mirrorCrowdfund).createCrowdfund(
             name,
             symbol,
             operator,
@@ -396,10 +345,7 @@ contract OurMinter is OurManagement {
      * @notice Marked as >> untrusted << Use caution when supplying crowdfundProxy_
      * @dev Close Funding period for Crowdfund
      */
-    function untrustedCloseCrowdFunding(address crowdfundProxy_)
-        external
-        onlyOwners
-    {
+    function untrustedCloseCrowdFunding(address crowdfundProxy_) external onlyOwners {
         IMirror(crowdfundProxy_).closeFunding();
     }
 
@@ -420,14 +366,7 @@ contract OurMinter is OurManagement {
         string memory name,
         string memory symbol
     ) external onlyOwners {
-        IPartyBid(_partyBidFactory).startParty(
-            marketWrapper,
-            nftContract,
-            tokenId,
-            auctionId,
-            name,
-            symbol
-        );
+        IPartyBid(_partyBid).startParty(marketWrapper, nftContract, tokenId, auctionId, name, symbol);
     }
 
     /** PartyBid
@@ -492,11 +431,7 @@ contract OurMinter is OurManagement {
         address newOwner_,
         uint256 tokenId_
     ) external onlyOwners {
-        IERC721(tokenContract_).safeTransferFrom(
-            address(msg.sender),
-            newOwner_,
-            tokenId_
-        );
+        IERC721(tokenContract_).safeTransferFrom(address(msg.sender), newOwner_, tokenId_);
     }
 
     /**
@@ -530,10 +465,7 @@ contract OurMinter is OurManagement {
      * @dev burns non-Zora ERC721 that Split contract owns/isApproved
      * @notice setApprovalForAll(address operator, bool approved)
      */
-    function untrustedBurn721(address tokenContract_, uint256 tokenId_)
-        external
-        onlyOwners
-    {
+    function untrustedBurn721(address tokenContract_, uint256 tokenId_) external onlyOwners {
         IERC721(tokenContract_).burn(tokenId_);
     }
 
@@ -548,14 +480,16 @@ contract OurMinter is OurManagement {
      * @dev see IERC20.sol
      *
      * @notice To include this functionality for ERC20s, approve() was removed from IERC721.
+     *
+     * @Owners be nice and approve all recipients allocations.
      */
-    function untrustedRescueERC20(
-        address tokenContract_,
-        address spender_,
-        uint256 amount_
-    ) external returns (bool) {
-        bool success = IERC20(tokenContract_).approve(spender_, amount_);
-        return success;
-    }
+    // function untrustedRescueERC20(
+    //     address tokenContract_,
+    //     address spender_,
+    //     uint256 amount_
+    // ) external onlyOwners returns (bool) {
+    //     bool success = IERC20(tokenContract_).approve(spender_, amount_);
+    //     return success;
+    // }
     //======== /IERC20 =========
 }
