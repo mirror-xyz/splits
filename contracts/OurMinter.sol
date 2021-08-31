@@ -390,33 +390,33 @@ contract OurMinter is OurStorage {
    * NOTE: Marked as >> untrusted << Use caution when supplying partyAddress_
    * @notice Contributes funds to PartyBid
    */
-  function untrustedContributeToParty(address partyAddress_) external payable {
-    IPartyBid(partyAddress_).contribute();
-  }
+  // function untrustedContributeToParty(address partyAddress_) external payable {
+  //   IPartyBid(partyAddress_).contribute();
+  // }
 
   /** PartyBid
    * NOTE: Marked as >> untrusted << Use caution when supplying partyAddress_
    * @notice Bid for Party
    */
-  function untrustedSplitPartyBid(address partyAddress_) external {
-    IPartyBid(partyAddress_).bid();
-  }
+  // function untrustedSplitPartyBid(address partyAddress_) external {
+  //   IPartyBid(partyAddress_).bid();
+  // }
 
   /** PartyBid
    * NOTE: Marked as >> untrusted << Use caution when supplying partyAddress_
    * @notice Finalizes Party
    */
-  function untrustedFinalizeParty(address partyAddress_) external {
-    IPartyBid(partyAddress_).finalize();
-  }
+  // function untrustedFinalizeParty(address partyAddress_) external {
+  //   IPartyBid(partyAddress_).finalize();
+  // }
 
   /** PartyBid
    * NOTE: Marked as >> untrusted << Use caution when supplying partyAddress_
    * @notice Claims funds from Party for Party contributors
    */
-  function untrustedClaimParty(address partyAddress_, address contributor) external {
-    IPartyBid(partyAddress_).claim(contributor);
-  }
+  // function untrustedClaimParty(address partyAddress_, address contributor) external {
+  //   IPartyBid(partyAddress_).claim(contributor);
+  // }
 
   //======== /IPartyBid =========
 
@@ -456,13 +456,13 @@ contract OurMinter is OurStorage {
    * @dev In case non-Zora ERC721 gets stuck in Account. Try untrustedSafeTransfer721 first.
    * @notice transferFrom(address from, address to, uint256 tokenId)
    */
-  function untrustedTransfer721(
-    address tokenContract_,
-    address newOwner_,
-    uint256 tokenId_
-  ) external {
-    IERC721(tokenContract_).safeTransferFrom(address(msg.sender), newOwner_, tokenId_);
-  }
+  // function untrustedTransfer721(
+  //   address tokenContract_,
+  //   address newOwner_,
+  //   uint256 tokenId_
+  // ) external {
+  //   IERC721(tokenContract_).transferFrom(address(msg.sender), newOwner_, tokenId_);
+  // }
 
   /**
    * NOTE: Marked as >> untrusted << Use caution when supplying tokenContract_
