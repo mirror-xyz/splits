@@ -22,36 +22,27 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface OurFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createSplit(bytes32,string)": FunctionFragment;
+    "createSplit(bytes32,bytes,string)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
-    "minter()": FunctionFragment;
-    "splitOwner()": FunctionFragment;
-    "splitter()": FunctionFragment;
+    "pylon()": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createSplit",
-    values: [BytesLike, string]
+    values: [BytesLike, BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "merkleRoot",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "minter", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "splitOwner",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "splitter", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pylon", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "createSplit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "minter", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "splitOwner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "splitter", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pylon", data: BytesLike): Result;
 
   events: {
     "ProxyCreated(address,address,string)": EventFragment;
@@ -76,12 +67,14 @@ export class OurFactory extends Contract {
   functions: {
     createSplit(
       merkleRoot_: BytesLike,
+      data: BytesLike,
       splitRecipients_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createSplit(bytes32,string)"(
+    "createSplit(bytes32,bytes,string)"(
       merkleRoot_: BytesLike,
+      data: BytesLike,
       splitRecipients_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -90,27 +83,21 @@ export class OurFactory extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
 
-    minter(overrides?: CallOverrides): Promise<[string]>;
+    pylon(overrides?: CallOverrides): Promise<[string]>;
 
-    "minter()"(overrides?: CallOverrides): Promise<[string]>;
-
-    splitOwner(overrides?: CallOverrides): Promise<[string]>;
-
-    "splitOwner()"(overrides?: CallOverrides): Promise<[string]>;
-
-    splitter(overrides?: CallOverrides): Promise<[string]>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<[string]>;
+    "pylon()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   createSplit(
     merkleRoot_: BytesLike,
+    data: BytesLike,
     splitRecipients_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createSplit(bytes32,string)"(
+  "createSplit(bytes32,bytes,string)"(
     merkleRoot_: BytesLike,
+    data: BytesLike,
     splitRecipients_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -119,27 +106,21 @@ export class OurFactory extends Contract {
 
   "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-  minter(overrides?: CallOverrides): Promise<string>;
+  pylon(overrides?: CallOverrides): Promise<string>;
 
-  "minter()"(overrides?: CallOverrides): Promise<string>;
-
-  splitOwner(overrides?: CallOverrides): Promise<string>;
-
-  "splitOwner()"(overrides?: CallOverrides): Promise<string>;
-
-  splitter(overrides?: CallOverrides): Promise<string>;
-
-  "splitter()"(overrides?: CallOverrides): Promise<string>;
+  "pylon()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     createSplit(
       merkleRoot_: BytesLike,
+      data: BytesLike,
       splitRecipients_: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createSplit(bytes32,string)"(
+    "createSplit(bytes32,bytes,string)"(
       merkleRoot_: BytesLike,
+      data: BytesLike,
       splitRecipients_: string,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -148,17 +129,9 @@ export class OurFactory extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-    minter(overrides?: CallOverrides): Promise<string>;
+    pylon(overrides?: CallOverrides): Promise<string>;
 
-    "minter()"(overrides?: CallOverrides): Promise<string>;
-
-    splitOwner(overrides?: CallOverrides): Promise<string>;
-
-    "splitOwner()"(overrides?: CallOverrides): Promise<string>;
-
-    splitter(overrides?: CallOverrides): Promise<string>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<string>;
+    "pylon()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -172,12 +145,14 @@ export class OurFactory extends Contract {
   estimateGas: {
     createSplit(
       merkleRoot_: BytesLike,
+      data: BytesLike,
       splitRecipients_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createSplit(bytes32,string)"(
+    "createSplit(bytes32,bytes,string)"(
       merkleRoot_: BytesLike,
+      data: BytesLike,
       splitRecipients_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -186,28 +161,22 @@ export class OurFactory extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    minter(overrides?: CallOverrides): Promise<BigNumber>;
+    pylon(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "minter()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    splitOwner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "splitOwner()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    splitter(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "pylon()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
     createSplit(
       merkleRoot_: BytesLike,
+      data: BytesLike,
       splitRecipients_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createSplit(bytes32,string)"(
+    "createSplit(bytes32,bytes,string)"(
       merkleRoot_: BytesLike,
+      data: BytesLike,
       splitRecipients_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -216,16 +185,8 @@ export class OurFactory extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    minter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    pylon(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "minter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    splitOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "splitOwner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    splitter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "pylon()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

@@ -13,7 +13,6 @@ import {
 import {
   Contract,
   ContractTransaction,
-  Overrides,
   CallOverrides,
 } from "@ethersproject/contracts";
 import { BytesLike } from "@ethersproject/bytes";
@@ -25,12 +24,7 @@ interface OurProxyInterface extends ethers.utils.Interface {
     "balanceForWindow(uint256)": FunctionFragment;
     "currentWindow()": FunctionFragment;
     "merkleRoot()": FunctionFragment;
-    "minter()": FunctionFragment;
-    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
-    "owner()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
-    "splitter()": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
+    "pylon()": FunctionFragment;
     "wethAddress()": FunctionFragment;
   };
 
@@ -46,21 +40,7 @@ interface OurProxyInterface extends ethers.utils.Interface {
     functionFragment: "merkleRoot",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "minter", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "onERC721Received",
-    values: [string, string, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "splitter", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [string]
-  ): string;
+  encodeFunctionData(functionFragment: "pylon", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "wethAddress",
     values?: undefined
@@ -75,35 +55,17 @@ interface OurProxyInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "minter", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "onERC721Received",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "splitter", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "pylon", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "wethAddress",
     data: BytesLike
   ): Result;
 
   events: {
-    "ETHReceived(uint256)": EventFragment;
-    "OwnershipTransferred(address,address)": EventFragment;
-    "TokenReceived(address,address,uint256,bytes)": EventFragment;
+    "ETHReceived(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ETHReceived"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TokenReceived"): EventFragment;
 }
 
 export class OurProxy extends Contract {
@@ -138,47 +100,9 @@ export class OurProxy extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
 
-    minter(overrides?: CallOverrides): Promise<[string]>;
+    pylon(overrides?: CallOverrides): Promise<[string]>;
 
-    "minter()"(overrides?: CallOverrides): Promise<[string]>;
-
-    onERC721Received(
-      operator_: string,
-      from_: string,
-      tokenId_: BigNumberish,
-      data_: BytesLike,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "onERC721Received(address,address,uint256,bytes)"(
-      operator_: string,
-      from_: string,
-      tokenId_: BigNumberish,
-      data_: BytesLike,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
-    "owner()"(overrides?: CallOverrides): Promise<[string]>;
-
-    renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
-
-    "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-    splitter(overrides?: CallOverrides): Promise<[string]>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<[string]>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    "pylon()"(overrides?: CallOverrides): Promise<[string]>;
 
     wethAddress(overrides?: CallOverrides): Promise<[string]>;
 
@@ -203,47 +127,9 @@ export class OurProxy extends Contract {
 
   "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-  minter(overrides?: CallOverrides): Promise<string>;
+  pylon(overrides?: CallOverrides): Promise<string>;
 
-  "minter()"(overrides?: CallOverrides): Promise<string>;
-
-  onERC721Received(
-    operator_: string,
-    from_: string,
-    tokenId_: BigNumberish,
-    data_: BytesLike,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "onERC721Received(address,address,uint256,bytes)"(
-    operator_: string,
-    from_: string,
-    tokenId_: BigNumberish,
-    data_: BytesLike,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  owner(overrides?: CallOverrides): Promise<string>;
-
-  "owner()"(overrides?: CallOverrides): Promise<string>;
-
-  renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-  splitter(overrides?: CallOverrides): Promise<string>;
-
-  "splitter()"(overrides?: CallOverrides): Promise<string>;
-
-  transferOwnership(
-    newOwner: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "transferOwnership(address)"(
-    newOwner: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  "pylon()"(overrides?: CallOverrides): Promise<string>;
 
   wethAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -268,47 +154,9 @@ export class OurProxy extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-    minter(overrides?: CallOverrides): Promise<string>;
+    pylon(overrides?: CallOverrides): Promise<string>;
 
-    "minter()"(overrides?: CallOverrides): Promise<string>;
-
-    onERC721Received(
-      operator_: string,
-      from_: string,
-      tokenId_: BigNumberish,
-      data_: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "onERC721Received(address,address,uint256,bytes)"(
-      operator_: string,
-      from_: string,
-      tokenId_: BigNumberish,
-      data_: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    owner(overrides?: CallOverrides): Promise<string>;
-
-    "owner()"(overrides?: CallOverrides): Promise<string>;
-
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    "renounceOwnership()"(overrides?: CallOverrides): Promise<void>;
-
-    splitter(overrides?: CallOverrides): Promise<string>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<string>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "pylon()"(overrides?: CallOverrides): Promise<string>;
 
     wethAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -316,19 +164,7 @@ export class OurProxy extends Contract {
   };
 
   filters: {
-    ETHReceived(value: null): EventFilter;
-
-    OwnershipTransferred(
-      oldOwner: string | null,
-      newOwner: string | null
-    ): EventFilter;
-
-    TokenReceived(
-      operator: null,
-      from: null,
-      tokenId: null,
-      data: null
-    ): EventFilter;
+    ETHReceived(sender: string | null, value: null): EventFilter;
   };
 
   estimateGas: {
@@ -350,47 +186,9 @@ export class OurProxy extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    minter(overrides?: CallOverrides): Promise<BigNumber>;
+    pylon(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "minter()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    onERC721Received(
-      operator_: string,
-      from_: string,
-      tokenId_: BigNumberish,
-      data_: BytesLike,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "onERC721Received(address,address,uint256,bytes)"(
-      operator_: string,
-      from_: string,
-      tokenId_: BigNumberish,
-      data_: BytesLike,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceOwnership(overrides?: Overrides): Promise<BigNumber>;
-
-    "renounceOwnership()"(overrides?: Overrides): Promise<BigNumber>;
-
-    splitter(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    "pylon()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -416,47 +214,9 @@ export class OurProxy extends Contract {
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    minter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    pylon(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "minter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    onERC721Received(
-      operator_: string,
-      from_: string,
-      tokenId_: BigNumberish,
-      data_: BytesLike,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "onERC721Received(address,address,uint256,bytes)"(
-      operator_: string,
-      from_: string,
-      tokenId_: BigNumberish,
-      data_: BytesLike,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceOwnership(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    "renounceOwnership()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    splitter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
+    "pylon()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
