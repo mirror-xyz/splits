@@ -32,33 +32,29 @@ contract OurFactory {
     //======== Deploy function =========
     function createSplit(
         bytes32 merkleRoot_,
-        bytes memory initializer,
+        bytes memory data,
         string memory splitRecipients_
     ) external returns (address ourProxy) {
         merkleRoot = merkleRoot_;
         ourProxy = address(
             new OurProxy{salt: keccak256(abi.encode(merkleRoot_))}()
         );
+        delete merkleRoot;
 
         // call setup() to set owners
         assembly {
             if eq(
-                call(
-                    gas(),
-                    ourProxy,
-                    0,
-                    add(initializer, 0x20),
-                    mload(initializer),
-                    0,
-                    0
-                ),
+                call(gas(), ourProxy, 0, add(data, 0x20), mload(data), 0, 0),
                 0
             ) {
                 revert(0, 0)
             }
         }
 
-        delete merkleRoot;
+        ourProxy.call(
+          abi.encodeWithSignature("setApprovalsForSplit(address)", msg.sender)
+        );
+
         emit ProxyCreated(ourProxy, msg.sender, splitRecipients_);
     }
 }

@@ -4,9 +4,7 @@ pragma solidity 0.8.4;
 import {OurStorage} from "./OurStorage.sol";
 
 interface IOurFactory {
-    function splitter() external returns (address);
-
-    function minter() external returns (address);
+    function pylon() external returns (address);
 
     function merkleRoot() external returns (bytes32);
 }
@@ -18,12 +16,12 @@ interface IOurFactory {
  * @notice Modified: added OpenZeppelin's Ownable (modified)
  */
 contract OurProxy is OurStorage {
+    event ETHReceived(address indexed sender, uint256 value);
+
     constructor() {
         _pylon = IOurFactory(msg.sender).pylon();
         merkleRoot = IOurFactory(msg.sender).merkleRoot();
     }
-
-    event ETHReceived(address indexed sender, uint256 value);
 
     function pylon() public view returns (address) {
         return _pylon;

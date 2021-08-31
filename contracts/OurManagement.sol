@@ -4,6 +4,7 @@ pragma solidity 0.8.4;
 contract OurManagement {
     event AddedOwner(address owner);
     event RemovedOwner(address owner);
+    event ProxySetup(address indexed initiator, address[] owners);
 
     address internal constant SENTINEL_OWNERS = address(0x1);
 
@@ -11,63 +12,75 @@ contract OurManagement {
     uint256 internal ownerCount;
     uint256 internal threshold;
 
-    function requireSelfCall() private view {
-        require(msg.sender == address(this));
+    function _msgSender() internal view returns (address) {
+        return msg.sender;
     }
 
-    modifier authorized() {
+    function requireOwnerCall(address caller_) internal view returns (bool) {
+        bool approved = isOwner(caller_);
+        return approved;
+    }
+
+    modifier onlyAnOwner() {
         // This is a function call as it minimized the bytecode size
-        requireSelfCall();
+        requireOwnerCall(_msgSender());
         _;
     }
 
-    /// @dev Setup function sets initial storage of contract.
-    /// @param owners_ List of addresses that can execute transactions other than claiming funds.
-    /// @param splitter_ Contract address that handles fallbacks for anyone other than owners.
-    function setup(address[] calldata owners_, address splitter_) external {
-        // setupOwners checks if the Threshold is already set, therefore preventing that this method is called twice
-        setupOwners(_owners);
-        splitter = splitter_;
-
-        emit ProxySetup(msg.sender, _owners, _threshold, to, fallbackHandler);
-    }
-
     /// @dev Setup function sets initial owners of contract.
-    /// @param _owners List of Split owners (can mint/manage auctions)
-    function setupOwners(address[] memory _owners) internal {
+    /// @param owners_ List of Split owners (can mint/manage auctions)
+    function setupOwners(address[] memory owners_) internal {
         // Threshold can only be 0 at initialization.
         // Check ensures that setup function can only be called once.
         require(threshold == 0, "Setup has already been completed once.");
         // Initializing Safe owners.
         address currentOwner = SENTINEL_OWNERS;
-        for (uint256 i = 0; i < _owners.length; i++) {
+        for (uint256 i = 0; i < owners_.length; i++) {
             // Owner address cannot be null.
-            address owner = _owners[i];
+            address owner = owners_[i];
             require(
                 owner != address(0) &&
                     owner != SENTINEL_OWNERS &&
                     owner != address(this) &&
-                    currentOwner != owner,
-                "GS203"
+                    currentOwner != owner
             );
             // No duplicate owners allowed.
-            require(owners[owner] == address(0), "GS204");
+            require(owners[owner] == address(0));
             owners[currentOwner] = owner;
             currentOwner = owner;
         }
         owners[currentOwner] = SENTINEL_OWNERS;
-        ownerCount = _owners.length;
+        ownerCount = owners_.length;
         threshold = 1;
+    }
+
+    /// @dev Allows to add a new owner to the Safe and update the threshold at the same time.
+    ///      This can only be done via a Safe transaction.
+    /// @notice Adds the owner `owner` to the Safe and updates the threshold to `_threshold`.
+    /// @param owner New owner address.
+    function addOwner(address owner) public onlyAnOwner {
+        // Owner address cannot be null, the sentinel or the Safe itself.
+        require(
+            owner != address(0) &&
+                owner != SENTINEL_OWNERS &&
+                owner != address(this)
+        );
+        // No duplicate owners allowed.
+        require(owners[owner] == address(0));
+        owners[owner] = owners[SENTINEL_OWNERS];
+        owners[SENTINEL_OWNERS] = owner;
+        ownerCount++;
+        emit AddedOwner(owner);
     }
 
     /// @dev Allows to remove an owner
     /// @notice Removes the owner `owner` from the Split
     /// @param prevOwner Owner that pointed to the owner to be removed in the linked list
     /// @param owner Owner address to be removed.
-    function removeOwner(address prevOwner, address owner) public {
+    function removeOwner(address prevOwner, address owner) public onlyAnOwner {
         // Validate owner address and check that it corresponds to owner index.
-        require(owner != address(0) && owner != SENTINEL_OWNERS, "GS203");
-        require(owners[prevOwner] == owner, "GS205");
+        require(owner != address(0) && owner != SENTINEL_OWNERS);
+        require(owners[prevOwner] == owner);
         owners[prevOwner] = owners[owner];
         owners[owner] = address(0);
         ownerCount--;
@@ -83,19 +96,20 @@ contract OurManagement {
         address prevOwner,
         address oldOwner,
         address newOwner
-    ) public {
+    ) public onlyAnOwner {
+        // require(onlyAnOwner(msg.sender), "1");
         // Owner address cannot be null, the sentinel or the Safe itself.
         require(
             newOwner != address(0) &&
                 newOwner != SENTINEL_OWNERS &&
                 newOwner != address(this),
-            "GS203"
+            "2"
         );
         // No duplicate owners allowed.
-        require(owners[newOwner] == address(0), "GS204");
+        require(owners[newOwner] == address(0), "3");
         // Validate oldOwner address and check that it corresponds to owner index.
-        require(oldOwner != address(0) && oldOwner != SENTINEL_OWNERS, "GS203");
-        require(owners[prevOwner] == oldOwner, "GS205");
+        require(oldOwner != address(0) && oldOwner != SENTINEL_OWNERS, "4");
+        require(owners[prevOwner] == oldOwner, "5");
         owners[newOwner] = owners[oldOwner];
         owners[prevOwner] = newOwner;
         owners[oldOwner] = address(0);
