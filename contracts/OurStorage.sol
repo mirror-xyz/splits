@@ -8,16 +8,16 @@ pragma solidity 0.8.4;
  * @notice Modified: store addresses as constants, add _minter
  */
 contract OurStorage {
-  bytes32 public merkleRoot;
-  uint256 public currentWindow;
+    bytes32 public merkleRoot;
+    uint256 public currentWindow;
 
-  /// @notice RINKEBY ADDRESS
-  address public constant wethAddress = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
+    address internal _pylon;
 
-  address internal _splitter;
-  address internal _minter;
+    /// @notice RINKEBY ADDRESS
+    address public constant wethAddress =
+        0xc778417E063141139Fce010982780140Aa0cD5Ab;
 
-  uint256[] public balanceForWindow;
-  mapping(bytes32 => bool) internal claimed;
-  uint256 internal depositedInWindow;
+    uint256[] public balanceForWindow;
+    mapping(bytes32 => bool) internal claimed;
+    uint256 internal depositedInWindow;
 }

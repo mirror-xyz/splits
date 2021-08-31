@@ -21,8 +21,9 @@ import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
-interface OurMinterInterface extends ethers.utils.Interface {
+interface OurPylonInterface extends ethers.utils.Interface {
   functions: {
+    "PERCENTAGE_SCALE()": FunctionFragment;
     "_mirrorAH()": FunctionFragment;
     "_mirrorCrowdfundFactory()": FunctionFragment;
     "_mirrorEditions()": FunctionFragment;
@@ -33,31 +34,46 @@ interface OurMinterInterface extends ethers.utils.Interface {
     "_zoraMedia()": FunctionFragment;
     "acceptZoraMarketBid(uint256,tuple)": FunctionFragment;
     "addOwner(address)": FunctionFragment;
+    "balanceForWindow(uint256)": FunctionFragment;
     "buyMirrorEdition(uint256)": FunctionFragment;
     "cancelZoraAuction(uint256)": FunctionFragment;
+    "claim(uint256,address,uint256,bytes32[])": FunctionFragment;
+    "claimForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "createMirrorAuction(uint256,uint256,uint256,address,address)": FunctionFragment;
     "createMirrorBid(uint256)": FunctionFragment;
     "createMirrorCrowdfund(string,string,address,address,uint256,uint256)": FunctionFragment;
     "createMirrorEdition(uint256,uint256,address)": FunctionFragment;
     "createZoraAuction(uint256,address,uint256,uint256,address,uint8,address)": FunctionFragment;
     "createZoraAuctionBid(uint256,uint256)": FunctionFragment;
+    "currentWindow()": FunctionFragment;
     "endMirrorAuction(uint256)": FunctionFragment;
     "endZoraAuction(uint256)": FunctionFragment;
     "getOwners()": FunctionFragment;
+    "incrementWindow()": FunctionFragment;
+    "incrementWindowThenClaimForAll(address,uint256,bytes32[])": FunctionFragment;
+    "isClaimed(uint256,address)": FunctionFragment;
     "isOwner(address)": FunctionFragment;
+    "merkleRoot()": FunctionFragment;
     "mintToAuctionForETH(tuple,tuple,uint256,uint256)": FunctionFragment;
     "mintZora(tuple,tuple)": FunctionFragment;
     "mintZoraWithSig(address,tuple,tuple,tuple)": FunctionFragment;
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
+    "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "removeOwner(address,address)": FunctionFragment;
     "removeZoraMarketAsk(uint256)": FunctionFragment;
     "removeZoraMarketBid(uint256,address)": FunctionFragment;
+    "scaleAmountByPercentage(uint256,uint256)": FunctionFragment;
     "setZoraAuctionApproval(uint256,bool)": FunctionFragment;
     "setZoraAuctionReservePrice(uint256,uint256)": FunctionFragment;
     "setZoraMarketAsk(uint256,tuple)": FunctionFragment;
     "setZoraMarketBid(uint256,tuple,address)": FunctionFragment;
     "setZoraMarketBidShares(uint256,tuple)": FunctionFragment;
+    "setup(address[])": FunctionFragment;
     "startSplitParty(address,address,uint256,uint256,string,string)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
     "swapOwner(address,address,address)": FunctionFragment;
+    "tokensReceived(address,address,address,uint256,bytes,bytes)": FunctionFragment;
     "unsafeCreateZoraAuction(uint256,address,uint256,uint256,address,uint8,address)": FunctionFragment;
     "untrustedBurn721(address,uint256)": FunctionFragment;
     "untrustedCloseCrowdFunding(address)": FunctionFragment;
@@ -68,9 +84,14 @@ interface OurMinterInterface extends ethers.utils.Interface {
     "updateZoraMediaMetadataURI(uint256,string)": FunctionFragment;
     "updateZoraMediaTokenURI(uint256,string)": FunctionFragment;
     "updateZoraMediaURIs(uint256,string,string)": FunctionFragment;
+    "wethAddress()": FunctionFragment;
     "withdrawEditionFunds(uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "PERCENTAGE_SCALE",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "_mirrorAH", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "_mirrorCrowdfundFactory",
@@ -115,12 +136,24 @@ interface OurMinterInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "addOwner", values: [string]): string;
   encodeFunctionData(
+    functionFragment: "balanceForWindow",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "buyMirrorEdition",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "cancelZoraAuction",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claim",
+    values: [BigNumberish, string, BigNumberish, BytesLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claimForAllWindows",
+    values: [string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
     functionFragment: "createMirrorAuction",
@@ -155,6 +188,10 @@ interface OurMinterInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "currentWindow",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "endMirrorAuction",
     values: [BigNumberish]
   ): string;
@@ -163,7 +200,23 @@ interface OurMinterInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "getOwners", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "incrementWindow",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "incrementWindowThenClaimForAll",
+    values: [string, BigNumberish, BytesLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isClaimed",
+    values: [BigNumberish, string]
+  ): string;
   encodeFunctionData(functionFragment: "isOwner", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "merkleRoot",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "mintToAuctionForETH",
     values: [
@@ -217,6 +270,18 @@ interface OurMinterInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "onERC1155BatchReceived",
+    values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC1155Received",
+    values: [string, string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC721Received",
+    values: [string, string, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "removeOwner",
     values: [string, string]
   ): string;
@@ -227,6 +292,10 @@ interface OurMinterInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "removeZoraMarketBid",
     values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "scaleAmountByPercentage",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setZoraAuctionApproval",
@@ -265,13 +334,22 @@ interface OurMinterInterface extends ethers.utils.Interface {
       }
     ]
   ): string;
+  encodeFunctionData(functionFragment: "setup", values: [string[]]): string;
   encodeFunctionData(
     functionFragment: "startSplitParty",
     values: [string, string, BigNumberish, BigNumberish, string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "swapOwner",
     values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokensReceived",
+    values: [string, string, string, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "unsafeCreateZoraAuction",
@@ -322,10 +400,18 @@ interface OurMinterInterface extends ethers.utils.Interface {
     values: [BigNumberish, string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "wethAddress",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "withdrawEditionFunds",
     values: [BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "PERCENTAGE_SCALE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "_mirrorAH", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "_mirrorCrowdfundFactory",
@@ -358,11 +444,20 @@ interface OurMinterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "addOwner", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "balanceForWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "buyMirrorEdition",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "cancelZoraAuction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimForAllWindows",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -390,6 +485,10 @@ interface OurMinterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "currentWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "endMirrorAuction",
     data: BytesLike
   ): Result;
@@ -398,7 +497,17 @@ interface OurMinterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOwners", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "incrementWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "incrementWindowThenClaimForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "isClaimed", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "mintToAuctionForETH",
     data: BytesLike
@@ -406,6 +515,18 @@ interface OurMinterInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "mintZora", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "mintZoraWithSig",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC1155BatchReceived",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC1155Received",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC721Received",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -418,6 +539,10 @@ interface OurMinterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "removeZoraMarketBid",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "scaleAmountByPercentage",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -440,11 +565,20 @@ interface OurMinterInterface extends ethers.utils.Interface {
     functionFragment: "setZoraMarketBidShares",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setup", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "startSplitParty",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "swapOwner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokensReceived",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "unsafeCreateZoraAuction",
     data: BytesLike
@@ -486,22 +620,38 @@ interface OurMinterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "wethAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "withdrawEditionFunds",
     data: BytesLike
   ): Result;
 
   events: {
     "AddedOwner(address)": EventFragment;
+    "Batch1155Received(address,address,uint256[],uint256[])": EventFragment;
+    "ERC1155Received(address,address,uint256,uint256)": EventFragment;
+    "ERC777Received(address,address,address,uint256)": EventFragment;
     "ProxySetup(address,address[])": EventFragment;
     "RemovedOwner(address)": EventFragment;
+    "TokenReceived(address,address,uint256)": EventFragment;
+    "TransferETH(address,uint256,bool)": EventFragment;
+    "WindowIncremented(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AddedOwner"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Batch1155Received"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ERC1155Received"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ERC777Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProxySetup"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemovedOwner"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TokenReceived"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TransferETH"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WindowIncremented"): EventFragment;
 }
 
-export class OurMinter extends Contract {
+export class OurPylon extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -512,9 +662,13 @@ export class OurMinter extends Contract {
   removeAllListeners(eventName: EventFilter | string): this;
   removeListener(eventName: any, listener: Listener): this;
 
-  interface: OurMinterInterface;
+  interface: OurPylonInterface;
 
   functions: {
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     _mirrorAH(overrides?: CallOverrides): Promise<[string]>;
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<[string]>;
@@ -581,6 +735,16 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     buyMirrorEdition(
       editionId: BigNumberish,
       overrides?: PayableOverrides
@@ -598,6 +762,36 @@ export class OurMinter extends Contract {
 
     "cancelZoraAuction(uint256)"(
       auctionId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    claim(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "claim(uint256,address,uint256,bytes32[])"(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -697,6 +891,10 @@ export class OurMinter extends Contract {
       overrides?: PayableOverrides
     ): Promise<ContractTransaction>;
 
+    currentWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     endMirrorAuction(
       tokenId: BigNumberish,
       overrides?: Overrides
@@ -721,12 +919,46 @@ export class OurMinter extends Contract {
 
     "getOwners()"(overrides?: CallOverrides): Promise<[string[]]>;
 
+    incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+    incrementWindowThenClaimForAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    isClaimed(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "isClaimed(uint256,address)"(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     isOwner(owner: string, overrides?: CallOverrides): Promise<[boolean]>;
 
     "isOwner(address)"(
       owner: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    merkleRoot(overrides?: CallOverrides): Promise<[string]>;
+
+    "merkleRoot()"(overrides?: CallOverrides): Promise<[string]>;
 
     mintToAuctionForETH(
       mediaData: {
@@ -836,6 +1068,58 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    onERC1155BatchReceived(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    onERC1155Received(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "onERC1155Received(address,address,uint256,uint256,bytes)"(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    onERC721Received(
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "onERC721Received(address,address,uint256,bytes)"(
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     removeOwner(
       prevOwner: string,
       owner: string,
@@ -869,6 +1153,18 @@ export class OurMinter extends Contract {
       bidder: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { scaledAmount: BigNumber }>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { scaledAmount: BigNumber }>;
 
     setZoraAuctionApproval(
       auctionId: BigNumberish,
@@ -952,6 +1248,16 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    setup(
+      owners_: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setup(address[])"(
+      owners_: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     startSplitParty(
       marketWrapper: string,
       nftContract: string,
@@ -972,6 +1278,16 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "supportsInterface(bytes4)"(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     swapOwner(
       prevOwner: string,
       oldOwner: string,
@@ -983,6 +1299,26 @@ export class OurMinter extends Contract {
       prevOwner: string,
       oldOwner: string,
       newOwner: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    tokensReceived(
+      operator: string,
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      arg4: BytesLike,
+      arg5: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+      operator: string,
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      arg4: BytesLike,
+      arg5: BytesLike,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -1120,6 +1456,10 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    wethAddress(overrides?: CallOverrides): Promise<[string]>;
+
+    "wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
+
     withdrawEditionFunds(
       editionId: BigNumberish,
       overrides?: Overrides
@@ -1130,6 +1470,10 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
   };
+
+  PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   _mirrorAH(overrides?: CallOverrides): Promise<string>;
 
@@ -1194,6 +1538,16 @@ export class OurMinter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  balanceForWindow(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "balanceForWindow(uint256)"(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   buyMirrorEdition(
     editionId: BigNumberish,
     overrides?: PayableOverrides
@@ -1211,6 +1565,36 @@ export class OurMinter extends Contract {
 
   "cancelZoraAuction(uint256)"(
     auctionId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  claim(
+    window: BigNumberish,
+    account: string,
+    scaledPercentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "claim(uint256,address,uint256,bytes32[])"(
+    window: BigNumberish,
+    account: string,
+    scaledPercentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  claimForAllWindows(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "claimForAllWindows(address,uint256,bytes32[])"(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -1310,6 +1694,10 @@ export class OurMinter extends Contract {
     overrides?: PayableOverrides
   ): Promise<ContractTransaction>;
 
+  currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   endMirrorAuction(
     tokenId: BigNumberish,
     overrides?: Overrides
@@ -1334,12 +1722,46 @@ export class OurMinter extends Contract {
 
   "getOwners()"(overrides?: CallOverrides): Promise<string[]>;
 
+  incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+  incrementWindowThenClaimForAll(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  isClaimed(
+    window: BigNumberish,
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "isClaimed(uint256,address)"(
+    window: BigNumberish,
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   isOwner(owner: string, overrides?: CallOverrides): Promise<boolean>;
 
   "isOwner(address)"(
     owner: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  merkleRoot(overrides?: CallOverrides): Promise<string>;
+
+  "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
   mintToAuctionForETH(
     mediaData: {
@@ -1449,6 +1871,58 @@ export class OurMinter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  onERC1155BatchReceived(
+    operator: string,
+    from: string,
+    ids: BigNumberish[],
+    values: BigNumberish[],
+    arg4: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"(
+    operator: string,
+    from: string,
+    ids: BigNumberish[],
+    values: BigNumberish[],
+    arg4: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  onERC1155Received(
+    operator: string,
+    from: string,
+    id: BigNumberish,
+    value: BigNumberish,
+    arg4: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "onERC1155Received(address,address,uint256,uint256,bytes)"(
+    operator: string,
+    from: string,
+    id: BigNumberish,
+    value: BigNumberish,
+    arg4: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  onERC721Received(
+    operator_: string,
+    from_: string,
+    tokenId_: BigNumberish,
+    arg3: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "onERC721Received(address,address,uint256,bytes)"(
+    operator_: string,
+    from_: string,
+    tokenId_: BigNumberish,
+    arg3: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   removeOwner(
     prevOwner: string,
     owner: string,
@@ -1482,6 +1956,18 @@ export class OurMinter extends Contract {
     bidder: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
+
+  scaleAmountByPercentage(
+    amount: BigNumberish,
+    scaledPercent: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "scaleAmountByPercentage(uint256,uint256)"(
+    amount: BigNumberish,
+    scaledPercent: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   setZoraAuctionApproval(
     auctionId: BigNumberish,
@@ -1565,6 +2051,13 @@ export class OurMinter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  setup(owners_: string[], overrides?: Overrides): Promise<ContractTransaction>;
+
+  "setup(address[])"(
+    owners_: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   startSplitParty(
     marketWrapper: string,
     nftContract: string,
@@ -1585,6 +2078,16 @@ export class OurMinter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  supportsInterface(
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "supportsInterface(bytes4)"(
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   swapOwner(
     prevOwner: string,
     oldOwner: string,
@@ -1596,6 +2099,26 @@ export class OurMinter extends Contract {
     prevOwner: string,
     oldOwner: string,
     newOwner: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  tokensReceived(
+    operator: string,
+    from: string,
+    to: string,
+    amount: BigNumberish,
+    arg4: BytesLike,
+    arg5: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+    operator: string,
+    from: string,
+    to: string,
+    amount: BigNumberish,
+    arg4: BytesLike,
+    arg5: BytesLike,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -1733,6 +2256,10 @@ export class OurMinter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  wethAddress(overrides?: CallOverrides): Promise<string>;
+
+  "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+
   withdrawEditionFunds(
     editionId: BigNumberish,
     overrides?: Overrides
@@ -1744,6 +2271,10 @@ export class OurMinter extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     _mirrorAH(overrides?: CallOverrides): Promise<string>;
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<string>;
@@ -1807,6 +2338,16 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     buyMirrorEdition(
       editionId: BigNumberish,
       overrides?: CallOverrides
@@ -1824,6 +2365,36 @@ export class OurMinter extends Contract {
 
     "cancelZoraAuction(uint256)"(
       auctionId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    claim(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "claim(uint256,address,uint256,bytes32[])"(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1923,6 +2494,10 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     endMirrorAuction(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1947,12 +2522,46 @@ export class OurMinter extends Contract {
 
     "getOwners()"(overrides?: CallOverrides): Promise<string[]>;
 
+    incrementWindow(overrides?: CallOverrides): Promise<void>;
+
+    "incrementWindow()"(overrides?: CallOverrides): Promise<void>;
+
+    incrementWindowThenClaimForAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    isClaimed(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "isClaimed(uint256,address)"(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     isOwner(owner: string, overrides?: CallOverrides): Promise<boolean>;
 
     "isOwner(address)"(
       owner: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    merkleRoot(overrides?: CallOverrides): Promise<string>;
+
+    "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
     mintToAuctionForETH(
       mediaData: {
@@ -2062,6 +2671,58 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    onERC1155BatchReceived(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    onERC1155Received(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      arg4: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "onERC1155Received(address,address,uint256,uint256,bytes)"(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      arg4: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    onERC721Received(
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      arg3: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "onERC721Received(address,address,uint256,bytes)"(
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      arg3: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     removeOwner(
       prevOwner: string,
       owner: string,
@@ -2095,6 +2756,18 @@ export class OurMinter extends Contract {
       bidder: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     setZoraAuctionApproval(
       auctionId: BigNumberish,
@@ -2178,6 +2851,13 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setup(owners_: string[], overrides?: CallOverrides): Promise<void>;
+
+    "setup(address[])"(
+      owners_: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     startSplitParty(
       marketWrapper: string,
       nftContract: string,
@@ -2198,6 +2878,16 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "supportsInterface(bytes4)"(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     swapOwner(
       prevOwner: string,
       oldOwner: string,
@@ -2209,6 +2899,26 @@ export class OurMinter extends Contract {
       prevOwner: string,
       oldOwner: string,
       newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    tokensReceived(
+      operator: string,
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      arg4: BytesLike,
+      arg5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+      operator: string,
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      arg4: BytesLike,
+      arg5: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -2346,6 +3056,10 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    wethAddress(overrides?: CallOverrides): Promise<string>;
+
+    "wethAddress()"(overrides?: CallOverrides): Promise<string>;
+
     withdrawEditionFunds(
       editionId: BigNumberish,
       overrides?: CallOverrides
@@ -2360,12 +3074,43 @@ export class OurMinter extends Contract {
   filters: {
     AddedOwner(owner: null): EventFilter;
 
+    Batch1155Received(
+      operator: null,
+      from: null,
+      ids: null,
+      values: null
+    ): EventFilter;
+
+    ERC1155Received(
+      operator: null,
+      from: null,
+      id: null,
+      value: null
+    ): EventFilter;
+
+    ERC777Received(
+      operator: null,
+      from: null,
+      to: null,
+      amount: null
+    ): EventFilter;
+
     ProxySetup(initiator: string | null, owners: null): EventFilter;
 
     RemovedOwner(owner: null): EventFilter;
+
+    TokenReceived(operator: null, from: null, tokenId: null): EventFilter;
+
+    TransferETH(account: null, amount: null, success: null): EventFilter;
+
+    WindowIncremented(currentWindow: null, fundsAvailable: null): EventFilter;
   };
 
   estimateGas: {
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PERCENTAGE_SCALE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     _mirrorAH(overrides?: CallOverrides): Promise<BigNumber>;
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -2429,6 +3174,16 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     buyMirrorEdition(
       editionId: BigNumberish,
       overrides?: PayableOverrides
@@ -2446,6 +3201,36 @@ export class OurMinter extends Contract {
 
     "cancelZoraAuction(uint256)"(
       auctionId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    claim(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "claim(uint256,address,uint256,bytes32[])"(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -2545,6 +3330,10 @@ export class OurMinter extends Contract {
       overrides?: PayableOverrides
     ): Promise<BigNumber>;
 
+    currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     endMirrorAuction(
       tokenId: BigNumberish,
       overrides?: Overrides
@@ -2569,12 +3358,46 @@ export class OurMinter extends Contract {
 
     "getOwners()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    incrementWindow(overrides?: Overrides): Promise<BigNumber>;
+
+    "incrementWindow()"(overrides?: Overrides): Promise<BigNumber>;
+
+    incrementWindowThenClaimForAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    isClaimed(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "isClaimed(uint256,address)"(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     isOwner(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "isOwner(address)"(
       owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    merkleRoot(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "merkleRoot()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     mintToAuctionForETH(
       mediaData: {
@@ -2684,6 +3507,58 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    onERC1155BatchReceived(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    onERC1155Received(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "onERC1155Received(address,address,uint256,uint256,bytes)"(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    onERC721Received(
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "onERC721Received(address,address,uint256,bytes)"(
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     removeOwner(
       prevOwner: string,
       owner: string,
@@ -2716,6 +3591,18 @@ export class OurMinter extends Contract {
       tokenId: BigNumberish,
       bidder: string,
       overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     setZoraAuctionApproval(
@@ -2800,6 +3687,13 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    setup(owners_: string[], overrides?: Overrides): Promise<BigNumber>;
+
+    "setup(address[])"(
+      owners_: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     startSplitParty(
       marketWrapper: string,
       nftContract: string,
@@ -2820,6 +3714,16 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "supportsInterface(bytes4)"(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     swapOwner(
       prevOwner: string,
       oldOwner: string,
@@ -2831,6 +3735,26 @@ export class OurMinter extends Contract {
       prevOwner: string,
       oldOwner: string,
       newOwner: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    tokensReceived(
+      operator: string,
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      arg4: BytesLike,
+      arg5: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+      operator: string,
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      arg4: BytesLike,
+      arg5: BytesLike,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -2968,6 +3892,10 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     withdrawEditionFunds(
       editionId: BigNumberish,
       overrides?: Overrides
@@ -2980,6 +3908,12 @@ export class OurMinter extends Contract {
   };
 
   populateTransaction: {
+    PERCENTAGE_SCALE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "PERCENTAGE_SCALE()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     _mirrorAH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -3056,6 +3990,16 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    balanceForWindow(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "balanceForWindow(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     buyMirrorEdition(
       editionId: BigNumberish,
       overrides?: PayableOverrides
@@ -3073,6 +4017,36 @@ export class OurMinter extends Contract {
 
     "cancelZoraAuction(uint256)"(
       auctionId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    claim(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "claim(uint256,address,uint256,bytes32[])"(
+      window: BigNumberish,
+      account: string,
+      scaledPercentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    claimForAllWindows(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "claimForAllWindows(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -3172,6 +4146,10 @@ export class OurMinter extends Contract {
       overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
+    currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     endMirrorAuction(
       tokenId: BigNumberish,
       overrides?: Overrides
@@ -3196,6 +4174,36 @@ export class OurMinter extends Contract {
 
     "getOwners()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "incrementWindow()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    incrementWindowThenClaimForAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "incrementWindowThenClaimForAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    isClaimed(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "isClaimed(uint256,address)"(
+      window: BigNumberish,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     isOwner(
       owner: string,
       overrides?: CallOverrides
@@ -3205,6 +4213,10 @@ export class OurMinter extends Contract {
       owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "merkleRoot()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     mintToAuctionForETH(
       mediaData: {
@@ -3314,6 +4326,58 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    onERC1155BatchReceived(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    onERC1155Received(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "onERC1155Received(address,address,uint256,uint256,bytes)"(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    onERC721Received(
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "onERC721Received(address,address,uint256,bytes)"(
+      operator_: string,
+      from_: string,
+      tokenId_: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     removeOwner(
       prevOwner: string,
       owner: string,
@@ -3346,6 +4410,18 @@ export class OurMinter extends Contract {
       tokenId: BigNumberish,
       bidder: string,
       overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    scaleAmountByPercentage(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "scaleAmountByPercentage(uint256,uint256)"(
+      amount: BigNumberish,
+      scaledPercent: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     setZoraAuctionApproval(
@@ -3430,6 +4506,16 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    setup(
+      owners_: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setup(address[])"(
+      owners_: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     startSplitParty(
       marketWrapper: string,
       nftContract: string,
@@ -3450,6 +4536,16 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "supportsInterface(bytes4)"(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     swapOwner(
       prevOwner: string,
       oldOwner: string,
@@ -3461,6 +4557,26 @@ export class OurMinter extends Contract {
       prevOwner: string,
       oldOwner: string,
       newOwner: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    tokensReceived(
+      operator: string,
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      arg4: BytesLike,
+      arg5: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+      operator: string,
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      arg4: BytesLike,
+      arg5: BytesLike,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -3597,6 +4713,10 @@ export class OurMinter extends Contract {
       metadataURI: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdrawEditionFunds(
       editionId: BigNumberish,

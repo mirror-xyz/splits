@@ -23,26 +23,17 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface IOurFactoryInterface extends ethers.utils.Interface {
   functions: {
     "merkleRoot()": FunctionFragment;
-    "minter()": FunctionFragment;
-    "splitOwner()": FunctionFragment;
-    "splitter()": FunctionFragment;
+    "pylon()": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "merkleRoot",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "minter", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "splitOwner",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "splitter", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pylon", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "minter", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "splitOwner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "splitter", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pylon", data: BytesLike): Result;
 
   events: {};
 }
@@ -65,51 +56,27 @@ export class IOurFactory extends Contract {
 
     "merkleRoot()"(overrides?: Overrides): Promise<ContractTransaction>;
 
-    minter(overrides?: Overrides): Promise<ContractTransaction>;
+    pylon(overrides?: Overrides): Promise<ContractTransaction>;
 
-    "minter()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-    splitOwner(overrides?: Overrides): Promise<ContractTransaction>;
-
-    "splitOwner()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-    splitter(overrides?: Overrides): Promise<ContractTransaction>;
-
-    "splitter()"(overrides?: Overrides): Promise<ContractTransaction>;
+    "pylon()"(overrides?: Overrides): Promise<ContractTransaction>;
   };
 
   merkleRoot(overrides?: Overrides): Promise<ContractTransaction>;
 
   "merkleRoot()"(overrides?: Overrides): Promise<ContractTransaction>;
 
-  minter(overrides?: Overrides): Promise<ContractTransaction>;
+  pylon(overrides?: Overrides): Promise<ContractTransaction>;
 
-  "minter()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-  splitOwner(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "splitOwner()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-  splitter(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "splitter()"(overrides?: Overrides): Promise<ContractTransaction>;
+  "pylon()"(overrides?: Overrides): Promise<ContractTransaction>;
 
   callStatic: {
     merkleRoot(overrides?: CallOverrides): Promise<string>;
 
     "merkleRoot()"(overrides?: CallOverrides): Promise<string>;
 
-    minter(overrides?: CallOverrides): Promise<string>;
+    pylon(overrides?: CallOverrides): Promise<string>;
 
-    "minter()"(overrides?: CallOverrides): Promise<string>;
-
-    splitOwner(overrides?: CallOverrides): Promise<string>;
-
-    "splitOwner()"(overrides?: CallOverrides): Promise<string>;
-
-    splitter(overrides?: CallOverrides): Promise<string>;
-
-    "splitter()"(overrides?: CallOverrides): Promise<string>;
+    "pylon()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
@@ -119,17 +86,9 @@ export class IOurFactory extends Contract {
 
     "merkleRoot()"(overrides?: Overrides): Promise<BigNumber>;
 
-    minter(overrides?: Overrides): Promise<BigNumber>;
+    pylon(overrides?: Overrides): Promise<BigNumber>;
 
-    "minter()"(overrides?: Overrides): Promise<BigNumber>;
-
-    splitOwner(overrides?: Overrides): Promise<BigNumber>;
-
-    "splitOwner()"(overrides?: Overrides): Promise<BigNumber>;
-
-    splitter(overrides?: Overrides): Promise<BigNumber>;
-
-    "splitter()"(overrides?: Overrides): Promise<BigNumber>;
+    "pylon()"(overrides?: Overrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -137,16 +96,8 @@ export class IOurFactory extends Contract {
 
     "merkleRoot()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
-    minter(overrides?: Overrides): Promise<PopulatedTransaction>;
+    pylon(overrides?: Overrides): Promise<PopulatedTransaction>;
 
-    "minter()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    splitOwner(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    "splitOwner()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    splitter(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    "splitter()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+    "pylon()"(overrides?: Overrides): Promise<PopulatedTransaction>;
   };
 }

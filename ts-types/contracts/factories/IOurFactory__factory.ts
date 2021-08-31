@@ -32,33 +32,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "minter",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "splitOwner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "splitter",
+    name: "pylon",
     outputs: [
       {
         internalType: "address",
