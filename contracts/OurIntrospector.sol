@@ -1,7 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.4;
 
-contract OurIntrospector {
+import "./interfaces/ERC1155TokenReceiver.sol";
+import "./interfaces/ERC721TokenReceiver.sol";
+import "./interfaces/ERC777TokensRecipient.sol";
+import "./interfaces/IERC165.sol";
+
+contract OurIntrospector is
+    ERC1155TokenReceiver,
+    ERC777TokensRecipient,
+    ERC721TokenReceiver,
+    IERC165
+{
     //======== ERC721 =========
     // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.3.0/contracts/token/ERC721/IERC721Receiver.sol
     event TokenReceived(address operator, address from, uint256 tokenId);
@@ -11,7 +21,7 @@ contract OurIntrospector {
         address from_,
         uint256 tokenId_,
         bytes calldata
-    ) external returns (bytes4) {
+    ) external override returns (bytes4) {
         emit TokenReceived(operator_, from_, tokenId_);
         return 0x150b7a02;
     }
@@ -37,7 +47,7 @@ contract OurIntrospector {
         uint256 id,
         uint256 value,
         bytes calldata
-    ) external pure override returns (bytes4) {
+    ) external override returns (bytes4) {
         emit ERC1155Received(operator, from, id, value);
         return 0xf23a6e61;
     }
@@ -48,7 +58,7 @@ contract OurIntrospector {
         uint256[] calldata ids,
         uint256[] calldata values,
         bytes calldata
-    ) external pure override returns (bytes4) {
+    ) external override returns (bytes4) {
         emit Batch1155Received(operator, from, ids, values);
         return 0xbc197c81;
     }
@@ -69,7 +79,7 @@ contract OurIntrospector {
         uint256 amount,
         bytes calldata,
         bytes calldata
-    ) external {
+    ) external override {
         emit ERC777Received(operator, from, to, amount);
     }
 
@@ -77,8 +87,7 @@ contract OurIntrospector {
     // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.3.0/contracts/utils/introspection/ERC165.sol
     function supportsInterface(bytes4 interfaceId)
         external
-        view
-        virtual
+        pure
         override
         returns (bool)
     {
