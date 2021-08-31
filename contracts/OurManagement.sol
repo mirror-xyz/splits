@@ -12,13 +12,27 @@ contract OurManagement {
   uint256 internal threshold;
 
   function requireSelfCall() private view {
-      require(msg.sender == address(this), "GS031");
+      require(msg.sender == address(this));
   }
 
   modifier authorized() {
       // This is a function call as it minimized the bytecode size
       requireSelfCall();
       _;
+  }
+
+  /// @dev Setup function sets initial storage of contract.
+  /// @param owners_ List of addresses that can execute transactions other than claiming funds.
+  /// @param splitter_ Contract address that handles fallbacks for anyone other than owners.
+  function setup(
+      address[] calldata owners_,
+      address splitter_
+  ) external {
+      // setupOwners checks if the Threshold is already set, therefore preventing that this method is called twice
+      setupOwners(_owners);
+      splitter = splitter_;
+
+      emit ProxySetup(msg.sender, _owners, _threshold, to, fallbackHandler);
   }
 
   /// @dev Setup function sets initial owners of contract.
