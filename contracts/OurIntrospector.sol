@@ -23,7 +23,7 @@ contract OurIntrospector is
 {
     //======== ERC721 =========
     // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.3.0/contracts/token/ERC721/IERC721Receiver.sol
-    event TokenReceived(address operator, address from, uint256 tokenId);
+    event ERC721Received(address operator, address from, uint256 tokenId);
 
     function onERC721Received(
         address operator_,
