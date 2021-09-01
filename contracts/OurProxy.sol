@@ -10,14 +10,15 @@ interface IOurFactory {
 }
 
 /**
- * @title OurProxy (originally SplitProxy)
- * @author MirrorXYZ https://github.com/mirror-xyz/splits - modified by Nick Adamson for Ourz
- *
- * @notice Modified: added OpenZeppelin's Ownable (modified)
+ * @title OurProxy
+ * @author Nick Adamson - nickadamson@pm.me
+ * 
+ * Building on the work from:
+ * @author Mirror       @title Splits   https://github.com/mirror-xyz/splits
+ * @author Gnosis       @title Safe     https://github.com/gnosis/safe-contracts
+ * & of course, @author OpenZeppelin
  */
 contract OurProxy is OurStorage {
-    event ETHReceived(address indexed sender, uint256 value);
-
     constructor() {
         _pylon = IOurFactory(msg.sender).pylon();
         merkleRoot = IOurFactory(msg.sender).merkleRoot();
@@ -44,11 +45,5 @@ contract OurProxy is OurStorage {
                 return(ptr, size)
             }
         }
-    }
-
-    // Plain ETH transfers.
-    receive() external payable {
-        emit ETHReceived(msg.sender, msg.value);
-        depositedInWindow += msg.value;
     }
 }

@@ -4,10 +4,13 @@ pragma solidity 0.8.4;
 import {OurProxy} from "./OurProxy.sol";
 
 /**
- * @title OurFactory (originally SplitFactory)
- * @author MirrorXYZ https://github.com/mirror-xyz/splits - modified by Nick Adamson for Ourz
- *
- * @notice Modified: store OurMinter.sol address, add events, remove WETHaddress in favor of constant
+ * @title OurFactory
+ * @author Nick Adamson - nickadamson@pm.me
+ * 
+ * Building on the work from:
+ * @author Mirror       @title Splits   https://github.com/mirror-xyz/splits
+ * @author Gnosis       @title Safe     https://github.com/gnosis/safe-contracts
+ * & of course, @author OpenZeppelin
  */
 contract OurFactory {
     //======== Graph Protocol =========
@@ -50,10 +53,6 @@ contract OurFactory {
                 revert(0, 0)
             }
         }
-
-        ourProxy.call(
-          abi.encodeWithSignature("setApprovalsForSplit(address)", msg.sender)
-        );
 
         emit ProxyCreated(ourProxy, msg.sender, splitRecipients_);
     }

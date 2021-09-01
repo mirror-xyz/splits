@@ -24,11 +24,11 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface OurMinterInterface extends ethers.utils.Interface {
   functions: {
     "_mirrorAH()": FunctionFragment;
-    "_mirrorCrowdfundFactory()": FunctionFragment;
+    "_mirrorCrowdfund()": FunctionFragment;
     "_mirrorEditions()": FunctionFragment;
-    "_partyBidFactory()": FunctionFragment;
-    "_wethAddress()": FunctionFragment;
-    "_zoraAuctionHouse()": FunctionFragment;
+    "_partyBid()": FunctionFragment;
+    "_weth()": FunctionFragment;
+    "_zoraAH()": FunctionFragment;
     "_zoraMarket()": FunctionFragment;
     "_zoraMedia()": FunctionFragment;
     "acceptZoraMarketBid(uint256,tuple)": FunctionFragment;
@@ -61,7 +61,6 @@ interface OurMinterInterface extends ethers.utils.Interface {
     "unsafeCreateZoraAuction(uint256,address,uint256,uint256,address,uint8,address)": FunctionFragment;
     "untrustedBurn721(address,uint256)": FunctionFragment;
     "untrustedCloseCrowdFunding(address)": FunctionFragment;
-    "untrustedRescueERC20(address,address,uint256)": FunctionFragment;
     "untrustedSafeTransfer721(address,address,uint256)": FunctionFragment;
     "untrustedSetApproval721(address,address,bool)": FunctionFragment;
     "updateMirrorMinBid(uint256)": FunctionFragment;
@@ -73,25 +72,16 @@ interface OurMinterInterface extends ethers.utils.Interface {
 
   encodeFunctionData(functionFragment: "_mirrorAH", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "_mirrorCrowdfundFactory",
+    functionFragment: "_mirrorCrowdfund",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "_mirrorEditions",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "_partyBidFactory",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "_wethAddress",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "_zoraAuctionHouse",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "_partyBid", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_weth", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_zoraAH", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "_zoraMarket",
     values?: undefined
@@ -294,10 +284,6 @@ interface OurMinterInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "untrustedRescueERC20",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "untrustedSafeTransfer721",
     values: [string, string, BigNumberish]
   ): string;
@@ -328,25 +314,16 @@ interface OurMinterInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "_mirrorAH", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "_mirrorCrowdfundFactory",
+    functionFragment: "_mirrorCrowdfund",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "_mirrorEditions",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "_partyBidFactory",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "_wethAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "_zoraAuctionHouse",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "_partyBid", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_weth", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_zoraAH", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "_zoraMarket",
     data: BytesLike
@@ -458,10 +435,6 @@ interface OurMinterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "untrustedRescueERC20",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "untrustedSafeTransfer721",
     data: BytesLike
   ): Result;
@@ -519,25 +492,25 @@ export class OurMinter extends Contract {
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<[string]>;
 
-    _mirrorCrowdfundFactory(overrides?: CallOverrides): Promise<[string]>;
+    _mirrorCrowdfund(overrides?: CallOverrides): Promise<[string]>;
 
-    "_mirrorCrowdfundFactory()"(overrides?: CallOverrides): Promise<[string]>;
+    "_mirrorCrowdfund()"(overrides?: CallOverrides): Promise<[string]>;
 
     _mirrorEditions(overrides?: CallOverrides): Promise<[string]>;
 
     "_mirrorEditions()"(overrides?: CallOverrides): Promise<[string]>;
 
-    _partyBidFactory(overrides?: CallOverrides): Promise<[string]>;
+    _partyBid(overrides?: CallOverrides): Promise<[string]>;
 
-    "_partyBidFactory()"(overrides?: CallOverrides): Promise<[string]>;
+    "_partyBid()"(overrides?: CallOverrides): Promise<[string]>;
 
-    _wethAddress(overrides?: CallOverrides): Promise<[string]>;
+    _weth(overrides?: CallOverrides): Promise<[string]>;
 
-    "_wethAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "_weth()"(overrides?: CallOverrides): Promise<[string]>;
 
-    _zoraAuctionHouse(overrides?: CallOverrides): Promise<[string]>;
+    _zoraAH(overrides?: CallOverrides): Promise<[string]>;
 
-    "_zoraAuctionHouse()"(overrides?: CallOverrides): Promise<[string]>;
+    "_zoraAH()"(overrides?: CallOverrides): Promise<[string]>;
 
     _zoraMarket(overrides?: CallOverrides): Promise<[string]>;
 
@@ -1030,20 +1003,6 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    untrustedRescueERC20(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "untrustedRescueERC20(address,address,uint256)"(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
     untrustedSafeTransfer721(
       tokenContract_: string,
       newOwner_: string,
@@ -1135,25 +1094,25 @@ export class OurMinter extends Contract {
 
   "_mirrorAH()"(overrides?: CallOverrides): Promise<string>;
 
-  _mirrorCrowdfundFactory(overrides?: CallOverrides): Promise<string>;
+  _mirrorCrowdfund(overrides?: CallOverrides): Promise<string>;
 
-  "_mirrorCrowdfundFactory()"(overrides?: CallOverrides): Promise<string>;
+  "_mirrorCrowdfund()"(overrides?: CallOverrides): Promise<string>;
 
   _mirrorEditions(overrides?: CallOverrides): Promise<string>;
 
   "_mirrorEditions()"(overrides?: CallOverrides): Promise<string>;
 
-  _partyBidFactory(overrides?: CallOverrides): Promise<string>;
+  _partyBid(overrides?: CallOverrides): Promise<string>;
 
-  "_partyBidFactory()"(overrides?: CallOverrides): Promise<string>;
+  "_partyBid()"(overrides?: CallOverrides): Promise<string>;
 
-  _wethAddress(overrides?: CallOverrides): Promise<string>;
+  _weth(overrides?: CallOverrides): Promise<string>;
 
-  "_wethAddress()"(overrides?: CallOverrides): Promise<string>;
+  "_weth()"(overrides?: CallOverrides): Promise<string>;
 
-  _zoraAuctionHouse(overrides?: CallOverrides): Promise<string>;
+  _zoraAH(overrides?: CallOverrides): Promise<string>;
 
-  "_zoraAuctionHouse()"(overrides?: CallOverrides): Promise<string>;
+  "_zoraAH()"(overrides?: CallOverrides): Promise<string>;
 
   _zoraMarket(overrides?: CallOverrides): Promise<string>;
 
@@ -1643,20 +1602,6 @@ export class OurMinter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  untrustedRescueERC20(
-    tokenContract_: string,
-    spender_: string,
-    amount_: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "untrustedRescueERC20(address,address,uint256)"(
-    tokenContract_: string,
-    spender_: string,
-    amount_: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   untrustedSafeTransfer721(
     tokenContract_: string,
     newOwner_: string,
@@ -1748,25 +1693,25 @@ export class OurMinter extends Contract {
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<string>;
 
-    _mirrorCrowdfundFactory(overrides?: CallOverrides): Promise<string>;
+    _mirrorCrowdfund(overrides?: CallOverrides): Promise<string>;
 
-    "_mirrorCrowdfundFactory()"(overrides?: CallOverrides): Promise<string>;
+    "_mirrorCrowdfund()"(overrides?: CallOverrides): Promise<string>;
 
     _mirrorEditions(overrides?: CallOverrides): Promise<string>;
 
     "_mirrorEditions()"(overrides?: CallOverrides): Promise<string>;
 
-    _partyBidFactory(overrides?: CallOverrides): Promise<string>;
+    _partyBid(overrides?: CallOverrides): Promise<string>;
 
-    "_partyBidFactory()"(overrides?: CallOverrides): Promise<string>;
+    "_partyBid()"(overrides?: CallOverrides): Promise<string>;
 
-    _wethAddress(overrides?: CallOverrides): Promise<string>;
+    _weth(overrides?: CallOverrides): Promise<string>;
 
-    "_wethAddress()"(overrides?: CallOverrides): Promise<string>;
+    "_weth()"(overrides?: CallOverrides): Promise<string>;
 
-    _zoraAuctionHouse(overrides?: CallOverrides): Promise<string>;
+    _zoraAH(overrides?: CallOverrides): Promise<string>;
 
-    "_zoraAuctionHouse()"(overrides?: CallOverrides): Promise<string>;
+    "_zoraAH()"(overrides?: CallOverrides): Promise<string>;
 
     _zoraMarket(overrides?: CallOverrides): Promise<string>;
 
@@ -2256,20 +2201,6 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    untrustedRescueERC20(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "untrustedRescueERC20(address,address,uint256)"(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     untrustedSafeTransfer721(
       tokenContract_: string,
       newOwner_: string,
@@ -2370,25 +2301,25 @@ export class OurMinter extends Contract {
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _mirrorCrowdfundFactory(overrides?: CallOverrides): Promise<BigNumber>;
+    _mirrorCrowdfund(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_mirrorCrowdfundFactory()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "_mirrorCrowdfund()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     _mirrorEditions(overrides?: CallOverrides): Promise<BigNumber>;
 
     "_mirrorEditions()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _partyBidFactory(overrides?: CallOverrides): Promise<BigNumber>;
+    _partyBid(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_partyBidFactory()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "_partyBid()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _wethAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    _weth(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_wethAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "_weth()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _zoraAuctionHouse(overrides?: CallOverrides): Promise<BigNumber>;
+    _zoraAH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_zoraAuctionHouse()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "_zoraAH()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     _zoraMarket(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -2878,20 +2809,6 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    untrustedRescueERC20(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "untrustedRescueERC20(address,address,uint256)"(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
     untrustedSafeTransfer721(
       tokenContract_: string,
       newOwner_: string,
@@ -2984,11 +2901,9 @@ export class OurMinter extends Contract {
 
     "_mirrorAH()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    _mirrorCrowdfundFactory(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    _mirrorCrowdfund(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_mirrorCrowdfundFactory()"(
+    "_mirrorCrowdfund()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2998,21 +2913,17 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    _partyBidFactory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    _partyBid(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_partyBidFactory()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "_partyBid()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    _wethAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    _weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_wethAddress()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "_weth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    _zoraAuctionHouse(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    _zoraAH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_zoraAuctionHouse()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "_zoraAH()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     _zoraMarket(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -3505,20 +3416,6 @@ export class OurMinter extends Contract {
 
     "untrustedCloseCrowdFunding(address)"(
       crowdfundProxy_: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    untrustedRescueERC20(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "untrustedRescueERC20(address,address,uint256)"(
-      tokenContract_: string,
-      spender_: string,
-      amount_: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

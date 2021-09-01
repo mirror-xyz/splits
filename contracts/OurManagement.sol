@@ -1,11 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.4;
 
+/**
+ * @title OurManagement
+ * @author Nick Adamson - nickadamson@pm.me
+ * 
+ * Building on the work from:
+ * @author Mirror       @title Splits   https://github.com/mirror-xyz/splits
+ * @author Gnosis       @title Safe     https://github.com/gnosis/safe-contracts
+ * & of course, @author OpenZeppelin
+ */
 contract OurManagement {
     event AddedOwner(address owner);
     event RemovedOwner(address owner);
     event ProxySetup(address indexed initiator, address[] owners);
 
+    // used as origin pointer for linked list of owners
     address internal constant SENTINEL_OWNERS = address(0x1);
 
     mapping(address => address) internal owners;
@@ -16,27 +26,26 @@ contract OurManagement {
         return msg.sender;
     }
 
-    function requireOwnerCall(address caller_) internal view returns (bool) {
-        bool approved = isOwner(caller_);
-        return approved;
+    function checkIsOwner(address caller_) internal view returns (bool) {
+        bool _isOwner = isOwner(caller_);
+        return _isOwner;
     }
 
-    modifier onlyAnOwner() {
+    modifier onlyOwners() {
         // This is a function call as it minimized the bytecode size
-        requireOwnerCall(_msgSender());
+        checkIsOwner(_msgSender());
         _;
     }
-
-    /// @dev Setup function sets initial owners of contract.
-    /// @param owners_ List of Split owners (can mint/manage auctions)
+    /** 
+     * @dev Setup function sets initial owners of contract.
+     * @param owners_ List of Split Owners (can mint/manage auctions)
+     * @notice threshold ensures that setup function can only be called once.
+     */
     function setupOwners(address[] memory owners_) internal {
-        // Threshold can only be 0 at initialization.
-        // Check ensures that setup function can only be called once.
         require(threshold == 0, "Setup has already been completed once.");
-        // Initializing Safe owners.
+        // Initializing Proxy owners.
         address currentOwner = SENTINEL_OWNERS;
         for (uint256 i = 0; i < owners_.length; i++) {
-            // Owner address cannot be null.
             address owner = owners_[i];
             require(
                 owner != address(0) &&
@@ -44,7 +53,6 @@ contract OurManagement {
                     owner != address(this) &&
                     currentOwner != owner
             );
-            // No duplicate owners allowed.
             require(owners[owner] == address(0));
             owners[currentOwner] = owner;
             currentOwner = owner;
@@ -54,11 +62,8 @@ contract OurManagement {
         threshold = 1;
     }
 
-    /// @dev Allows to add a new owner to the Safe and update the threshold at the same time.
-    ///      This can only be done via a Safe transaction.
-    /// @notice Adds the owner `owner` to the Safe and updates the threshold to `_threshold`.
-    /// @param owner New owner address.
-    function addOwner(address owner) public onlyAnOwner {
+    /// @dev Allows to add a new owner
+    function addOwner(address owner) public onlyOwners {
         // Owner address cannot be null, the sentinel or the Safe itself.
         require(
             owner != address(0) &&
@@ -74,10 +79,7 @@ contract OurManagement {
     }
 
     /// @dev Allows to remove an owner
-    /// @notice Removes the owner `owner` from the Split
-    /// @param prevOwner Owner that pointed to the owner to be removed in the linked list
-    /// @param owner Owner address to be removed.
-    function removeOwner(address prevOwner, address owner) public onlyAnOwner {
+    function removeOwner(address prevOwner, address owner) public onlyOwners {
         // Validate owner address and check that it corresponds to owner index.
         require(owner != address(0) && owner != SENTINEL_OWNERS);
         require(owners[prevOwner] == owner);
@@ -87,8 +89,7 @@ contract OurManagement {
         emit RemovedOwner(owner);
     }
 
-    /// @dev Allows to swap/replace an owner from the Split with another address.
-    /// @notice Replaces the owner `oldOwner` in the Split with `newOwner`.
+    /// @dev Allows to swap/replace an owner from the Proxy with another address.
     /// @param prevOwner Owner that pointed to the owner to be replaced in the linked list
     /// @param oldOwner Owner address to be replaced.
     /// @param newOwner New owner address.
@@ -96,8 +97,7 @@ contract OurManagement {
         address prevOwner,
         address oldOwner,
         address newOwner
-    ) public onlyAnOwner {
-        // require(onlyAnOwner(msg.sender), "1");
+    ) public onlyOwners {
         // Owner address cannot be null, the sentinel or the Safe itself.
         require(
             newOwner != address(0) &&
@@ -122,7 +122,6 @@ contract OurManagement {
     }
 
     /// @dev Returns array of owners.
-    /// @return Array of Safe owners.
     function getOwners() public view returns (address[] memory) {
         address[] memory array = new address[](ownerCount);
 
