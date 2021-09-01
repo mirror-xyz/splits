@@ -48,6 +48,7 @@ contract OurMinter is OurManagement {
      * @notice Approve the splitOwner and Zora Auction House to manage Split's ERC-721s
      * @dev Called in Proxy's Constructor, hence internal
      */
+
     function setupApprovalForAH() internal {
         IERC721(_zoraMedia).setApprovalForAll(_zoraAH, true);
     }
