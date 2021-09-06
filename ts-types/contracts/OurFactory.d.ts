@@ -137,7 +137,7 @@ export class OurFactory extends Contract {
   filters: {
     ProxyCreated(
       ourProxy: null,
-      proxyOwner: null,
+      proxyCreator: null,
       splitRecipients: null
     ): EventFilter;
   };

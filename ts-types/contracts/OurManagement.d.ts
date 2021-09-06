@@ -52,7 +52,7 @@ interface OurManagementInterface extends ethers.utils.Interface {
 
   events: {
     "AddedOwner(address)": EventFragment;
-    "ProxySetup(address,address[])": EventFragment;
+    "ProxySetup(address[])": EventFragment;
     "RemovedOwner(address)": EventFragment;
   };
 
@@ -216,7 +216,7 @@ export class OurManagement extends Contract {
   filters: {
     AddedOwner(owner: null): EventFilter;
 
-    ProxySetup(initiator: string | null, owners: null): EventFilter;
+    ProxySetup(owners: null): EventFilter;
 
     RemovedOwner(owner: null): EventFilter;
   };

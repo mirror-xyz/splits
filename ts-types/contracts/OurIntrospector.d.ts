@@ -74,14 +74,14 @@ interface OurIntrospectorInterface extends ethers.utils.Interface {
   events: {
     "Batch1155Received(address,address,uint256[],uint256[])": EventFragment;
     "ERC1155Received(address,address,uint256,uint256)": EventFragment;
+    "ERC721Received(address,address,uint256)": EventFragment;
     "ERC777Received(address,address,address,uint256)": EventFragment;
-    "TokenReceived(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Batch1155Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC1155Received"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ERC721Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC777Received"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TokenReceived"): EventFragment;
 }
 
 export class OurIntrospector extends Contract {
@@ -362,14 +362,14 @@ export class OurIntrospector extends Contract {
       value: null
     ): EventFilter;
 
+    ERC721Received(operator: null, from: null, tokenId: null): EventFilter;
+
     ERC777Received(
       operator: null,
       from: null,
       to: null,
       amount: null
     ): EventFilter;
-
-    TokenReceived(operator: null, from: null, tokenId: null): EventFilter;
   };
 
   estimateGas: {

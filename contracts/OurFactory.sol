@@ -16,7 +16,7 @@ contract OurFactory {
     //======== Graph Protocol =========
     event ProxyCreated(
         address ourProxy,
-        address proxyOwner,
+        address proxyCreator,
         string splitRecipients
     );
 
@@ -36,7 +36,7 @@ contract OurFactory {
     function createSplit(
         bytes32 merkleRoot_,
         bytes memory data,
-        string memory splitRecipients_
+        string calldata splitRecipients_
     ) external returns (address ourProxy) {
         merkleRoot = merkleRoot_;
         ourProxy = address(
@@ -44,6 +44,8 @@ contract OurFactory {
         );
         delete merkleRoot;
 
+        emit ProxyCreated(ourProxy, msg.sender, splitRecipients_);
+        
         // call setup() to set owners
         assembly {
             if eq(
@@ -53,7 +55,5 @@ contract OurFactory {
                 revert(0, 0)
             }
         }
-
-        emit ProxyCreated(ourProxy, msg.sender, splitRecipients_);
     }
 }

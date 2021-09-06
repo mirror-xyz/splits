@@ -13,7 +13,7 @@ pragma solidity 0.8.4;
 contract OurManagement {
     event AddedOwner(address owner);
     event RemovedOwner(address owner);
-    event ProxySetup(address indexed initiator, address[] owners);
+    event ProxySetup(address[] owners);
 
     // used as origin pointer for linked list of owners
     address internal constant SENTINEL_OWNERS = address(0x1);

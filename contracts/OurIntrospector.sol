@@ -31,7 +31,7 @@ contract OurIntrospector is
         uint256 tokenId_,
         bytes calldata
     ) external override returns (bytes4) {
-        emit TokenReceived(operator_, from_, tokenId_);
+        emit ERC721Received(operator_, from_, tokenId_);
         return 0x150b7a02;
     }
 

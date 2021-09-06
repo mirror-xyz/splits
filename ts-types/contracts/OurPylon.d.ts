@@ -599,12 +599,12 @@ interface OurPylonInterface extends ethers.utils.Interface {
     "AddedOwner(address)": EventFragment;
     "Batch1155Received(address,address,uint256[],uint256[])": EventFragment;
     "ERC1155Received(address,address,uint256,uint256)": EventFragment;
+    "ERC721Received(address,address,uint256)": EventFragment;
     "ERC777Received(address,address,address,uint256)": EventFragment;
     "ETHReceived(address,uint256)": EventFragment;
     "MassTransferERC20(address,uint256,bool)": EventFragment;
-    "ProxySetup(address,address[])": EventFragment;
+    "ProxySetup(address[])": EventFragment;
     "RemovedOwner(address)": EventFragment;
-    "TokenReceived(address,address,uint256)": EventFragment;
     "TransferETH(address,uint256,bool)": EventFragment;
     "WindowIncremented(uint256,uint256)": EventFragment;
   };
@@ -612,12 +612,12 @@ interface OurPylonInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "AddedOwner"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Batch1155Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC1155Received"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ERC721Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC777Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ETHReceived"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MassTransferERC20"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProxySetup"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemovedOwner"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TokenReceived"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferETH"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "WindowIncremented"): EventFragment;
 }
@@ -3023,6 +3023,8 @@ export class OurPylon extends Contract {
       value: null
     ): EventFilter;
 
+    ERC721Received(operator: null, from: null, tokenId: null): EventFilter;
+
     ERC777Received(
       operator: null,
       from: null,
@@ -3034,11 +3036,9 @@ export class OurPylon extends Contract {
 
     MassTransferERC20(token: null, amount: null, success: null): EventFilter;
 
-    ProxySetup(initiator: string | null, owners: null): EventFilter;
+    ProxySetup(owners: null): EventFilter;
 
     RemovedOwner(owner: null): EventFilter;
-
-    TokenReceived(operator: null, from: null, tokenId: null): EventFilter;
 
     TransferETH(account: null, amount: null, success: null): EventFilter;
 

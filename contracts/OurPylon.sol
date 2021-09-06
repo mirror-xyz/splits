@@ -28,11 +28,10 @@ contract OurPylon is OurSplitter, OurMinter, OurIntrospector {
      */
     function setup(address[] calldata owners_) external {
         setupOwners(owners_);
+        emit ProxySetup(owners_);
 
         // Approve Zora AH
-        // setupApprovalForAH();
-
-        emit ProxySetup(tx.origin, owners_);
+        setupApprovalForAH();
     }
 
     /**
