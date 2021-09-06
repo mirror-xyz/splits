@@ -13,11 +13,12 @@ import {OurProxy} from "./OurProxy.sol";
  * & of course, @author OpenZeppelin
  */
 contract OurFactory {
-    //======== Graph Protocol =========
+    //======== Subgraph =========
     event ProxyCreated(
         address ourProxy,
         address proxyCreator,
-        string splitRecipients
+        string splitRecipients,
+        string nickname
     );
 
     //======== Immutable storage =========
@@ -36,7 +37,8 @@ contract OurFactory {
     function createSplit(
         bytes32 merkleRoot_,
         bytes memory data,
-        string calldata splitRecipients_
+        string calldata splitRecipients_,
+        string calldata nickname_
     ) external returns (address ourProxy) {
         merkleRoot = merkleRoot_;
         ourProxy = address(
@@ -44,7 +46,7 @@ contract OurFactory {
         );
         delete merkleRoot;
 
-        emit ProxyCreated(ourProxy, msg.sender, splitRecipients_);
+        emit ProxyCreated(ourProxy, msg.sender, splitRecipients_, nickname_);
         
         // call setup() to set owners
         assembly {

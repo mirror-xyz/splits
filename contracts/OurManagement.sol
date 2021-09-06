@@ -11,9 +11,10 @@ pragma solidity 0.8.4;
  * & of course, @author OpenZeppelin
  */
 contract OurManagement {
+    event ProxySetup(address[] owners);
     event AddedOwner(address owner);
     event RemovedOwner(address owner);
-    event ProxySetup(address[] owners);
+    event ChangeNickname(string newNickname);
 
     // used as origin pointer for linked list of owners
     address internal constant SENTINEL_OWNERS = address(0x1);
@@ -115,6 +116,10 @@ contract OurManagement {
         owners[oldOwner] = address(0);
         emit RemovedOwner(oldOwner);
         emit AddedOwner(newOwner);
+    }
+
+    function editNickname(string calldata newNickname_) public onlyOwners {
+        emit ChangeNickname(newNickname_);
     }
 
     function isOwner(address owner) public view returns (bool) {
