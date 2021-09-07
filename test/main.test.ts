@@ -51,7 +51,7 @@ describe("SplitProxy via Factory", () => {
     let splitCreator, fakeWETH, account1, account2, funder, transactionHandler;
     let tree;
 
-    describe("when there is a 50-50 allocation", () => {
+    describe("when there is a 50-50 allocation\nNOTICE: IF THIS TEST IS FAILING\nGo to OurPylon.sol and comment out setupApprovalForAH(). This repo's tests have not had Zora local tests integrated.", () => {
       beforeEach(async () => {
         [
           splitCreator,
