@@ -27,9 +27,8 @@ contract OurManagement {
         return msg.sender;
     }
 
-    function checkIsOwner(address caller_) internal view returns (bool) {
-        bool _isOwner = isOwner(caller_);
-        return _isOwner;
+    function checkIsOwner(address caller_) internal view {
+        require(isOwner(caller_), "Caller is not an approved owner of this Split");
     }
 
     modifier onlyOwners() {
