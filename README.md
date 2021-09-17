@@ -8,8 +8,12 @@
 
 View the original README here: https://github.com/mirror-xyz/splits/blob/main/README.md
 
-<br/><br/>
-
+<br/>
+`npm i`
+<br/>
+`npm run test`
+<br/>
+https://discord.gg/GmmaBszDTK is the discord if you need help
 ---
 
 # our-contracts
@@ -47,18 +51,18 @@ Subgraph: https://thegraph.com/legacy-explorer/subgraph/nickadamson/ourzrinkebyv
 
 ## Changes:
 
-- hardcode contract addresses where applicable to save gas
-- implement IERC721-Receiver on SplitProxy
-- add 'Ownable' to SplitProxy
-  - this allows the contract to have a switch in its fallback()
-  - depending on the address of msg.sender, the fallback will go to splitter or minter
-- add OurMinter.sol
-  - Basically lets a SplitProxy do things like mint a Zora NFT, be a curator, etc.
-- Revise Tests
-  - checks that 'owner' of SplitProxy is the EOA that called Proxy creation
-  - gas costs are more expensive for deploying logic contracts
-  - 0.5 eth test fails but larger denominations do not
-- gas cost for creation of the OurProxy is around 2.5x the cost of the original SplitProxy.
-  - this can be reduced further if you remove the setApproval calls in constructor, or some of the access
+-   hardcode contract addresses where applicable to save gas
+-   implement IERC721-Receiver on SplitProxy
+-   add 'Ownable' to SplitProxy
+    -   this allows the contract to have a switch in its fallback()
+    -   depending on the address of msg.sender, the fallback will go to splitter or minter
+-   add OurMinter.sol
+    -   Basically lets a SplitProxy do things like mint a Zora NFT, be a curator, etc.
+-   Revise Tests
+    -   checks that 'owner' of SplitProxy is the EOA that called Proxy creation
+    -   gas costs are more expensive for deploying logic contracts
+    -   0.5 eth test fails but larger denominations do not
+-   gas cost for creation of the OurProxy is around 2.5x the cost of the original SplitProxy.
+    -   this can be reduced further if you remove the setApproval calls in constructor, or some of the access
 
 # Critiques, ideas, and any other feedback are greatly appreciated. Open an issue, or email me: nickadamson@pm.me
