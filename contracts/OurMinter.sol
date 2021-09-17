@@ -207,7 +207,7 @@ contract OurMinter is OurManagement {
         uint256 duration,
         uint256 reservePrice,
         address payable curator,
-        uint8 curatorFeePercentages,
+        uint8 curatorFeePercentage,
         address auctionCurrency
     ) external onlyOwners {
         IZora(_zoraAH).createAuction(
@@ -216,7 +216,7 @@ contract OurMinter is OurManagement {
             duration,
             reservePrice,
             curator,
-            curatorFeePercentages,
+            curatorFeePercentage,
             auctionCurrency
         );
     }
@@ -236,26 +236,11 @@ contract OurMinter is OurManagement {
     }
 
     /** AuctionHouse
-     * @notice Bid on an Auction
-     */
-    function createZoraAuctionBid(uint256 auctionId, uint256 amount) external payable {
-        IZora(_zoraAH).createBid(auctionId, amount);
-    }
-
-    /** AuctionHouse
-     * @notice End an Auction
-     */
-    function endZoraAuction(uint256 auctionId) external onlyOwners {
-        IZora(_zoraAH).endAuction(auctionId);
-    }
-
-    /** AuctionHouse
      * @notice Cancel an Auction before any bids have been placed
      */
     function cancelZoraAuction(uint256 auctionId) external onlyOwners {
         IZora(_zoraAH).cancelAuction(auctionId);
     }
-
     //======== /IZora =========
 
     /**======== IMirror =========
@@ -276,20 +261,6 @@ contract OurMinter is OurManagement {
     }
 
     /** ReserveAuctionV3
-     * @notice Bid on Reserve Auction
-     */
-    function createMirrorBid(uint256 tokenId) external payable {
-        IMirror(_mirrorAH).createBid(tokenId);
-    }
-
-    /** ReserveAuctionV3
-     * @notice End Reserve Auction
-     */
-    function endMirrorAuction(uint256 tokenId) external onlyOwners {
-        IMirror(_mirrorAH).endAuction(tokenId);
-    }
-
-    /** ReserveAuctionV3
      * @notice Update Minimum Bid on Reserve Auction
      */
     function updateMirrorMinBid(uint256 minBid) external onlyOwners {
@@ -305,13 +276,6 @@ contract OurMinter is OurManagement {
         address payable fundingRecipient
     ) external onlyOwners {
         IMirror(_mirrorEditions).createEdition(quantity, price, fundingRecipient);
-    }
-
-    /** Editions
-     * @notice Buy an Edition
-     */
-    function buyMirrorEdition(uint256 editionId) external payable {
-        IMirror(_mirrorEditions).buyEdition(editionId);
     }
 
     /** Editions
@@ -349,7 +313,6 @@ contract OurMinter is OurManagement {
     function untrustedCloseCrowdFunding(address crowdfundProxy_) external onlyOwners {
         IMirror(crowdfundProxy_).closeFunding();
     }
-
     //======== /IMirror =========
 
     /**======== IPartyBid =========
@@ -369,39 +332,6 @@ contract OurMinter is OurManagement {
     ) external onlyOwners {
         IPartyBid(_partyBid).startParty(marketWrapper, nftContract, tokenId, auctionId, name, symbol);
     }
-
-    /** PartyBid
-     * NOTE: Marked as >> untrusted << Use caution when supplying partyAddress_
-     * @notice Contributes funds to PartyBid
-     */
-    // function untrustedContributeToParty(address partyAddress_) external payable {
-    //   IPartyBid(partyAddress_).contribute();
-    // }
-
-    /** PartyBid
-     * NOTE: Marked as >> untrusted << Use caution when supplying partyAddress_
-     * @notice Bid for Party
-     */
-    // function untrustedSplitPartyBid(address partyAddress_) external onlyOwners {
-    //   IPartyBid(partyAddress_).bid();
-    // }
-
-    /** PartyBid
-     * NOTE: Marked as >> untrusted << Use caution when supplying partyAddress_
-     * @notice Finalizes Party
-     */
-    // function untrustedFinalizeParty(address partyAddress_) external onlyOwners {
-    //   IPartyBid(partyAddress_).finalize();
-    // }
-
-    /** PartyBid
-     * NOTE: Marked as >> untrusted << Use caution when supplying partyAddress_
-     * @notice Claims funds from Party for Party contributors
-     */
-    // function untrustedClaimParty(address partyAddress_, address contributor) external onlyOwners {
-    //   IPartyBid(partyAddress_).claim(contributor);
-    // }
-
     //======== /IPartyBid =========
 
     /**======== IERC721 =========
@@ -435,18 +365,7 @@ contract OurMinter is OurManagement {
         IERC721(tokenContract_).safeTransferFrom(address(msg.sender), newOwner_, tokenId_);
     }
 
-    /**
-     * NOTE: Marked as >> untrusted << Use caution when supplying tokenContract_
-     * @dev In case non-Zora ERC721 gets stuck in Account. Try untrustedSafeTransfer721 first.
-     * @notice transferFrom(address from, address to, uint256 tokenId)
-     */
-    // function untrustedTransfer721(
-    //   address tokenContract_,
-    //   address newOwner_,
-    //   uint256 tokenId_
-    // ) external onlyOwners {
-    //   IERC721(tokenContract_).transferFrom(address(msg.sender), newOwner_, tokenId_);
-    // }
+
 
     /**
      * NOTE: Marked as >> untrusted << Use caution when supplying tokenContract_
@@ -469,28 +388,5 @@ contract OurMinter is OurManagement {
     function untrustedBurn721(address tokenContract_, uint256 tokenId_) external onlyOwners {
         IERC721(tokenContract_).burn(tokenId_);
     }
-
     //======== /IERC721 =========
-
-    /**======== IERC20 =========
-     * NOTE: SPLITS DO NOT SUPPORT ERC20. MUST BE HANDLED MANUALLY.
-     * NOTE: Marked as >> untrusted << Use caution when supplying tokenContract_
-     *
-     * @dev As a last resort option, this allows the splitOwner to approve another
-     * address to transfer any ERC20s that are stuck in the Split contract.
-     * @dev see IERC20.sol
-     *
-     * @notice To include this functionality for ERC20s, approve() was removed from IERC721.
-     *
-     * @Owners be nice and approve all recipients allocations.
-     */
-    // function untrustedRescueERC20(
-    //     address tokenContract_,
-    //     address spender_,
-    //     uint256 amount_
-    // ) external onlyOwners returns (bool) {
-    //     bool success = IERC20(tokenContract_).approve(spender_, amount_);
-    //     return success;
-    // }
-    //======== /IERC20 =========
 }
