@@ -27,6 +27,11 @@ interface IWETH {
 contract OurSplitter is OurStorage {
     uint256 public constant PERCENTAGE_SCALE = 10e5;
 
+    struct Proof {
+        bytes32[] merkleProof;
+    }
+
+
     /**======== Subgraph =========
      * ETHReceived - emits sender and value in receive() fallback
      * TransferETH - emits destination address, value, and success bool
@@ -37,12 +42,6 @@ contract OurSplitter is OurStorage {
     event TransferETH(address account, uint256 amount, bool success);
     event MassTransferERC20(address token, uint256 amount, bool success);
     event WindowIncremented(uint256 currentWindow, uint256 fundsAvailable);
-
-    // Plain ETH transfers
-    receive() external payable {
-        emit ETHReceived(msg.sender, msg.value);
-        depositedInWindow += msg.value;
-    }
 
     function claimETH(
         uint256 window,
@@ -78,43 +77,52 @@ contract OurSplitter is OurStorage {
     }
 
     /**
-     * NOTE: SPLITS DO NOT SUPPORT ERC20. THIS FUNCTION IS PROVIDED AS A LAST RESORT.
-     * NOTE: AVOID ERC-20 AUCTION CURRENCIES AT ALL COST.
-     *
-     * @dev As a last resort option, this allows an Owner to attempt transferring the entire balance of an ERC20 to ALL split recipients.
-     * @notice THE ONLY ADDRESS & ALLOCATION CHECKED ARE INDEX 0. THIS IS EASILY MANIPULATED.
-     * @notice only callable by Owner, however doesn't protect against rogue owner.
-     *
-     * @custom:owners DONT BE SHITTY. OurActions live eternally on the block chain, Z is watching.
+     * @notice if amount of tokens are not equally divisible according to allocation
+     * the remainder will be forwarded to accounts[0]
      */
     function massClaimERC20(
         address tokenAddress,
         address[] calldata accounts,
         uint256[] calldata allocations,
-        bytes32[] calldata merkleProofZero // accounts[0], allocations[0]
+        Proof[] calldata merkleProofs
     ) internal {
         require(
             verifyProof(
-                merkleProofZero,
+                merkleProofs[0].merkleProof,
                 merkleRoot,
                 getNode(accounts[0], allocations[0])
             ),
-            "Invalid proof"
+            "Invalid proof for Account 0"
         );
 
         uint256 ERC20Balance = IERC20(tokenAddress).balanceOf(address(this));
+        uint256 totalSent = 0;
 
-        for (uint256 i = 0; i <= accounts.length; i++) {
+        for (uint256 i = 1; i < accounts.length; i++) {
+            require(
+                verifyProof(
+                    merkleProofs[i].merkleProof,
+                    merkleRoot,
+                    getNode(accounts[i], allocations[i])
+                ),
+                "Invalid proof"
+            );
+
+            uint256 scaledAmount = scaleAmountByPercentage(ERC20Balance, allocations[i]);
             transferERC20(
                 tokenAddress, 
                 accounts[i], 
-                scaleAmountByPercentage(
-                    ERC20Balance,
-                    allocations[i]
-                )
+                scaledAmount
             );
+            totalSent += scaledAmount;
         }
 
+        uint256 remaining = ERC20Balance - totalSent;
+        transferERC20(
+                tokenAddress, 
+                accounts[0], 
+                remaining
+        );
         emit MassTransferERC20(tokenAddress, ERC20Balance, true);
     }
 
@@ -159,6 +167,38 @@ contract OurSplitter is OurStorage {
         emit WindowIncremented(currentWindow, fundsAvailable);
     }
 
+    //======== Quality of Life Functions =========
+    function incrementThenClaimAll(
+        address account,
+        uint256 percentageAllocation,
+        bytes32[] calldata merkleProof
+    ) external {
+        incrementWindow();
+        claimAll(account, percentageAllocation, merkleProof);
+    }
+
+     function claimAll(
+        address account,
+        uint256 percentageAllocation,
+        bytes32[] calldata merkleProof
+    ) private {
+        // Make sure that the user has this allocation granted.
+        require(
+            verifyProof(merkleProof, merkleRoot, getNode(account, percentageAllocation)),
+            "Invalid proof"
+        );
+
+        uint256 amount = 0;
+        for (uint256 i = 0; i < currentWindow; i++) {
+            if (!isClaimed(i, account)) {
+                setClaimed(i, account);
+
+                amount += scaleAmountByPercentage(balanceForWindow[i], percentageAllocation);
+            }
+        }
+
+        transferETHOrWETH(account, amount);
+    }
 
     function scaleAmountByPercentage(uint256 amount, uint256 scaledPercent)
         public
@@ -173,8 +213,6 @@ contract OurSplitter is OurStorage {
         scaledAmount = (amount * scaledPercent) / (100 * PERCENTAGE_SCALE);
     }
 
-    
-
     function isClaimed(uint256 window, address account)
         public
         view
@@ -182,6 +220,7 @@ contract OurSplitter is OurStorage {
     {
         return claimed[getClaimHash(window, account)];
     }
+    //======== /QoL =========
 
     //======== Private Functions ========
     function setClaimed(uint256 window, address account) private {
@@ -210,13 +249,14 @@ contract OurSplitter is OurStorage {
     function transferETHOrWETH(address to, uint256 value) private returns (bool didSucceed) {
         // Try to transfer ETH to the given recipient.
         didSucceed = attemptETHTransfer(to, value);
-       if (!didSucceed) {
+        if (!didSucceed) {
             // If the transfer fails, wrap and send as WETH, so that
             // the auction is not impeded and the recipient still
             // can claim ETH via the WETH contract (similar to escrow).
             IWETH(weth).deposit{value: value}();
             IWETH(weth).transfer(to, value);
             // At this point, the recipient can unwrap WETH.
+            didSucceed = true;
         }
 
         emit TransferETH(to, value, didSucceed);

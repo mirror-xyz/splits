@@ -31,7 +31,7 @@ contract OurPylon is OurSplitter, OurMinter, OurIntrospector {
         emit ProxySetup(owners_);
 
         // Approve Zora AH
-        setupApprovalForAH();
+        // setupApprovalForAH();
     }
 
     /**
@@ -42,9 +42,9 @@ contract OurPylon is OurSplitter, OurMinter, OurIntrospector {
         address tokenAddress,
         address[] calldata accounts,
         uint256[] calldata allocations,
-        bytes32[] calldata merkleProofZero // accounts[0], allocations[0]
+        Proof[] calldata merkleProofs
     ) external onlyOwners {
         require(tokenAddress != address(0), "Use claimETH");
-        massClaimERC20(tokenAddress, accounts, allocations, merkleProofZero);
+        massClaimERC20(tokenAddress, accounts, allocations, merkleProofs);
     }
 }
