@@ -293,7 +293,7 @@ interface IZora {
         uint256 duration,
         uint256 reservePrice,
         address payable curator,
-        uint8 curatorFeePercentages,
+        uint8 curatorFeePercentage,
         address auctionCurrency
     ) external returns (uint256);
 

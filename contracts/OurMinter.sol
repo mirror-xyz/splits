@@ -181,7 +181,7 @@ contract OurMinter is OurManagement {
         uint256 duration,
         uint256 reservePrice,
         address payable curator,
-        uint8 curatorFeePercentages,
+        uint8 curatorFeePercentage,
         address auctionCurrency
     ) external onlyOwners {
         require(auctionCurrency == address(0) || auctionCurrency == _weth);
@@ -191,7 +191,7 @@ contract OurMinter is OurManagement {
             duration,
             reservePrice,
             curator,
-            curatorFeePercentages,
+            curatorFeePercentage,
             auctionCurrency
         );
     }
