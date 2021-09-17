@@ -731,7 +731,7 @@ const _abi = [
       },
       {
         internalType: "uint8",
-        name: "curatorFeePercentages",
+        name: "curatorFeePercentage",
         type: "uint8",
       },
       {

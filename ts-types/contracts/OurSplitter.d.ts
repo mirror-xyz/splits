@@ -27,6 +27,7 @@ interface OurSplitterInterface extends ethers.utils.Interface {
     "claimETH(uint256,address,uint256,bytes32[])": FunctionFragment;
     "claimETHForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "currentWindow()": FunctionFragment;
+    "incrementThenClaimAll(address,uint256,bytes32[])": FunctionFragment;
     "incrementWindow()": FunctionFragment;
     "isClaimed(uint256,address)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
@@ -53,6 +54,10 @@ interface OurSplitterInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "currentWindow",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "incrementThenClaimAll",
+    values: [string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
     functionFragment: "incrementWindow",
@@ -87,6 +92,10 @@ interface OurSplitterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "currentWindow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "incrementThenClaimAll",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -176,6 +185,20 @@ export class OurSplitter extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    incrementThenClaimAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "incrementThenClaimAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -261,6 +284,20 @@ export class OurSplitter extends Contract {
 
   "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  incrementThenClaimAll(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "incrementThenClaimAll(address,uint256,bytes32[])"(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
   "incrementWindow()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -345,6 +382,20 @@ export class OurSplitter extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    incrementThenClaimAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "incrementThenClaimAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     incrementWindow(overrides?: CallOverrides): Promise<void>;
 
@@ -442,6 +493,20 @@ export class OurSplitter extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    incrementThenClaimAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "incrementThenClaimAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     incrementWindow(overrides?: Overrides): Promise<BigNumber>;
 
     "incrementWindow()"(overrides?: Overrides): Promise<BigNumber>;
@@ -529,6 +594,20 @@ export class OurSplitter extends Contract {
     currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    incrementThenClaimAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "incrementThenClaimAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
     incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
 

@@ -306,7 +306,7 @@ export class IZora extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -317,7 +317,7 @@ export class IZora extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -611,7 +611,7 @@ export class IZora extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -622,7 +622,7 @@ export class IZora extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -916,7 +916,7 @@ export class IZora extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -927,7 +927,7 @@ export class IZora extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1307,7 +1307,7 @@ export class IZora extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -1318,7 +1318,7 @@ export class IZora extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -1610,7 +1610,7 @@ export class IZora extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -1621,7 +1621,7 @@ export class IZora extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;

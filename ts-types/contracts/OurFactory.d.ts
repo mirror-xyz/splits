@@ -22,14 +22,14 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface OurFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createSplit(bytes32,bytes,string)": FunctionFragment;
+    "createSplit(bytes32,bytes,string,string)": FunctionFragment;
     "merkleRoot()": FunctionFragment;
     "pylon()": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createSplit",
-    values: [BytesLike, BytesLike, string]
+    values: [BytesLike, BytesLike, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "merkleRoot",
@@ -45,7 +45,7 @@ interface OurFactoryInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "pylon", data: BytesLike): Result;
 
   events: {
-    "ProxyCreated(address,address,string)": EventFragment;
+    "ProxyCreated(address,address,string,string)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ProxyCreated"): EventFragment;
@@ -69,13 +69,15 @@ export class OurFactory extends Contract {
       merkleRoot_: BytesLike,
       data: BytesLike,
       splitRecipients_: string,
+      nickname_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createSplit(bytes32,bytes,string)"(
+    "createSplit(bytes32,bytes,string,string)"(
       merkleRoot_: BytesLike,
       data: BytesLike,
       splitRecipients_: string,
+      nickname_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -92,13 +94,15 @@ export class OurFactory extends Contract {
     merkleRoot_: BytesLike,
     data: BytesLike,
     splitRecipients_: string,
+    nickname_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createSplit(bytes32,bytes,string)"(
+  "createSplit(bytes32,bytes,string,string)"(
     merkleRoot_: BytesLike,
     data: BytesLike,
     splitRecipients_: string,
+    nickname_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -115,13 +119,15 @@ export class OurFactory extends Contract {
       merkleRoot_: BytesLike,
       data: BytesLike,
       splitRecipients_: string,
+      nickname_: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createSplit(bytes32,bytes,string)"(
+    "createSplit(bytes32,bytes,string,string)"(
       merkleRoot_: BytesLike,
       data: BytesLike,
       splitRecipients_: string,
+      nickname_: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -138,7 +144,8 @@ export class OurFactory extends Contract {
     ProxyCreated(
       ourProxy: null,
       proxyCreator: null,
-      splitRecipients: null
+      splitRecipients: null,
+      nickname: null
     ): EventFilter;
   };
 
@@ -147,13 +154,15 @@ export class OurFactory extends Contract {
       merkleRoot_: BytesLike,
       data: BytesLike,
       splitRecipients_: string,
+      nickname_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createSplit(bytes32,bytes,string)"(
+    "createSplit(bytes32,bytes,string,string)"(
       merkleRoot_: BytesLike,
       data: BytesLike,
       splitRecipients_: string,
+      nickname_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -171,13 +180,15 @@ export class OurFactory extends Contract {
       merkleRoot_: BytesLike,
       data: BytesLike,
       splitRecipients_: string,
+      nickname_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createSplit(bytes32,bytes,string)"(
+    "createSplit(bytes32,bytes,string,string)"(
       merkleRoot_: BytesLike,
       data: BytesLike,
       splitRecipients_: string,
+      nickname_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

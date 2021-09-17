@@ -55,7 +55,11 @@ interface OurProxyInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "pylon", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weth", data: BytesLike): Result;
 
-  events: {};
+  events: {
+    "ETHReceived(address,uint256)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "ETHReceived"): EventFragment;
 }
 
 export class OurProxy extends Contract {
@@ -153,7 +157,9 @@ export class OurProxy extends Contract {
     "weth()"(overrides?: CallOverrides): Promise<string>;
   };
 
-  filters: {};
+  filters: {
+    ETHReceived(sender: string | null, value: null): EventFilter;
+  };
 
   estimateGas: {
     balanceForWindow(

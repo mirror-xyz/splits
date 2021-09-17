@@ -14,7 +14,6 @@ import {
   Contract,
   ContractTransaction,
   Overrides,
-  PayableOverrides,
   CallOverrides,
 } from "@ethersproject/contracts";
 import { BytesLike } from "@ethersproject/bytes";
@@ -35,21 +34,18 @@ interface OurPylonInterface extends ethers.utils.Interface {
     "acceptZoraMarketBid(uint256,tuple)": FunctionFragment;
     "addOwner(address)": FunctionFragment;
     "balanceForWindow(uint256)": FunctionFragment;
-    "buyMirrorEdition(uint256)": FunctionFragment;
     "cancelZoraAuction(uint256)": FunctionFragment;
-    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])": FunctionFragment;
+    "claimERC20ForAllSplits(address,address[],uint256[],tuple[])": FunctionFragment;
     "claimETH(uint256,address,uint256,bytes32[])": FunctionFragment;
     "claimETHForAllWindows(address,uint256,bytes32[])": FunctionFragment;
     "createMirrorAuction(uint256,uint256,uint256,address,address)": FunctionFragment;
-    "createMirrorBid(uint256)": FunctionFragment;
     "createMirrorCrowdfund(string,string,address,address,uint256,uint256)": FunctionFragment;
     "createMirrorEdition(uint256,uint256,address)": FunctionFragment;
     "createZoraAuction(uint256,address,uint256,uint256,address,uint8,address)": FunctionFragment;
-    "createZoraAuctionBid(uint256,uint256)": FunctionFragment;
     "currentWindow()": FunctionFragment;
-    "endMirrorAuction(uint256)": FunctionFragment;
-    "endZoraAuction(uint256)": FunctionFragment;
+    "editNickname(string)": FunctionFragment;
     "getOwners()": FunctionFragment;
+    "incrementThenClaimAll(address,uint256,bytes32[])": FunctionFragment;
     "incrementWindow()": FunctionFragment;
     "isClaimed(uint256,address)": FunctionFragment;
     "isOwner(address)": FunctionFragment;
@@ -130,16 +126,12 @@ interface OurPylonInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "buyMirrorEdition",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "cancelZoraAuction",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "claimERC20ForAllSplits",
-    values: [string, string[], BigNumberish[], BytesLike[]]
+    values: [string, string[], BigNumberish[], { merkleProof: BytesLike[] }[]]
   ): string;
   encodeFunctionData(
     functionFragment: "claimETH",
@@ -152,10 +144,6 @@ interface OurPylonInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "createMirrorAuction",
     values: [BigNumberish, BigNumberish, BigNumberish, string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "createMirrorBid",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "createMirrorCrowdfund",
@@ -178,22 +166,18 @@ interface OurPylonInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "createZoraAuctionBid",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "currentWindow",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "endMirrorAuction",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "endZoraAuction",
-    values: [BigNumberish]
+    functionFragment: "editNickname",
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "getOwners", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "incrementThenClaimAll",
+    values: [string, BigNumberish, BytesLike[]]
+  ): string;
   encodeFunctionData(
     functionFragment: "incrementWindow",
     values?: undefined
@@ -422,10 +406,6 @@ interface OurPylonInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "buyMirrorEdition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "cancelZoraAuction",
     data: BytesLike
   ): Result;
@@ -443,10 +423,6 @@ interface OurPylonInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "createMirrorBid",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "createMirrorCrowdfund",
     data: BytesLike
   ): Result;
@@ -459,22 +435,18 @@ interface OurPylonInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "createZoraAuctionBid",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "currentWindow",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "endMirrorAuction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "endZoraAuction",
+    functionFragment: "editNickname",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOwners", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "incrementThenClaimAll",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "incrementWindow",
     data: BytesLike
@@ -598,6 +570,7 @@ interface OurPylonInterface extends ethers.utils.Interface {
   events: {
     "AddedOwner(address)": EventFragment;
     "Batch1155Received(address,address,uint256[],uint256[])": EventFragment;
+    "ChangeNickname(string)": EventFragment;
     "ERC1155Received(address,address,uint256,uint256)": EventFragment;
     "ERC721Received(address,address,uint256)": EventFragment;
     "ERC777Received(address,address,address,uint256)": EventFragment;
@@ -611,6 +584,7 @@ interface OurPylonInterface extends ethers.utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "AddedOwner"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Batch1155Received"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChangeNickname"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC1155Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC721Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC777Received"): EventFragment;
@@ -716,16 +690,6 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    buyMirrorEdition(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
-    "buyMirrorEdition(uint256)"(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
     cancelZoraAuction(
       auctionId: BigNumberish,
       overrides?: Overrides
@@ -740,15 +704,15 @@ export class OurPylon extends Contract {
       tokenAddress: string,
       accounts: string[],
       allocations: BigNumberish[],
-      merkleProofZero: BytesLike[],
+      merkleProofs: { merkleProof: BytesLike[] }[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+    "claimERC20ForAllSplits(address,address[],uint256[],tuple[])"(
       tokenAddress: string,
       accounts: string[],
       allocations: BigNumberish[],
-      merkleProofZero: BytesLike[],
+      merkleProofs: { merkleProof: BytesLike[] }[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -800,16 +764,6 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    createMirrorBid(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
-    "createMirrorBid(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
     createMirrorCrowdfund(
       name: string,
       symbol: string,
@@ -850,7 +804,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -861,50 +815,42 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    createZoraAuctionBid(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
-    "createZoraAuctionBid(uint256,uint256)"(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
     ): Promise<ContractTransaction>;
 
     currentWindow(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    endMirrorAuction(
-      tokenId: BigNumberish,
+    editNickname(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "endMirrorAuction(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    endZoraAuction(
-      auctionId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "endZoraAuction(uint256)"(
-      auctionId: BigNumberish,
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
     getOwners(overrides?: CallOverrides): Promise<[string[]]>;
 
     "getOwners()"(overrides?: CallOverrides): Promise<[string[]]>;
+
+    incrementThenClaimAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "incrementThenClaimAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -1301,7 +1247,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -1312,7 +1258,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -1507,16 +1453,6 @@ export class OurPylon extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  buyMirrorEdition(
-    editionId: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
-  "buyMirrorEdition(uint256)"(
-    editionId: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
   cancelZoraAuction(
     auctionId: BigNumberish,
     overrides?: Overrides
@@ -1531,15 +1467,15 @@ export class OurPylon extends Contract {
     tokenAddress: string,
     accounts: string[],
     allocations: BigNumberish[],
-    merkleProofZero: BytesLike[],
+    merkleProofs: { merkleProof: BytesLike[] }[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+  "claimERC20ForAllSplits(address,address[],uint256[],tuple[])"(
     tokenAddress: string,
     accounts: string[],
     allocations: BigNumberish[],
-    merkleProofZero: BytesLike[],
+    merkleProofs: { merkleProof: BytesLike[] }[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -1591,16 +1527,6 @@ export class OurPylon extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  createMirrorBid(
-    tokenId: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
-  "createMirrorBid(uint256)"(
-    tokenId: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
   createMirrorCrowdfund(
     name: string,
     symbol: string,
@@ -1641,7 +1567,7 @@ export class OurPylon extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -1652,50 +1578,42 @@ export class OurPylon extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  createZoraAuctionBid(
-    auctionId: BigNumberish,
-    amount: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
-  "createZoraAuctionBid(uint256,uint256)"(
-    auctionId: BigNumberish,
-    amount: BigNumberish,
-    overrides?: PayableOverrides
   ): Promise<ContractTransaction>;
 
   currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
   "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  endMirrorAuction(
-    tokenId: BigNumberish,
+  editNickname(
+    newNickname_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "endMirrorAuction(uint256)"(
-    tokenId: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  endZoraAuction(
-    auctionId: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "endZoraAuction(uint256)"(
-    auctionId: BigNumberish,
+  "editNickname(string)"(
+    newNickname_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   getOwners(overrides?: CallOverrides): Promise<string[]>;
 
   "getOwners()"(overrides?: CallOverrides): Promise<string[]>;
+
+  incrementThenClaimAll(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "incrementThenClaimAll(address,uint256,bytes32[])"(
+    account: string,
+    percentageAllocation: BigNumberish,
+    merkleProof: BytesLike[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   incrementWindow(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -2089,7 +2007,7 @@ export class OurPylon extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -2100,7 +2018,7 @@ export class OurPylon extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -2295,16 +2213,6 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    buyMirrorEdition(
-      editionId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "buyMirrorEdition(uint256)"(
-      editionId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     cancelZoraAuction(
       auctionId: BigNumberish,
       overrides?: CallOverrides
@@ -2319,15 +2227,15 @@ export class OurPylon extends Contract {
       tokenAddress: string,
       accounts: string[],
       allocations: BigNumberish[],
-      merkleProofZero: BytesLike[],
+      merkleProofs: { merkleProof: BytesLike[] }[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+    "claimERC20ForAllSplits(address,address[],uint256[],tuple[])"(
       tokenAddress: string,
       accounts: string[],
       allocations: BigNumberish[],
-      merkleProofZero: BytesLike[],
+      merkleProofs: { merkleProof: BytesLike[] }[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -2379,16 +2287,6 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    createMirrorBid(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "createMirrorBid(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     createMirrorCrowdfund(
       name: string,
       symbol: string,
@@ -2429,7 +2327,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -2440,20 +2338,8 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    createZoraAuctionBid(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "createZoraAuctionBid(uint256,uint256)"(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -2461,29 +2347,33 @@ export class OurPylon extends Contract {
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    endMirrorAuction(
-      tokenId: BigNumberish,
+    editNickname(
+      newNickname_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "endMirrorAuction(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    endZoraAuction(
-      auctionId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "endZoraAuction(uint256)"(
-      auctionId: BigNumberish,
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     getOwners(overrides?: CallOverrides): Promise<string[]>;
 
     "getOwners()"(overrides?: CallOverrides): Promise<string[]>;
+
+    incrementThenClaimAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "incrementThenClaimAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     incrementWindow(overrides?: CallOverrides): Promise<void>;
 
@@ -2877,7 +2767,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -2888,7 +2778,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -3016,6 +2906,8 @@ export class OurPylon extends Contract {
       values: null
     ): EventFilter;
 
+    ChangeNickname(newNickname: null): EventFilter;
+
     ERC1155Received(
       operator: null,
       from: null,
@@ -3123,16 +3015,6 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    buyMirrorEdition(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
-    "buyMirrorEdition(uint256)"(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
     cancelZoraAuction(
       auctionId: BigNumberish,
       overrides?: Overrides
@@ -3147,15 +3029,15 @@ export class OurPylon extends Contract {
       tokenAddress: string,
       accounts: string[],
       allocations: BigNumberish[],
-      merkleProofZero: BytesLike[],
+      merkleProofs: { merkleProof: BytesLike[] }[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+    "claimERC20ForAllSplits(address,address[],uint256[],tuple[])"(
       tokenAddress: string,
       accounts: string[],
       allocations: BigNumberish[],
-      merkleProofZero: BytesLike[],
+      merkleProofs: { merkleProof: BytesLike[] }[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -3207,16 +3089,6 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    createMirrorBid(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
-    "createMirrorBid(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
     createMirrorCrowdfund(
       name: string,
       symbol: string,
@@ -3257,7 +3129,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -3268,50 +3140,42 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    createZoraAuctionBid(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
-    "createZoraAuctionBid(uint256,uint256)"(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
     ): Promise<BigNumber>;
 
     currentWindow(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    endMirrorAuction(
-      tokenId: BigNumberish,
+    editNickname(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "endMirrorAuction(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    endZoraAuction(
-      auctionId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "endZoraAuction(uint256)"(
-      auctionId: BigNumberish,
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
     getOwners(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getOwners()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    incrementThenClaimAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "incrementThenClaimAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
     incrementWindow(overrides?: Overrides): Promise<BigNumber>;
 
@@ -3705,7 +3569,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -3716,7 +3580,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -3921,16 +3785,6 @@ export class OurPylon extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    buyMirrorEdition(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "buyMirrorEdition(uint256)"(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
     cancelZoraAuction(
       auctionId: BigNumberish,
       overrides?: Overrides
@@ -3945,15 +3799,15 @@ export class OurPylon extends Contract {
       tokenAddress: string,
       accounts: string[],
       allocations: BigNumberish[],
-      merkleProofZero: BytesLike[],
+      merkleProofs: { merkleProof: BytesLike[] }[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "claimERC20ForAllSplits(address,address[],uint256[],bytes32[])"(
+    "claimERC20ForAllSplits(address,address[],uint256[],tuple[])"(
       tokenAddress: string,
       accounts: string[],
       allocations: BigNumberish[],
-      merkleProofZero: BytesLike[],
+      merkleProofs: { merkleProof: BytesLike[] }[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -4005,16 +3859,6 @@ export class OurPylon extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    createMirrorBid(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "createMirrorBid(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
     createMirrorCrowdfund(
       name: string,
       symbol: string,
@@ -4055,7 +3899,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -4066,50 +3910,42 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    createZoraAuctionBid(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "createZoraAuctionBid(uint256,uint256)"(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
     currentWindow(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "currentWindow()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    endMirrorAuction(
-      tokenId: BigNumberish,
+    editNickname(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "endMirrorAuction(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    endZoraAuction(
-      auctionId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "endZoraAuction(uint256)"(
-      auctionId: BigNumberish,
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     getOwners(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getOwners()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    incrementThenClaimAll(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "incrementThenClaimAll(address,uint256,bytes32[])"(
+      account: string,
+      percentageAllocation: BigNumberish,
+      merkleProof: BytesLike[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
     incrementWindow(overrides?: Overrides): Promise<PopulatedTransaction>;
 
@@ -4509,7 +4345,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -4520,7 +4356,7 @@ export class OurPylon extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;

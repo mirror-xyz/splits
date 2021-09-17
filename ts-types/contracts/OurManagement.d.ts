@@ -23,6 +23,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface OurManagementInterface extends ethers.utils.Interface {
   functions: {
     "addOwner(address)": FunctionFragment;
+    "editNickname(string)": FunctionFragment;
     "getOwners()": FunctionFragment;
     "isOwner(address)": FunctionFragment;
     "removeOwner(address,address)": FunctionFragment;
@@ -30,6 +31,10 @@ interface OurManagementInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(functionFragment: "addOwner", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "editNickname",
+    values: [string]
+  ): string;
   encodeFunctionData(functionFragment: "getOwners", values?: undefined): string;
   encodeFunctionData(functionFragment: "isOwner", values: [string]): string;
   encodeFunctionData(
@@ -42,6 +47,10 @@ interface OurManagementInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "addOwner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "editNickname",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getOwners", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isOwner", data: BytesLike): Result;
   decodeFunctionResult(
@@ -52,11 +61,13 @@ interface OurManagementInterface extends ethers.utils.Interface {
 
   events: {
     "AddedOwner(address)": EventFragment;
+    "ChangeNickname(string)": EventFragment;
     "ProxySetup(address[])": EventFragment;
     "RemovedOwner(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AddedOwner"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChangeNickname"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProxySetup"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemovedOwner"): EventFragment;
 }
@@ -82,6 +93,16 @@ export class OurManagement extends Contract {
 
     "addOwner(address)"(
       owner: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    editNickname(
+      newNickname_: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -130,6 +151,16 @@ export class OurManagement extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  editNickname(
+    newNickname_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "editNickname(string)"(
+    newNickname_: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   getOwners(overrides?: CallOverrides): Promise<string[]>;
 
   "getOwners()"(overrides?: CallOverrides): Promise<string[]>;
@@ -175,6 +206,16 @@ export class OurManagement extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    editNickname(
+      newNickname_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "editNickname(string)"(
+      newNickname_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     getOwners(overrides?: CallOverrides): Promise<string[]>;
 
     "getOwners()"(overrides?: CallOverrides): Promise<string[]>;
@@ -216,6 +257,8 @@ export class OurManagement extends Contract {
   filters: {
     AddedOwner(owner: null): EventFilter;
 
+    ChangeNickname(newNickname: null): EventFilter;
+
     ProxySetup(owners: null): EventFilter;
 
     RemovedOwner(owner: null): EventFilter;
@@ -226,6 +269,16 @@ export class OurManagement extends Contract {
 
     "addOwner(address)"(
       owner: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    editNickname(
+      newNickname_: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -275,6 +328,16 @@ export class OurManagement extends Contract {
 
     "addOwner(address)"(
       owner: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    editNickname(
+      newNickname_: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

@@ -14,7 +14,6 @@ import {
   Contract,
   ContractTransaction,
   Overrides,
-  PayableOverrides,
   CallOverrides,
 } from "@ethersproject/contracts";
 import { BytesLike } from "@ethersproject/bytes";
@@ -33,16 +32,12 @@ interface OurMinterInterface extends ethers.utils.Interface {
     "_zoraMedia()": FunctionFragment;
     "acceptZoraMarketBid(uint256,tuple)": FunctionFragment;
     "addOwner(address)": FunctionFragment;
-    "buyMirrorEdition(uint256)": FunctionFragment;
     "cancelZoraAuction(uint256)": FunctionFragment;
     "createMirrorAuction(uint256,uint256,uint256,address,address)": FunctionFragment;
-    "createMirrorBid(uint256)": FunctionFragment;
     "createMirrorCrowdfund(string,string,address,address,uint256,uint256)": FunctionFragment;
     "createMirrorEdition(uint256,uint256,address)": FunctionFragment;
     "createZoraAuction(uint256,address,uint256,uint256,address,uint8,address)": FunctionFragment;
-    "createZoraAuctionBid(uint256,uint256)": FunctionFragment;
-    "endMirrorAuction(uint256)": FunctionFragment;
-    "endZoraAuction(uint256)": FunctionFragment;
+    "editNickname(string)": FunctionFragment;
     "getOwners()": FunctionFragment;
     "isOwner(address)": FunctionFragment;
     "mintToAuctionForETH(tuple,tuple,uint256,uint256)": FunctionFragment;
@@ -105,20 +100,12 @@ interface OurMinterInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "addOwner", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "buyMirrorEdition",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "cancelZoraAuction",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "createMirrorAuction",
     values: [BigNumberish, BigNumberish, BigNumberish, string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "createMirrorBid",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "createMirrorCrowdfund",
@@ -141,16 +128,8 @@ interface OurMinterInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "createZoraAuctionBid",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "endMirrorAuction",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "endZoraAuction",
-    values: [BigNumberish]
+    functionFragment: "editNickname",
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "getOwners", values?: undefined): string;
   encodeFunctionData(functionFragment: "isOwner", values: [string]): string;
@@ -335,19 +314,11 @@ interface OurMinterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "addOwner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "buyMirrorEdition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "cancelZoraAuction",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "createMirrorAuction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "createMirrorBid",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -363,15 +334,7 @@ interface OurMinterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "createZoraAuctionBid",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "endMirrorAuction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "endZoraAuction",
+    functionFragment: "editNickname",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOwners", data: BytesLike): Result;
@@ -465,11 +428,13 @@ interface OurMinterInterface extends ethers.utils.Interface {
 
   events: {
     "AddedOwner(address)": EventFragment;
+    "ChangeNickname(string)": EventFragment;
     "ProxySetup(address[])": EventFragment;
     "RemovedOwner(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AddedOwner"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChangeNickname"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProxySetup"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemovedOwner"): EventFragment;
 }
@@ -554,16 +519,6 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    buyMirrorEdition(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
-    "buyMirrorEdition(uint256)"(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
     cancelZoraAuction(
       auctionId: BigNumberish,
       overrides?: Overrides
@@ -590,16 +545,6 @@ export class OurMinter extends Contract {
       creator: string,
       creatorShareRecipient: string,
       overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    createMirrorBid(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
-    "createMirrorBid(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
     ): Promise<ContractTransaction>;
 
     createMirrorCrowdfund(
@@ -642,7 +587,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -653,40 +598,18 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    createZoraAuctionBid(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
-    "createZoraAuctionBid(uint256,uint256)"(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<ContractTransaction>;
-
-    endMirrorAuction(
-      tokenId: BigNumberish,
+    editNickname(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "endMirrorAuction(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    endZoraAuction(
-      auctionId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "endZoraAuction(uint256)"(
-      auctionId: BigNumberish,
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -965,7 +888,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -976,7 +899,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -1153,16 +1076,6 @@ export class OurMinter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  buyMirrorEdition(
-    editionId: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
-  "buyMirrorEdition(uint256)"(
-    editionId: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
   cancelZoraAuction(
     auctionId: BigNumberish,
     overrides?: Overrides
@@ -1189,16 +1102,6 @@ export class OurMinter extends Contract {
     creator: string,
     creatorShareRecipient: string,
     overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  createMirrorBid(
-    tokenId: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
-  "createMirrorBid(uint256)"(
-    tokenId: BigNumberish,
-    overrides?: PayableOverrides
   ): Promise<ContractTransaction>;
 
   createMirrorCrowdfund(
@@ -1241,7 +1144,7 @@ export class OurMinter extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -1252,40 +1155,18 @@ export class OurMinter extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  createZoraAuctionBid(
-    auctionId: BigNumberish,
-    amount: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
-  "createZoraAuctionBid(uint256,uint256)"(
-    auctionId: BigNumberish,
-    amount: BigNumberish,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
-  endMirrorAuction(
-    tokenId: BigNumberish,
+  editNickname(
+    newNickname_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "endMirrorAuction(uint256)"(
-    tokenId: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  endZoraAuction(
-    auctionId: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "endZoraAuction(uint256)"(
-    auctionId: BigNumberish,
+  "editNickname(string)"(
+    newNickname_: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -1564,7 +1445,7 @@ export class OurMinter extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -1575,7 +1456,7 @@ export class OurMinter extends Contract {
     duration: BigNumberish,
     reservePrice: BigNumberish,
     curator: string,
-    curatorFeePercentages: BigNumberish,
+    curatorFeePercentage: BigNumberish,
     auctionCurrency: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -1752,16 +1633,6 @@ export class OurMinter extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    buyMirrorEdition(
-      editionId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "buyMirrorEdition(uint256)"(
-      editionId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     cancelZoraAuction(
       auctionId: BigNumberish,
       overrides?: CallOverrides
@@ -1787,16 +1658,6 @@ export class OurMinter extends Contract {
       reservePrice: BigNumberish,
       creator: string,
       creatorShareRecipient: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    createMirrorBid(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "createMirrorBid(uint256)"(
-      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1840,7 +1701,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1851,40 +1712,18 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    createZoraAuctionBid(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
+    editNickname(
+      newNickname_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "createZoraAuctionBid(uint256,uint256)"(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    endMirrorAuction(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "endMirrorAuction(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    endZoraAuction(
-      auctionId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "endZoraAuction(uint256)"(
-      auctionId: BigNumberish,
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -2163,7 +2002,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -2174,7 +2013,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -2291,6 +2130,8 @@ export class OurMinter extends Contract {
   filters: {
     AddedOwner(owner: null): EventFilter;
 
+    ChangeNickname(newNickname: null): EventFilter;
+
     ProxySetup(owners: null): EventFilter;
 
     RemovedOwner(owner: null): EventFilter;
@@ -2360,16 +2201,6 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    buyMirrorEdition(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
-    "buyMirrorEdition(uint256)"(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
     cancelZoraAuction(
       auctionId: BigNumberish,
       overrides?: Overrides
@@ -2396,16 +2227,6 @@ export class OurMinter extends Contract {
       creator: string,
       creatorShareRecipient: string,
       overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    createMirrorBid(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
-    "createMirrorBid(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
     ): Promise<BigNumber>;
 
     createMirrorCrowdfund(
@@ -2448,7 +2269,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -2459,40 +2280,18 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    createZoraAuctionBid(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
-    "createZoraAuctionBid(uint256,uint256)"(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
-    endMirrorAuction(
-      tokenId: BigNumberish,
+    editNickname(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "endMirrorAuction(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    endZoraAuction(
-      auctionId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "endZoraAuction(uint256)"(
-      auctionId: BigNumberish,
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -2771,7 +2570,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -2782,7 +2581,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -2967,16 +2766,6 @@ export class OurMinter extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    buyMirrorEdition(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "buyMirrorEdition(uint256)"(
-      editionId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
     cancelZoraAuction(
       auctionId: BigNumberish,
       overrides?: Overrides
@@ -3003,16 +2792,6 @@ export class OurMinter extends Contract {
       creator: string,
       creatorShareRecipient: string,
       overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    createMirrorBid(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "createMirrorBid(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
     createMirrorCrowdfund(
@@ -3055,7 +2834,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -3066,40 +2845,18 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    createZoraAuctionBid(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "createZoraAuctionBid(uint256,uint256)"(
-      auctionId: BigNumberish,
-      amount: BigNumberish,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
-    endMirrorAuction(
-      tokenId: BigNumberish,
+    editNickname(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "endMirrorAuction(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    endZoraAuction(
-      auctionId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "endZoraAuction(uint256)"(
-      auctionId: BigNumberish,
+    "editNickname(string)"(
+      newNickname_: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -3381,7 +3138,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -3392,7 +3149,7 @@ export class OurMinter extends Contract {
       duration: BigNumberish,
       reservePrice: BigNumberish,
       curator: string,
-      curatorFeePercentages: BigNumberish,
+      curatorFeePercentage: BigNumberish,
       auctionCurrency: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
